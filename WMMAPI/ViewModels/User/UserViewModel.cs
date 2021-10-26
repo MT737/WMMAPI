@@ -1,8 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using WMMAPI.Database.Models;
 
-namespace WMMAPI.ViewModels
+namespace WMMAPI.ViewModels.User
 {
     public class UserViewModel
     {
@@ -22,9 +21,7 @@ namespace WMMAPI.ViewModels
         [Required, EmailAddress, StringLength(200)]
         public string EmailAddress { get; set; }
 
-
-        //TODO: Research better ways to limit information returned
-        public UserViewModel(User user)
+        public UserViewModel(Database.Models.User user)
         {
             UserId = user.UserId;
             FirstName = user.FirstName;
