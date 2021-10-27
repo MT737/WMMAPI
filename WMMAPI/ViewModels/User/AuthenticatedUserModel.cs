@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WMMAPI.ViewModels.User
 {
-    public class UserViewModel
+    public class AuthenticatedUserModel
     {
         public Guid UserId { get; set; }
 
@@ -15,13 +18,17 @@ namespace WMMAPI.ViewModels.User
 
         public string EmailAddress { get; set; }
 
-        public UserViewModel(Database.Models.User user)
+        public string Token { get; set; }
+     
+        public AuthenticatedUserModel(Database.Models.User user, string token)
         {
             UserId = user.UserId;
             FirstName = user.FirstName;
             LastName = user.LastName;
             DOB = user.DOB;
             EmailAddress = user.EmailAddress;
+            Token = token;
         }
     }
+
 }

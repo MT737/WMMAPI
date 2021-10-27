@@ -20,7 +20,11 @@ namespace WMMAPI.ViewModels.User
 
         [Required, EmailAddress, StringLength(200)]
         public string EmailAddress { get; set; }
-                
+
+        //TODO: stringlength for a password?
+        [Required, StringLength(100)]
+        public string Password { get; set; }
+
         public Database.Models.User ToDB()
         {
             Database.Models.User u = new()
