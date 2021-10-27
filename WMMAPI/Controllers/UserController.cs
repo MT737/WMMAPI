@@ -35,6 +35,7 @@ namespace WMMAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
+        [ProducesResponseType(typeof(AuthenticatedUserModel), StatusCodes.Status200OK)]
         public IActionResult Authenticate([FromBody] AuthenticateUserModel model)
         {
             var user = _userRepository.Authenticate(model.EmailAddress, model.Password);
@@ -63,7 +64,6 @@ namespace WMMAPI.Controllers
 
         [AllowAnonymous]
         [HttpPut("register")]
-        [ProducesResponseType(typeof(UserViewModel), StatusCodes.Status200OK)]
         public IActionResult Register([FromBody] NewUserViewModel user)
         {
             try
@@ -82,8 +82,10 @@ namespace WMMAPI.Controllers
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(UserViewModel), StatusCodes.Status200OK)]
-        public IActionResult GetById(Guid userId)
+        public IActionResult GetById(string id)
         {
+            Guid userId = Guid.Parse(id);
+
             // Confirm user is the same requesting
             if (User.Identity.Name != userId.ToString())
                 return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
@@ -104,8 +106,9 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult ModifyUser(Guid userId, [FromBody]UpdateUserModel model)
+        public IActionResult ModifyUser(string id, [FromBody]UpdateUserModel model)
         {
+            Guid userId = Guid.Parse(id);
             // Confirm user is the same requesting
             if (User.Identity.Name != userId.ToString())
                 return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
@@ -126,8 +129,10 @@ namespace WMMAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteCustomer(Guid userId)
+        public IActionResult DeleteCustomer(string id)
         {
+            Guid userId = Guid.Parse(id);
+
             // Confirm user is the same requesting
             if (User.Identity.Name != userId.ToString())
                 return BadRequest(new { message = "Passed userId does not match id of authenticated user." });

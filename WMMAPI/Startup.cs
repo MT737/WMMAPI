@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Text;
@@ -31,7 +32,7 @@ namespace WMMAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddCors(); //TODO Research this
+            services.AddCors(); //TODO Research this
             services.AddControllers();
 
 
@@ -63,6 +64,15 @@ namespace WMMAPI
                         }
                         return Task.CompletedTask;
                     }
+                };
+                x.RequireHttpsMetadata = true;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false, //TODO: Review these settings
+                    ValidateAudience = false
                 };
             });
 
@@ -100,7 +110,7 @@ namespace WMMAPI
 
             app.UseRouting();
 
-            // Research this
+            //TODO: Research this
             app.UseCors(x => x
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
