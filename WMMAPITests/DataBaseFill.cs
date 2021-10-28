@@ -67,7 +67,13 @@ namespace WMMAPITests
                 };
 
                 //Transaction Type
-                var transactionType = new TransactionType
+                var transactionTypeCredit = new TransactionType
+                {
+                    TransactionTypeId = Guid.NewGuid(),
+                    Name = "Credit"
+                };
+
+                var transactionTypeDebit = new TransactionType
                 {
                     TransactionTypeId = Guid.NewGuid(),
                     Name = "Debit"
@@ -79,7 +85,7 @@ namespace WMMAPITests
                     TransactionId = Guid.NewGuid(),
                     UserId = user.UserId,
                     TransactionDate = DateTime.Now,
-                    TransactionTypeId = transactionType.TransactionTypeId,
+                    TransactionTypeId = transactionTypeDebit.TransactionTypeId,
                     AccountId = account.AccountId,
                     CategoryId = category.CategoryId,
                     VendorId = vendor.VendorId,
@@ -91,7 +97,8 @@ namespace WMMAPITests
                 db.Accounts.Add(account);
                 db.Categories.Add(category);
                 db.Vendors.Add(vendor);
-                db.TransactionTypes.Add(transactionType);
+                db.TransactionTypes.Add(transactionTypeDebit);
+                db.TransactionTypes.Add(transactionTypeCredit);
                 db.Transactions.Add(transaction);
                 db.SaveChanges();
             }

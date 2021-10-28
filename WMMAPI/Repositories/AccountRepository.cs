@@ -77,12 +77,12 @@ namespace WMMAPI.Repositories
             //TODO: Further test account balances
             //TODO: Replace magic string with reference to Global
             var paymentTo = Context.Transactions
-                 .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Payment To")
+                 .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Credit")
                  .ToList()
                  .Sum(t => t.Amount);
 
             var paymentFrom = Context.Transactions
-                .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Payment From")
+                .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Debit")
                 .ToList()
                 .Sum(t => t.Amount);
 
