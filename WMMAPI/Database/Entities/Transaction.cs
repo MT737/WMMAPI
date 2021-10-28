@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace WMMAPI.Database.Models
+namespace WMMAPI.Database.Entities
 {
     public class Transaction
     {

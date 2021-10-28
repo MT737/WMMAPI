@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using WMMAPI.Database;
-using WMMAPI.Database.Models;
+using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using WMMAPI.ViewModels.User;
 
 namespace WMMAPI.Repositories
 {

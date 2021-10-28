@@ -1,7 +1,5 @@
 ﻿using System;
-using WMMAPI.Database.Models;
-using WMMAPI.Interfaces;
-using WMMAPI.ViewModels.User;
+using WMMAPI.Database.Entities;
 
 namespace WMMAPI.Interfaces
 {

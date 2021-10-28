@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WMMAPI.ViewModels.User
 {
@@ -24,9 +21,9 @@ namespace WMMAPI.ViewModels.User
         public string Password { get; set; }
 
 
-        public Database.Models.User ToDB(Guid userId)
+        public Database.Entities.User ToDB(Guid userId)
         {
-            return new Database.Models.User
+            return new Database.Entities.User
             {
                 UserId = userId,
                 FirstName = FirstName ?? " ",

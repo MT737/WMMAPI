@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace WMMAPI.ViewModels.User
 {
@@ -15,7 +14,7 @@ namespace WMMAPI.ViewModels.User
 
         public string EmailAddress { get; set; }
 
-        public UserViewModel(Database.Models.User user)
+        public UserViewModel(Database.Entities.User user)
         {
             UserId = user.UserId;
             FirstName = user.FirstName;

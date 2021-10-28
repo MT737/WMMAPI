@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WMMAPI.Database.Models;
-using System;
+using WMMAPI.Database.Entities;
 
 namespace WMMAPI.Database
 {

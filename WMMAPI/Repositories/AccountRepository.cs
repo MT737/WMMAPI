@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Database;
-using WMMAPI.Database.Models;
+using WMMAPI.Database.Entities;
 using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories

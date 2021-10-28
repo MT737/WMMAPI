@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WMMAPI.ViewModels.User
 {
@@ -20,7 +16,7 @@ namespace WMMAPI.ViewModels.User
 
         public string Token { get; set; }
      
-        public AuthenticatedUserModel(Database.Models.User user, string token)
+        public AuthenticatedUserModel(Database.Entities.User user, string token)
         {
             UserId = user.UserId;
             FirstName = user.FirstName;
