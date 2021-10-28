@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using System;
 using WMMAPI.Database;
-using WMMAPI.Database.Models;
+using WMMAPI.Database.Entities;
 
 namespace WMMAPITests
 {

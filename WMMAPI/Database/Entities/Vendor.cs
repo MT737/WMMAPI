@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace WMMAPI.Database.Models
+namespace WMMAPI.Database.Entities
 {
-    public class Category
+    public class Vendor
     {
         //Properties
         [Required]
-        public Guid CategoryId { get; set; }
+        public Guid VendorId { get; set; }
 
         [Required]
         public Guid UserId { get; set; }
@@ -24,8 +24,7 @@ namespace WMMAPI.Database.Models
 
 
         //Navigation Property
-        public User User { get; set; }
-
         public ICollection<Transaction> Transactions { get; set; }
+        public User User { get; set; }
     }
 }

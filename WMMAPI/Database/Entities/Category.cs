@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace WMMAPI.Database.Models
+namespace WMMAPI.Database.Entities
 {
-    public class Account
+    public class Category
     {
         //Properties
         [Required]
-        public Guid AccountId { get; set; }
+        public Guid CategoryId { get; set; }
 
         [Required]
         public Guid UserId { get; set; }
@@ -17,10 +17,10 @@ namespace WMMAPI.Database.Models
         public string Name { get; set; }
 
         [Required]
-        public bool IsAsset { get; set; }
+        public bool IsDefault { get; set; }
 
         [Required]
-        public bool IsActive { get; set; }
+        public bool IsDisplayed { get; set; }
 
 
         //Navigation Property

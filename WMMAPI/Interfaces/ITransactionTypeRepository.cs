@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using WMMAPI.Database.Models;
+using WMMAPI.Database.Entities;
 
 namespace WMMAPI.Interfaces
 {
