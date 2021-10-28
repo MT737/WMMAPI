@@ -11,7 +11,7 @@ using System.Text;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using WMMAPI.ViewModels.User;
+using WMMAPI.Models.UserModels;
 
 namespace WMMAPI.Controllers
 {
@@ -64,7 +64,7 @@ namespace WMMAPI.Controllers
 
         [AllowAnonymous]
         [HttpPut("register")]
-        public IActionResult Register([FromBody] NewUserViewModel user)
+        public IActionResult Register([FromBody] RegisterUserModel user)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(UserViewModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UserModel), StatusCodes.Status200OK)]
         public IActionResult GetById(string id)
         {
             Guid userId = Guid.Parse(id);
@@ -95,7 +95,7 @@ namespace WMMAPI.Controllers
                 var result = _userRepository.GetById(userId);
                 if (result != null)
                 {
-                    return Ok(new UserViewModel(result));
+                    return Ok(new UserModel(result));
                 }
                 return BadRequest(new { message = "User not found" });
             }

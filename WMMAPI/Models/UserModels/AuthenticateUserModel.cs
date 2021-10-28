@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WMMAPI.ViewModels.User
+namespace WMMAPI.Models.UserModels
 {
     public class AuthenticateUserModel
     {

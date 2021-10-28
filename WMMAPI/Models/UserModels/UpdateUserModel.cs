@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using WMMAPI.Database.Entities;
 
-namespace WMMAPI.ViewModels.User
+namespace WMMAPI.Models.UserModels
 {
     public class UpdateUserModel
     {
@@ -21,9 +22,9 @@ namespace WMMAPI.ViewModels.User
         public string Password { get; set; }
 
 
-        public Database.Entities.User ToDB(Guid userId)
+        public User ToDB(Guid userId)
         {
-            return new Database.Entities.User
+            return new User
             {
                 UserId = userId,
                 FirstName = FirstName ?? " ",

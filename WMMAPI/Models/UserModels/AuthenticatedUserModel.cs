@@ -1,6 +1,7 @@
 ﻿using System;
+using WMMAPI.Database.Entities;
 
-namespace WMMAPI.ViewModels.User
+namespace WMMAPI.Models.UserModels
 {
     public class AuthenticatedUserModel
     {
@@ -16,7 +17,7 @@ namespace WMMAPI.ViewModels.User
 
         public string Token { get; set; }
      
-        public AuthenticatedUserModel(Database.Entities.User user, string token)
+        public AuthenticatedUserModel(User user, string token)
         {
             UserId = user.UserId;
             FirstName = user.FirstName;

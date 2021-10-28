@@ -1,8 +1,9 @@
 ﻿using System;
+using WMMAPI.Database.Entities;
 
-namespace WMMAPI.ViewModels.User
+namespace WMMAPI.Models.UserModels
 {
-    public class UserViewModel
+    public class UserModel
     {
         public Guid UserId { get; set; }
 
@@ -14,7 +15,7 @@ namespace WMMAPI.ViewModels.User
 
         public string EmailAddress { get; set; }
 
-        public UserViewModel(Database.Entities.User user)
+        public UserModel(User user)
         {
             UserId = user.UserId;
             FirstName = user.FirstName;

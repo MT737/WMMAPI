@@ -1,9 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using WMMAPI.Database.Entities;
 
-namespace WMMAPI.ViewModels.User
+namespace WMMAPI.Models.UserModels
 {
-    public class NewUserViewModel
+    public class RegisterUserModel
     {
         //Properties
         [Required, StringLength(200)]
@@ -22,9 +23,9 @@ namespace WMMAPI.ViewModels.User
         [Required, StringLength(100)]
         public string Password { get; set; }
 
-        public Database.Entities.User ToDB()
+        public User ToDB()
         {
-            Database.Entities.User u = new()
+            User u = new()
             {
                 UserId = Guid.NewGuid(),
                 FirstName = FirstName,
