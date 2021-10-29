@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
+using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
@@ -51,6 +52,17 @@ namespace WMMAPI.Repositories
                 .Count();
         }
 
+        public void AddCategory(Category category)
+        {
+            if (NameExists(category))
+                throw new AppException($"{category.Name} already exists.");
+
+            if (String.IsNullOrWhiteSpace(category.Name))
+                throw new AppException("Category name cannot be empty or whitespace only string.");
+
+            Add(category);
+        }
+
         /// <summary>
         /// Indicates the existence of a the category.
         /// </summary>
@@ -58,12 +70,12 @@ namespace WMMAPI.Repositories
         /// <param name="categoryId">Category Id of which the name existence is desired</param>
         /// <param name="userId">Guid: UserID of the account.</param>
         /// <returns>Bool: Indication of the category name's current existence in the user's DB profile.</returns>
-        public bool NameExists(string desiredCategoryName, Guid categoryId, Guid userId)
+        public bool NameExists(Category category)
         {
             return Context.Categories
-                .Where(c => c.UserId == userId
-                    && c.Name.ToLower() == desiredCategoryName.ToLower()
-                    && c.CategoryId == categoryId)
+                .Where(c => c.UserId == category.UserId
+                    && c.Name.ToLower() == category.Name.ToLower()
+                    && c.CategoryId == category.CategoryId)
                 .Any();
         }
 
