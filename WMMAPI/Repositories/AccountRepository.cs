@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
+using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
@@ -37,6 +38,43 @@ namespace WMMAPI.Repositories
                 .Where(a => a.UserId == userId)
                 .OrderBy(a => a.Name)
                 .ToList();
+        }
+
+        public void AddAccount(Account newAccount)
+        {
+            // Validate account
+            if (String.IsNullOrWhiteSpace(newAccount.Name))
+                throw new AppException("Account name cannot be empty or whitespace only string.");
+            
+            if (NameExists(newAccount))
+                throw new AppException($"Account name {newAccount.Name} is already in use.");
+
+            Add(newAccount);
+        }
+
+        public void ModifyAccount(Account account)
+        {
+            var currentAccount = Context.Accounts
+                .FirstOrDefault(a => a.AccountId == account.AccountId
+                && a.UserId == account.UserId);
+
+            if (currentAccount == null)
+                throw new AppException("Account not found.");
+
+            //TODO: Centralize the account validation
+
+            // Validate account
+            if (!String.IsNullOrWhiteSpace(account.Name))
+            {
+                if (NameExists(account))
+                    throw new AppException($"Account name {account.Name} is already in use.");
+
+                currentAccount.Name = account.Name;
+            }
+
+            // Update remaining properties
+            //currentAccount.IsAsset = account.IsAsset; //TODO: Not currently allowing altering of IsAsset
+            currentAccount.IsActive = account.IsActive;
         }
 
         /// <summary>
@@ -77,12 +115,12 @@ namespace WMMAPI.Repositories
             //TODO: Further test account balances
             //TODO: Replace magic string with reference to Global
             var paymentTo = Context.Transactions
-                 .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Payment To")
+                 .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Credit")
                  .ToList()
                  .Sum(t => t.Amount);
 
             var paymentFrom = Context.Transactions
-                .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Payment From")
+                .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Debit")
                 .ToList()
                 .Sum(t => t.Amount);
 
@@ -105,12 +143,12 @@ namespace WMMAPI.Repositories
         /// <param name="accountId">Guid: Account Id of which the name existence is desired.</param>
         /// <param name="userID">Guid: UserID of the account.</param>
         /// <returns>Bool: Indication of the account name's current existence in the user's DB profile.</returns>
-        public bool NameExists(string desiredAccountName, Guid accountId, Guid userId)
+        public bool NameExists(Account account)
         {
             return Context.Accounts
-                 .Where(a => a.UserId == userId
-                    && a.Name.ToLower() == desiredAccountName.ToLower()
-                    && a.AccountId != accountId)
+                 .Where(a => a.UserId == account.UserId
+                    && a.Name.ToLower() == account.Name.ToLower()
+                    && a.AccountId != account.AccountId)
                  .Any();
         }
 

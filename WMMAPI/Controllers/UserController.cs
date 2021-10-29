@@ -84,12 +84,11 @@ namespace WMMAPI.Controllers
         [ProducesResponseType(typeof(UserModel), StatusCodes.Status200OK)]
         public IActionResult GetById(string id)
         {
-            Guid userId = Guid.Parse(id);
-
             // Confirm user is the same requesting
-            if (User.Identity.Name != userId.ToString())
+            if (User.Identity.Name != id)
                 return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
 
+            Guid userId = Guid.Parse(id);
             try
             {
                 var result = _userRepository.GetById(userId);
@@ -108,13 +107,11 @@ namespace WMMAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult ModifyUser(string id, [FromBody]UpdateUserModel model)
         {
-            Guid userId = Guid.Parse(id);
             // Confirm user is the same requesting
-            if (User.Identity.Name != userId.ToString())
+            if (User.Identity.Name != id)
                 return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
 
-            var dbUser = model.ToDB(userId);
-
+            var dbUser = model.ToDB(Guid.Parse(id));
             try
             {
                 //Update user
@@ -131,12 +128,11 @@ namespace WMMAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteCustomer(string id)
         {
-            Guid userId = Guid.Parse(id);
-
             // Confirm user is the same requesting
-            if (User.Identity.Name != userId.ToString())
+            if (User.Identity.Name != id)
                 return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
 
+            Guid userId = Guid.Parse(id);
             try
             {
                 _userRepository.Delete(userId);
