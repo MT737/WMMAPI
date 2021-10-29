@@ -15,5 +15,6 @@ namespace WMMAPI.Interfaces
         bool NameExists(Account account);
         bool UserOwnsAccount(Guid id, Guid userID);
         void AddAccount(Account account);
+        void ModifyAccount(Account account);
     }
 }

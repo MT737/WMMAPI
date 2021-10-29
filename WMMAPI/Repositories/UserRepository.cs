@@ -64,7 +64,8 @@ namespace WMMAPI.Repositories
 
         public void Modify(User user, string password = null)
         {
-            var currentUser = Context.Users.Find(user.UserId);
+            var currentUser = Context.Users
+                .FirstOrDefault(u => u.UserId == user.UserId);
 
             if (currentUser == null)
                 throw new AppException("User not found");

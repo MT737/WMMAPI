@@ -54,10 +54,9 @@ namespace WMMAPI.Repositories
 
         public void ModifyAccount(Account account)
         {
-            var currentAccount = Context.Accounts.Find( new { 
-                AccountId = account.AccountId,
-                UserId = account.UserId
-                });
+            var currentAccount = Context.Accounts
+                .FirstOrDefault(a => a.AccountId == account.AccountId
+                && a.UserId == account.UserId);
 
             if (currentAccount == null)
                 throw new AppException("Account not found.");
@@ -74,9 +73,8 @@ namespace WMMAPI.Repositories
             }
 
             // Update remaining properties
-            currentAccount.IsAsset = account.IsAsset;
+            //currentAccount.IsAsset = account.IsAsset; //TODO: Not currently allowing altering of IsAsset
             currentAccount.IsActive = account.IsActive;
-
         }
 
         /// <summary>

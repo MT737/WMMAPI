@@ -66,6 +66,9 @@ namespace WMMAPI.Controllers
             {
                 var account = model.ToDB();
                 _accountRepository.AddAccount(account);
+
+                //TODO: Need to add functionality for setting initial balance
+                //Can leverage transaction repo...
                 return Ok();
             }
             catch (AppException ex)
@@ -86,24 +89,14 @@ namespace WMMAPI.Controllers
             {
                 var account = model.ToDB(userId);
                 _accountRepository.ModifyAccount(account);
+
+                //TODO: Add functionality for adjusting balance
+                return Ok();
             }
             catch (AppException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
-
-
-        //edit account
-            //balance adjustment transaction if balance is edited
-
-        //Validate account
-            //name
-            
-
-        //Complete account transaction?? Might not need this...
-
-        //Delete account (soft delete)
-
     }
 }

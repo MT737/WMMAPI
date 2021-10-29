@@ -11,7 +11,7 @@ namespace WMMAPI.Models.AccountModels
                 
         public string Name { get; set; }
 
-        public bool IsAsset { get; set; }
+        //public bool IsAsset { get; set; } //TODO: Should this be alterable?
 
         public bool IsActive { get; set; }
         
@@ -23,7 +23,7 @@ namespace WMMAPI.Models.AccountModels
                 UserId = userId,
                 AccountId = AccountId,
                 Name = Name,
-                IsAsset = IsAsset, //TODO: Should this be changeable?
+                IsAsset = false, //Using a placeholder for now //TODO: Should this be changeable?
                 IsActive = IsActive
             };
         }
