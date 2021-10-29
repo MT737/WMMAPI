@@ -70,7 +70,7 @@ namespace WMMAPI.Repositories
                 throw new AppException("User not found");
 
             // Confirm email is open or current email for user
-            if (!string.IsNullOrWhiteSpace(user.EmailAddress))
+            if (!String.IsNullOrWhiteSpace(user.EmailAddress))
             {
                 if (Context.Users.Any(u => u.EmailAddress == user.EmailAddress && u.UserId != user.UserId))
                     throw new AppException("Email is alread registered to an account");

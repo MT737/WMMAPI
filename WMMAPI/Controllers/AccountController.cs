@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -27,12 +28,11 @@ namespace WMMAPI.Controllers
         [HttpGet("userAccounts/{id}")]
         public IActionResult GetAccountsByUserId(string id)
         {
-            Guid userId = Guid.Parse(id);
-
             // Confirm user is the same requesting
-            if (User.Identity.Name != userId.ToString())
+            if (User.Identity.Name != id)
                 return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
 
+            Guid userId = Guid.Parse(id);
             try
             {
                 // Get list of accounts
@@ -49,8 +49,61 @@ namespace WMMAPI.Controllers
             }
             catch (AppException ex)
             {
-                return BadRequest( new { message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
         }
+
+        //TODO: Add endpoint for returning paged list?
+
+        [HttpPost]
+        public IActionResult AddAccount(AddAccountModel model)
+        {
+            // Confirm user is the same requesting
+            if (User.Identity.Name != model.UserId.ToString())
+                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
+
+            try
+            {
+                var account = model.ToDB();
+                _accountRepository.AddAccount(account);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult ModifyAccount(string id, UpdateAccountModel model)
+        {
+            //Confirm user is the same requesting
+            if (User.Identity.Name != id)
+                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
+
+            Guid userId = Guid.Parse(id);
+            try
+            {
+                var account = model.ToDB(userId);
+                _accountRepository.ModifyAccount(account);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        //edit account
+            //balance adjustment transaction if balance is edited
+
+        //Validate account
+            //name
+            
+
+        //Complete account transaction?? Might not need this...
+
+        //Delete account (soft delete)
+
     }
 }

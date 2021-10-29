@@ -4,6 +4,7 @@ using WMMAPI.Database.Entities;
 
 namespace WMMAPI.Interfaces
 {
+    //TODO: Refactor to remove unused methods (limiting controller interactions)
     public interface IAccountRepository : IBaseRepository<Account>
     {
         Account Get(Guid id, Guid userId);
@@ -11,7 +12,8 @@ namespace WMMAPI.Interfaces
         int GetCount(Guid userId);
         Guid GetId(string name, Guid userId);
         IList<Account> GetList(Guid userId);
-        bool NameExists(string desiredAccountName, Guid accountId, Guid userId);
+        bool NameExists(Account account);
         bool UserOwnsAccount(Guid id, Guid userID);
+        void AddAccount(Account account);
     }
 }
