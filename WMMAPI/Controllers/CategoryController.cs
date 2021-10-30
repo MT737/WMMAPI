@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.CategoryModels;
 
@@ -16,7 +17,7 @@ namespace WMMAPI.Controllers
     {
         private readonly ILogger<CategoryController> _logger;
         private readonly ICategoryRepository _categoryRepository;
-
+        
         public CategoryController(ILogger<CategoryController> logger, ICategoryRepository categoryRepo)
         {
             _logger = logger;
@@ -25,17 +26,12 @@ namespace WMMAPI.Controllers
 
         //Get list
 
-        [HttpGet("userCategories/{id}")]
-        public IActionResult GetCategories(string id)
-        {
-            // Confirm user is the same requesting
-            if (User.Identity.Name != id)
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
-            Guid userId = Guid.Parse(id);
+        [HttpGet]
+        public IActionResult GetCategories()
+        {            
             try
             {
-                var catList = _categoryRepository.GetList(userId);
+                var catList = _categoryRepository.GetList(Guid.Parse(User.Identity.Name));
                 List<CategoryModel> categories = catList.Select(c => new CategoryModel(c)).ToList();
                 return Ok(categories);
             }
@@ -47,17 +43,12 @@ namespace WMMAPI.Controllers
             //TODO: Additional exception catching?
         }
 
-        [HttpPost("{id}")]
-        public IActionResult AddCategory(string id, AddCategoryModel model)
-        {
-            // Confirm user is the same requesting
-            if (User.Identity.Name != id)
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
-            Guid userId = Guid.Parse(id);
+        [HttpPost]
+        public IActionResult AddCategory([FromBody] AddCategoryModel model)
+        {            
             try
             {
-                var category = model.ToDB(userId);
+                var category = model.ToDB(Guid.Parse(User.Identity.Name));
                 _categoryRepository.AddCategory(category);
                 return Ok();
             }
@@ -67,9 +58,36 @@ namespace WMMAPI.Controllers
             }
         }
 
-        //Edit
+        [HttpPut]
+        public IActionResult ModifyCategory([FromBody] UpdateCategoryModel model)
+        {
+            try
+            {
+                Guid userId = Guid.Parse(User.Identity.Name);
+                _categoryRepository.ModifyCategory(model.ToDB(userId));
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }            
+        }
 
-        //Delete
-            //This needs to implement absorbtion stuffs
+        [HttpDelete]
+        public IActionResult DeleteCatgory([FromBody] DeleteCategoryModel model)
+        {
+            try
+            {
+                _categoryRepository.DeleteCategory(
+                    model.AbsorbedId,
+                    model.AbsorbingId,
+                    Guid.Parse(User.Identity.Name));
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });                
+            }
+        }
     }
 }

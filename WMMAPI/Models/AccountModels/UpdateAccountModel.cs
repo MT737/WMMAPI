@@ -8,11 +8,13 @@ namespace WMMAPI.Models.AccountModels
     {
         [Required]
         public Guid AccountId { get; set; }
-                
+
+        [Required, StringLength(100)]                
         public string Name { get; set; }
 
         //public bool IsAsset { get; set; } //TODO: Should this be alterable?
 
+        [Required]
         public bool IsActive { get; set; }
         
 

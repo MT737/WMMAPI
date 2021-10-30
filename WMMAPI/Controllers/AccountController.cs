@@ -25,13 +25,12 @@ namespace WMMAPI.Controllers
         }
         
         [HttpGet]
-        public IActionResult GetAccountsByUserId()
+        public IActionResult GetAccounts()
         {
-            Guid userId = Guid.Parse(User.Identity.Name);            
             try
             {
                 // Get list of accounts
-                var accounts = _accountRepository.GetList(userId);
+                var accounts = _accountRepository.GetList(Guid.Parse(User.Identity.Name));
                 List<AccountModel> accountsWithBalance = accounts.Select(x => new AccountModel(x)).ToList();
 
                 // Get balances
@@ -51,12 +50,11 @@ namespace WMMAPI.Controllers
         //TODO: Add endpoint for returning paged list?
 
         [HttpPost]
-        public IActionResult AddAccount(AddAccountModel model)
-        {
-            Guid userId = Guid.Parse(User.Identity.Name);
+        public IActionResult AddAccount([FromBody] AddAccountModel model)
+        {            
             try
             {
-                var account = model.ToDB(userId);
+                var account = model.ToDB(Guid.Parse(User.Identity.Name));
                 _accountRepository.AddAccount(account);
 
                 //TODO: Need to add functionality for setting initial balance
@@ -70,12 +68,11 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPut]
-        public IActionResult ModifyAccount(UpdateAccountModel model)
-        {            
-            Guid userId = Guid.Parse(User.Identity.Name);
+        public IActionResult ModifyAccount([FromBody] UpdateAccountModel model)
+        {
             try
             {
-                var account = model.ToDB(userId);
+                var account = model.ToDB(Guid.Parse(User.Identity.Name));
                 _accountRepository.ModifyAccount(account);
 
                 //TODO: Add functionality for adjusting balance

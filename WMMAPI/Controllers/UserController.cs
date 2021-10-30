@@ -36,7 +36,7 @@ namespace WMMAPI.Controllers
         [AllowAnonymous]
         [HttpPost("authenticate")]
         [ProducesResponseType(typeof(AuthenticatedUserModel), StatusCodes.Status200OK)]
-        public IActionResult Authenticate([FromBody] AuthenticateUserModel model)
+        public IActionResult AuthenticateUser([FromBody] AuthenticateUserModel model)
         {
             var user = _userRepository.Authenticate(model.EmailAddress, model.Password);
 
@@ -64,7 +64,7 @@ namespace WMMAPI.Controllers
 
         [AllowAnonymous]
         [HttpPut("register")]
-        public IActionResult Register([FromBody] RegisterUserModel user)
+        public IActionResult RegisterUser([FromBody] RegisterUserModel user)
         {
             try
             {
@@ -80,18 +80,13 @@ namespace WMMAPI.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
         [ProducesResponseType(typeof(UserModel), StatusCodes.Status200OK)]
-        public IActionResult GetById(string id)
+        public IActionResult Get()
         {
-            // Confirm user is the same requesting
-            if (User.Identity.Name != id)
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
-            Guid userId = Guid.Parse(id);
             try
             {
-                var result = _userRepository.GetById(userId);
+                var result = _userRepository.GetById(Guid.Parse(User.Identity.Name));
                 if (result != null)
                 {
                     return Ok(new UserModel(result));
@@ -104,17 +99,12 @@ namespace WMMAPI.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult ModifyUser(string id, [FromBody]UpdateUserModel model)
-        {
-            // Confirm user is the same requesting
-            if (User.Identity.Name != id)
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
-            var dbUser = model.ToDB(Guid.Parse(id));
+        [HttpPut]
+        public IActionResult ModifyUser([FromBody] UpdateUserModel model)
+        {            
             try
             {
-                //Update user
+                var dbUser = model.ToDB(Guid.Parse(User.Identity.Name));    
                 _userRepository.Modify(dbUser, model.Password);
                 return Ok();
             }
@@ -125,17 +115,13 @@ namespace WMMAPI.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteCustomer(string id)
-        {
-            // Confirm user is the same requesting
-            if (User.Identity.Name != id)
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
-            Guid userId = Guid.Parse(id);
+        [HttpDelete]
+        public IActionResult DeleteUser()
+        {            
             try
             {
-                _userRepository.Delete(userId);
+                //TODO: Update to a soft delete
+                _userRepository.Delete(Guid.Parse(User.Identity.Name));
                 return Ok();
             }
             catch (AppException ex)

@@ -10,12 +10,14 @@ namespace WMMAPI.Interfaces
         void AddCategory(Category category);
         void CreateDefaults(Guid userId);
         bool DefaultsExist(Guid userId);
+        void DeleteCategory(Guid absorbedId, Guid absorbingGuid, Guid userId);
         Category Get(Guid id, Guid userId);
         decimal GetCategorySpending(Guid categoryId, Guid userId);
         int GetCount(Guid userId);
         Guid GetId(string name, Guid userId);
         List<Category> GetList(Guid userId);
         bool IsDefault(Guid entityId, Guid userId);
+        void ModifyCategory(Category category);
         bool NameExists(Category category);
         bool UserOwnsCategory(Guid categoryId, Guid userId);
     }
