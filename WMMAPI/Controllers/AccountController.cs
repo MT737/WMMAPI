@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -25,18 +24,13 @@ namespace WMMAPI.Controllers
             _accountRepository = accountRepository;
         }
         
-        [HttpGet("userAccounts/{id}")]
-        public IActionResult GetAccountsByUserId(string id)
+        [HttpGet]
+        public IActionResult GetAccounts()
         {
-            // Confirm user is the same requesting
-            if (User.Identity.Name != id)
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
-            Guid userId = Guid.Parse(id);
             try
             {
                 // Get list of accounts
-                var accounts = _accountRepository.GetList(userId);
+                var accounts = _accountRepository.GetList(Guid.Parse(User.Identity.Name));
                 List<AccountModel> accountsWithBalance = accounts.Select(x => new AccountModel(x)).ToList();
 
                 // Get balances
@@ -56,15 +50,11 @@ namespace WMMAPI.Controllers
         //TODO: Add endpoint for returning paged list?
 
         [HttpPost]
-        public IActionResult AddAccount(AddAccountModel model)
-        {
-            // Confirm user is the same requesting
-            if (User.Identity.Name != model.UserId.ToString())
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
+        public IActionResult AddAccount([FromBody] AddAccountModel model)
+        {            
             try
             {
-                var account = model.ToDB();
+                var account = model.ToDB(Guid.Parse(User.Identity.Name));
                 _accountRepository.AddAccount(account);
 
                 //TODO: Need to add functionality for setting initial balance
@@ -77,17 +67,12 @@ namespace WMMAPI.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult ModifyAccount(string id, UpdateAccountModel model)
+        [HttpPut]
+        public IActionResult ModifyAccount([FromBody] UpdateAccountModel model)
         {
-            //Confirm user is the same requesting
-            if (User.Identity.Name != id)
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
-            Guid userId = Guid.Parse(id);
             try
             {
-                var account = model.ToDB(userId);
+                var account = model.ToDB(Guid.Parse(User.Identity.Name));
                 _accountRepository.ModifyAccount(account);
 
                 //TODO: Add functionality for adjusting balance

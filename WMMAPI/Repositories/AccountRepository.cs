@@ -42,39 +42,29 @@ namespace WMMAPI.Repositories
 
         public void AddAccount(Account newAccount)
         {
-            // Validate account
-            if (String.IsNullOrWhiteSpace(newAccount.Name))
-                throw new AppException("Account name cannot be empty or whitespace only string.");
+            // Validate account. Validation errors result in thrown exceptions.
+            ValidateAccount(newAccount);
             
-            if (NameExists(newAccount))
-                throw new AppException($"Account name {newAccount.Name} is already in use.");
-
+            //If still here, validation passed. Add account.
             Add(newAccount);
         }
 
         public void ModifyAccount(Account account)
         {
+            // Pull current account from DB
             var currentAccount = Context.Accounts
-                .FirstOrDefault(a => a.AccountId == account.AccountId
-                && a.UserId == account.UserId);
-
+                .FirstOrDefault(a => a.AccountId == account.AccountId && a.UserId == account.UserId);            
             if (currentAccount == null)
                 throw new AppException("Account not found.");
 
-            //TODO: Centralize the account validation
-
-            // Validate account
-            if (!String.IsNullOrWhiteSpace(account.Name))
-            {
-                if (NameExists(account))
-                    throw new AppException($"Account name {account.Name} is already in use.");
-
-                currentAccount.Name = account.Name;
-            }
-
-            // Update remaining properties
+            // Validate account modification. Validation errors result in thrown exceptions.
+            ValidateAccount(account);
+            
+            // If still here, validation passed. Update properties and call update.
             //currentAccount.IsAsset = account.IsAsset; //TODO: Not currently allowing altering of IsAsset
+            currentAccount.Name = account.Name;
             currentAccount.IsActive = account.IsActive;
+            Update(currentAccount);
         }
 
         /// <summary>
@@ -161,6 +151,16 @@ namespace WMMAPI.Repositories
         public bool UserOwnsAccount(Guid id, Guid userID)
         {
             return Context.Accounts.Where(a => a.AccountId == id && a.UserId == userID).Any();
+        }
+
+        // Private helper methods
+        private void ValidateAccount(Account account)
+        {
+            if (!String.IsNullOrWhiteSpace(account.Name))
+                throw new AppException("Account name cannot be empty or whitespace only string.");
+
+            if (NameExists(account))
+                throw new AppException($"Account name {account.Name} is already in use.");
         }
     }
 }

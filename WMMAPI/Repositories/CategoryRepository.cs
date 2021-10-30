@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
+using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
@@ -51,6 +52,54 @@ namespace WMMAPI.Repositories
                 .Count();
         }
 
+        public void AddCategory(Category category)
+        {
+            // Validate category. Validation errors result in thrown exceptions.
+            ValidateCategory(category);
+
+            // If still here, validation passed. Add category.
+            Add(category);
+        }
+
+        public void ModifyCategory(Category category)
+        {
+            Category currentCategory = Context.Categories
+                .FirstOrDefault(c => c.CategoryId == category.CategoryId && c.UserId == category.UserId);
+
+            if (currentCategory == null)
+                throw new AppException("Category not found.");
+
+            //Validate category
+            if (currentCategory.IsDefault)
+                throw new AppException("Default categories cannot be modified.");
+
+            // Validate category modification. Validation errors result in thrown exceptions.
+            ValidateCategory(category);
+
+            // If still here, validation passed. Update properties and call update.
+            currentCategory.Name = category.Name;
+            currentCategory.IsDefault = category.IsDisplayed;
+            Update(currentCategory);
+        }
+
+        public void DeleteCategory(Guid absorbedId, Guid absorbingId, Guid userId)
+        {
+            // Confirm categories exist and are owned by user
+            var absorbedCatExists = Context.Categories.FirstOrDefault(c => c.CategoryId == absorbedId && c.UserId == userId);
+            if (absorbedCatExists == null)
+                throw new AppException("Category selected for deletion not found.");
+
+            var absorbingCatExists = Context.Categories.Any(c => c.CategoryId == absorbingId && c.UserId == userId);
+            if (!absorbingCatExists)
+                throw new AppException("Category selected to absorbed deleted category not found.");
+
+            //TODO: Problem. What if the db fails to delete post absorption? Worst case, category continues to exist
+            //but all transactions have been modified. However, would prefer to update the database at one time...
+            // Call absorption process
+            Absorption(absorbedId, absorbingId, userId);
+            Delete(absorbedId);
+        }
+
         /// <summary>
         /// Indicates the existence of a the category.
         /// </summary>
@@ -58,12 +107,12 @@ namespace WMMAPI.Repositories
         /// <param name="categoryId">Category Id of which the name existence is desired</param>
         /// <param name="userId">Guid: UserID of the account.</param>
         /// <returns>Bool: Indication of the category name's current existence in the user's DB profile.</returns>
-        public bool NameExists(string desiredCategoryName, Guid categoryId, Guid userId)
+        public bool NameExists(Category category)
         {
             return Context.Categories
-                .Where(c => c.UserId == userId
-                    && c.Name.ToLower() == desiredCategoryName.ToLower()
-                    && c.CategoryId == categoryId)
+                .Where(c => c.UserId == category.UserId
+                    && c.Name.ToLower() == category.Name.ToLower()
+                    && c.CategoryId == category.CategoryId)
                 .Any();
         }
 
@@ -114,7 +163,6 @@ namespace WMMAPI.Repositories
         /// <param name="userId">Guid: User Id of the owner of the categories being adjusted.</param>
         public void Absorption(Guid absorbedId, Guid absorbingId, Guid userId)
         {
-            // TODO: This works for a small database, but for large scale, this should be set to bulk update.
             IQueryable<Transaction> transactionCategoriesToUpdate = Context.Transactions
                 .Where(c => c.CategoryId == absorbedId && c.UserId == userId);
 
@@ -183,6 +231,16 @@ namespace WMMAPI.Repositories
             return Context.Categories
                 .Where(c => c.CategoryId == entityId && c.UserId == userId && c.IsDefault == true)
                 .Any();
+        }
+
+        // Private helper methods
+        private void ValidateCategory(Category category)
+        {
+            if (NameExists(category))
+                throw new AppException($"{category.Name} already exists.");
+
+            if (String.IsNullOrWhiteSpace(category.Name))
+                throw new AppException("Category name cannot be empty or whitespace only string.");
         }
     }
 }
