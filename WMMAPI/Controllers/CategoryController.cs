@@ -24,8 +24,6 @@ namespace WMMAPI.Controllers
             _categoryRepository = categoryRepo;
         }
 
-        //Get list
-
         [HttpGet]
         public IActionResult GetCategories()
         {            
