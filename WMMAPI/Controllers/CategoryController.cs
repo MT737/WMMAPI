@@ -31,8 +31,9 @@ namespace WMMAPI.Controllers
         {            
             try
             {
-                var catList = _categoryRepository.GetList(Guid.Parse(User.Identity.Name));
-                List<CategoryModel> categories = catList.Select(c => new CategoryModel(c)).ToList();
+                List<CategoryModel> categories = _categoryRepository
+                    .GetList(Guid.Parse(User.Identity.Name))
+                    .Select(c => new CategoryModel(c)).ToList();
                 return Ok(categories);
             }
             catch (ApplicationException ex)
@@ -50,7 +51,7 @@ namespace WMMAPI.Controllers
             {
                 var category = model.ToDB(Guid.Parse(User.Identity.Name));
                 _categoryRepository.AddCategory(category);
-                return Ok();
+                return Ok(new CategoryModel(category));
             }
             catch (Exception ex)
             {

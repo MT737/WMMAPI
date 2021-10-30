@@ -16,7 +16,6 @@ namespace WMMAPI.Interfaces
         int GetCount(Guid userId);
         Guid GetId(string name, Guid userId);
         List<Category> GetList(Guid userId);
-        bool IsDefault(Guid entityId, Guid userId);
         void ModifyCategory(Category category);
         bool NameExists(Category category);
         bool UserOwnsCategory(Guid categoryId, Guid userId);

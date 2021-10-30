@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
+using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
 {
     public class VendorRepository : BaseRepository<Vendor>, IVendorRepository
     {
+        //TODO: Update all saved summaries (repos have had large modifications)
+
         public VendorRepository(WMMContext context) : base(context)
         {
         }
@@ -39,6 +42,57 @@ namespace WMMAPI.Repositories
                 .OrderBy(v => v.Name)
                 .ToList();
         }
+
+        public void AddVendor(Vendor vendor)
+        {
+            // Validate vendor. Validation errors result in thrown exceptions.
+            ValidateVendor(vendor);
+
+            // If still here, validation passed. Call add
+            Add(vendor);
+        }
+
+        public void ModifyVendor(Vendor vendor)
+        {
+            var currentVendor = Context.Vendors
+                .FirstOrDefault(v => v.VendorId == vendor.VendorId && v.UserId == vendor.UserId);
+
+            if (currentVendor == null)
+                throw new AppException("Vendor not found.");
+
+            if (currentVendor.IsDefault)
+                throw new AppException("Default vendors cannot be modified.");
+
+            // Validate vendor modification. Validation errors result in thrown exceptions.
+            ValidateVendor(vendor);
+
+            // If still here, validation passed. Update properties and call update
+            currentVendor.Name = vendor.Name;
+            currentVendor.IsDisplayed = vendor.IsDisplayed;
+
+            Update(vendor);
+
+        }
+
+        //TODO: Much of this logic is shared with Category. Look into consolidation (generics?)
+        public void DeleteVendor(Guid absorbedId, Guid absorbingId, Guid userId)
+        {
+            // Confirm vendors exist and are owned by the user
+            var absorbedVendorExists = Context.Vendors.FirstOrDefault(v => v.VendorId == absorbedId && v.UserId == userId);
+            if (absorbedVendorExists == null)
+                throw new AppException("Vendor selected for deletion not found.");
+            if (absorbedVendorExists.IsDefault)
+                throw new AppException($"{absorbedVendorExists.Name} is a default vendor and cannot be deleted.");
+
+            var absorbingVendorExists = Context.Vendors.Any(v => v.VendorId == absorbingId && v.UserId == userId);
+            if (!absorbingVendorExists)
+                throw new AppException("Vendor selected to absorb deleted vendor not found.");
+
+            //TODO: Problem. What if the db fails to delete post absorption? Worst case, vendor continues to exist
+            Absorption(absorbedId, absorbingId, userId);
+            Delete(absorbedId);
+        }
+
 
         /// <summary>
         /// Returns the number of vendors in the DB tied to the user's profile.
@@ -77,14 +131,11 @@ namespace WMMAPI.Repositories
         /// <summary>
         /// Determines if the vendor name currently exits in the DB.
         /// </summary>
-        /// <param name="desiredName">string: desired name to test for existence.</param>
-        /// <param name="vendorId">Guid: id of the vendor (or default value if vendor is new).</param>
-        /// <param name="userId">Guid: Used to filter the vendor name search to just those owned by the user.</param>
         /// <returns>Bool: True if the vendor name already exists in the DB. False otherwise.</returns>
-        public bool NameExists(string desiredName, Guid vendorId, Guid userId)
+        public bool NameExists(Vendor vendor)
         {
             return Context.Vendors
-                .Where(v => v.UserId == userId && v.Name.ToLower() == desiredName.ToLower() && v.VendorId != vendorId)
+                .Where(v => v.UserId == vendor.UserId && v.Name.ToLower() == vendor.Name.ToLower() && v.VendorId != vendor.VendorId)
                 .Any();
         }
 
@@ -149,17 +200,27 @@ namespace WMMAPI.Repositories
             return Context.Vendors.Where(v => v.UserId == userId && v.IsDefault == true).Any();
         }
 
+        //TODO: Deprecated????
         /// <summary>
         /// Indicates if a user's vendor reference is a default vendor.
         /// </summary>
-        /// <param name="vendorId">Guid: Id of the vendor of interest.</param>
-        /// <param name="userId">Guid: Id of the user of interest.</param>
         /// <returns>Bool: True of the vendor is a default vendor. False otherwise.</returns>
-        public bool IsDefault(Guid vendorId, Guid userId)
+        //public bool IsDefault(Vendor vendor)
+        //{
+        //    return Context.Vendors
+        //        .First(v => v.VendorId == vendor.VendorId 
+        //            && v.UserId == vendor.UserId).IsDefault;
+        //}
+
+
+        // Private helper methods
+        private void ValidateVendor(Vendor vendor)
         {
-            return Context.Vendors
-                .Where(v => v.VendorId == vendorId && v.UserId == userId && v.IsDefault == true)
-                .Any();
+            if (NameExists(vendor))
+                throw new AppException($"Vendor {vendor.Name} already exists.");
+
+            if (String.IsNullOrWhiteSpace(vendor.Name))
+                throw new AppException("Vendor name cannot be empty or whitespace only string.");
         }
     }
 }
