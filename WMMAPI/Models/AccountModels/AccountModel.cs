@@ -7,8 +7,6 @@ namespace WMMAPI.Models.AccountModels
     {
         public Guid AccountId { get; set; }
 
-        public Guid UserId { get; set; }
-
         public string Name { get; set; }
 
         public bool IsAsset { get; set; }
@@ -21,7 +19,6 @@ namespace WMMAPI.Models.AccountModels
         public AccountModel(Account account)
         {
             AccountId = account.AccountId;
-            UserId = account.UserId;
             Name = account.Name;
             IsAsset = account.IsAsset;
             IsActive = account.IsActive;            

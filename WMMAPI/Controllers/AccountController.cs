@@ -30,13 +30,14 @@ namespace WMMAPI.Controllers
             try
             {
                 // Get list of accounts
-                var accounts = _accountRepository.GetList(Guid.Parse(User.Identity.Name));
-                List<AccountModel> accountsWithBalance = accounts.Select(x => new AccountModel(x)).ToList();
+                List<AccountModel> accountsWithBalance = _accountRepository
+                    .GetList(Guid.Parse(User.Identity.Name))
+                    .Select(x => new AccountModel(x)).ToList();
 
                 // Get balances
                 foreach (var item in accountsWithBalance)
                 {
-                    item.Balance = _accountRepository.GetBalance(item.AccountId, item.UserId, item.IsAsset);
+                    item.Balance = _accountRepository.GetBalance(item.AccountId, Guid.Parse(User.Identity.Name), item.IsAsset);
                 }
 
                 return Ok(accountsWithBalance);
@@ -59,7 +60,7 @@ namespace WMMAPI.Controllers
 
                 //TODO: Need to add functionality for setting initial balance
                 //Can leverage transaction repo...
-                return Ok();
+                return Ok(new AccountModel(account));
             }
             catch (AppException ex)
             {

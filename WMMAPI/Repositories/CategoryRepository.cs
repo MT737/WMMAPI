@@ -69,7 +69,6 @@ namespace WMMAPI.Repositories
             if (currentCategory == null)
                 throw new AppException("Category not found.");
 
-            //Validate category
             if (currentCategory.IsDefault)
                 throw new AppException("Default categories cannot be modified.");
 
@@ -88,7 +87,9 @@ namespace WMMAPI.Repositories
             var absorbedCatExists = Context.Categories.FirstOrDefault(c => c.CategoryId == absorbedId && c.UserId == userId);
             if (absorbedCatExists == null)
                 throw new AppException("Category selected for deletion not found.");
-
+            if (absorbedCatExists.IsDefault)
+                throw new AppException($"{absorbedCatExists.Name} is a default category and cannot be deleted.");
+            
             var absorbingCatExists = Context.Categories.Any(c => c.CategoryId == absorbingId && c.UserId == userId);
             if (!absorbingCatExists)
                 throw new AppException("Category selected to absorbed deleted category not found.");
@@ -219,19 +220,19 @@ namespace WMMAPI.Repositories
             return Context.Categories.Where(c => c.UserId == userId && c.IsDefault == true).Any();
         }
 
-
+        //TODO: Deprecated??
         /// <summary>
         /// Inidcates the default status of the category.
         /// </summary>
         /// <param name="entityID">Guid: the id of the category for which to check default status.</param>
         /// <param name="userID">Guid: the user's Id to confirm ownership of the category.</param>
         /// <returns></returns>
-        public bool IsDefault(Guid entityId, Guid userId)
-        {
-            return Context.Categories
-                .Where(c => c.CategoryId == entityId && c.UserId == userId && c.IsDefault == true)
-                .Any();
-        }
+        //public bool IsDefault(Guid entityId, Guid userId)
+        //{
+        //    return Context.Categories
+        //        .Where(c => c.CategoryId == entityId && c.UserId == userId && c.IsDefault == true)
+        //        .Any();
+        //}
 
         // Private helper methods
         private void ValidateCategory(Category category)

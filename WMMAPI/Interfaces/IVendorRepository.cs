@@ -7,6 +7,8 @@ namespace WMMAPI.Interfaces
     public interface IVendorRepository : IBaseRepository<Vendor>
     {
         void Absorption(Guid absorbedId, Guid absorbingId, Guid userId);
+        void DeleteVendor(Guid absorbedId, Guid absorbingId, Guid userId);
+        void AddVendor(Vendor vendor);
         void CreateDefaults(Guid userId);
         bool DefaultsExist(Guid userId);
         Vendor Get(Guid id, Guid userId);
@@ -14,8 +16,8 @@ namespace WMMAPI.Interfaces
         int GetCount(Guid userId);
         Guid GetID(string name, Guid userID);
         IList<Vendor> GetList(Guid userId);
-        bool IsDefault(Guid vendorId, Guid userId);
-        bool NameExists(string desiredName, Guid vendorId, Guid userId);
+        void ModifyVendor(Vendor vendor);
+        bool NameExists(Vendor vendor);
         bool UserOwnsVendor(Guid vendorId, Guid userID);
     }
 }
