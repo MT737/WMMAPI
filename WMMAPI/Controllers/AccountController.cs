@@ -24,14 +24,10 @@ namespace WMMAPI.Controllers
             _accountRepository = accountRepository;
         }
         
-        [HttpGet("userAccounts/{id}")]
-        public IActionResult GetAccountsByUserId(string id)
+        [HttpGet]
+        public IActionResult GetAccountsByUserId()
         {
-            // Confirm user is the same requesting
-            if (User.Identity.Name != id)
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
-            Guid userId = Guid.Parse(id);
+            Guid userId = Guid.Parse(User.Identity.Name);            
             try
             {
                 // Get list of accounts
@@ -57,13 +53,10 @@ namespace WMMAPI.Controllers
         [HttpPost]
         public IActionResult AddAccount(AddAccountModel model)
         {
-            // Confirm user is the same requesting
-            if (User.Identity.Name != model.UserId.ToString())
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
+            Guid userId = Guid.Parse(User.Identity.Name);
             try
             {
-                var account = model.ToDB();
+                var account = model.ToDB(userId);
                 _accountRepository.AddAccount(account);
 
                 //TODO: Need to add functionality for setting initial balance
@@ -76,14 +69,10 @@ namespace WMMAPI.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult ModifyAccount(string id, UpdateAccountModel model)
-        {
-            //Confirm user is the same requesting
-            if (User.Identity.Name != id)
-                return BadRequest(new { message = "Passed userId does not match id of authenticated user." });
-
-            Guid userId = Guid.Parse(id);
+        [HttpPut]
+        public IActionResult ModifyAccount(UpdateAccountModel model)
+        {            
+            Guid userId = Guid.Parse(User.Identity.Name);
             try
             {
                 var account = model.ToDB(userId);

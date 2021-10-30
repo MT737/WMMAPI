@@ -5,10 +5,7 @@ using WMMAPI.Database.Entities;
 namespace WMMAPI.Models.AccountModels
 {
     public class AddAccountModel
-    {   
-        [Required]
-        public Guid UserId { get; set; }
-
+    {           
         [Required]
         public string Name { get; set; }
 
@@ -21,12 +18,12 @@ namespace WMMAPI.Models.AccountModels
         [Required]
         public decimal Balance { get; set; }
 
-        public Account ToDB()
+        public Account ToDB(Guid userId)
         {
             return new Account
             {
                 AccountId = Guid.NewGuid(),
-                UserId = UserId,
+                UserId = userId,
                 Name = Name,
                 IsAsset = IsAsset,
                 IsActive = IsActive
