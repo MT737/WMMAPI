@@ -6,13 +6,13 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
-namespace WMMAPI.Repositories
+namespace WMMAPI.Services
 {
-    public class VendorRepository : BaseRepository<Vendor>, IVendorService
+    public class VendorService : BaseService<Vendor>, IVendorService
     {
         //TODO: Update all saved summaries (repos have had large modifications)
 
-        public VendorRepository(WMMContext context) : base(context)
+        public VendorService(WMMContext context) : base(context)
         {
         }
 

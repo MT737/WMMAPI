@@ -5,11 +5,11 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
-namespace WMMAPI.Repositories
+namespace WMMAPI.Services
 {
-    public class UserRepository : BaseRepository<User>, IUserService
+    public class UserService : BaseService<User>, IUserService
     {
-        public UserRepository(WMMContext context) : base(context)
+        public UserService(WMMContext context) : base(context)
         {
         }
 

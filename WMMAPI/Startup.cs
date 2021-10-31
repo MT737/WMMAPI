@@ -12,11 +12,7 @@ using System.Threading.Tasks;
 using WMMAPI.Database;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using WMMAPI.Repositories;
-
-
-
-
+using WMMAPI.Services;
 
 namespace WMMAPI
 {
@@ -81,11 +77,11 @@ namespace WMMAPI
             //TODO: Add environment check to adjust db connection...
             services.AddScoped<WMMContext>();
 
-            services.AddScoped<IAccountService, AccountRepository>();
-            services.AddScoped<ICategoryService, CategoryRepository>();
-            services.AddScoped<ITransactionService, TransactionRepository>();
-            services.AddScoped<IUserService, UserRepository>();
-            services.AddScoped<IVendorService, VendorRepository>();
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IVendorService, VendorService>();
 
             //TODO: Consult the swagger documentation for greater familiarity with what this is doing
             services.AddSwaggerGen(c =>

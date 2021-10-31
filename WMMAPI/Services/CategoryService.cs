@@ -6,11 +6,11 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
-namespace WMMAPI.Repositories
+namespace WMMAPI.Services
 {
-    public class CategoryRepository : BaseRepository<Category>, ICategoryService
+    public class CategoryService : BaseService<Category>, ICategoryService
     {
-        public CategoryRepository(WMMContext context) : base(context)
+        public CategoryService(WMMContext context) : base(context)
         {
         }
 

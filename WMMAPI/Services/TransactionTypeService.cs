@@ -4,11 +4,11 @@ using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Interfaces;
 
-namespace WMMAPI.Repositories
+namespace WMMAPI.Services
 {
-    public class TransactionTypeRepository : BaseRepository<TransactionType>
+    public class TransactionTypeService : BaseService<TransactionType>
     {
-        public TransactionTypeRepository(WMMContext context) : base(context)
+        public TransactionTypeService(WMMContext context) : base(context)
         {
         }
 

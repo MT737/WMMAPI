@@ -6,11 +6,11 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
-namespace WMMAPI.Repositories
+namespace WMMAPI.Services
 {
-    public class AccountRepository : BaseRepository<Account>, IAccountService
+    public class AccountService : BaseService<Account>, IAccountService
     {
-        public AccountRepository(WMMContext context) : base(context)
+        public AccountService(WMMContext context) : base(context)
         {
         }
 

@@ -7,11 +7,11 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
-namespace WMMAPI.Repositories
+namespace WMMAPI.Services
 {
-    public class TransactionRepository : BaseRepository<Transaction>, ITransactionService
+    public class TransactionService : BaseService<Transaction>, ITransactionService
     {
-        public TransactionRepository(WMMContext context) : base(context)
+        public TransactionService(WMMContext context) : base(context)
         {
         }
 
