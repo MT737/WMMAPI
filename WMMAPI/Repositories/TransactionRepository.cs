@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
+using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
@@ -83,6 +84,39 @@ namespace WMMAPI.Repositories
         public bool UserOwnsTransaction(Guid id, Guid userId)
         {
             return Context.Transactions.Where(t => t.TransactionId == id && t.UserId == userId).Any();
+        }
+
+        public void ModifyTransaction(Transaction transaction)
+        {
+            Transaction currentTransaction = Context.Transactions
+                .FirstOrDefault(t => t.TransactionId == transaction.TransactionId 
+                    && t.UserId == transaction.UserId);
+
+            if (currentTransaction == null)
+                throw new AppException("Transaction not found.");
+
+            //TODO: Any validation required?
+
+            // Update properties
+            currentTransaction.TransactionDate = transaction.TransactionDate;
+            currentTransaction.TransactionTypeId = transaction.TransactionTypeId;
+            currentTransaction.AccountId = transaction.AccountId;
+            currentTransaction.CategoryId = transaction.CategoryId;
+            currentTransaction.VendorId = transaction.VendorId;
+            currentTransaction.Amount = transaction.Amount;
+            currentTransaction.Description = transaction.Description;
+
+            Update(currentTransaction);
+        }
+
+        public void DeleteTransaction(Guid userId, Guid transactionId)
+        {
+            //TODO: This hits the DB twice. Better to just let the DB return an error and handle it?
+            bool transactionExists = Context.Transactions.Any(t => t.UserId == userId && t.TransactionId == transactionId);
+            if (!transactionExists)
+                throw new AppException("Transaction not found.");
+
+            Delete(transactionId);
         }
     }
 }
