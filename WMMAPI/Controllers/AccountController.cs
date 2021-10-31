@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.AccountModels;
@@ -30,15 +28,8 @@ namespace WMMAPI.Controllers
             try
             {
                 // Get list of accounts
-                List<AccountModel> accountsWithBalance = _accountService
-                    .GetList(Guid.Parse(User.Identity.Name))
-                    .Select(x => new AccountModel(x)).ToList();
-
-                // Get balances
-                foreach (var item in accountsWithBalance)
-                {
-                    item.Balance = _accountService.GetBalance(item.AccountId, Guid.Parse(User.Identity.Name), item.IsAsset);
-                }
+                var accountsWithBalance = _accountService
+                    .GetList(Guid.Parse(User.Identity.Name));
 
                 return Ok(accountsWithBalance);
             }

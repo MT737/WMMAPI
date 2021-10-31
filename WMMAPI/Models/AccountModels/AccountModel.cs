@@ -21,7 +21,7 @@ namespace WMMAPI.Models.AccountModels
             AccountId = account.AccountId;
             Name = account.Name;
             IsAsset = account.IsAsset;
-            IsActive = account.IsActive;            
+            IsActive = account.IsActive;
         }
     }
 }
