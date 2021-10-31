@@ -26,8 +26,8 @@ namespace WMMAPI.Database.Entities
 
         [Required]
         public Guid VendorId { get; set; }
-        
-        [Required, Range(-9999999999999999.99, 9999999999999999.99)]
+                
+        [Required, Range(0, 9999999999999999.99)]
         public decimal Amount { get; set; }
 
         [StringLength(200)]
