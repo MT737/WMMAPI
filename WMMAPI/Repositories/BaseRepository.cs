@@ -5,7 +5,7 @@ using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
 {
-    public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
+    public abstract class BaseRepository<TEntity> where TEntity : class
     {
         // Properties
         protected WMMContext Context { get; set; }

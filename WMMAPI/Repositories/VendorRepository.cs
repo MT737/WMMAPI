@@ -8,7 +8,7 @@ using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
 {
-    public class VendorRepository : BaseRepository<Vendor>, IVendorRepository
+    public class VendorRepository : BaseRepository<Vendor>, IVendorService
     {
         //TODO: Update all saved summaries (repos have had large modifications)
 

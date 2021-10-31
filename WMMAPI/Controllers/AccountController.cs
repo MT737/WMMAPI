@@ -16,12 +16,12 @@ namespace WMMAPI.Controllers
     public class AccountController : ControllerBase
     {        
         private readonly ILogger<AccountController> _logger;
-        private readonly IAccountRepository _accountRepository;
+        private readonly IAccountService _accountService;
 
-        public AccountController(ILogger<AccountController> logger, IAccountRepository accountRepository)
+        public AccountController(ILogger<AccountController> logger, IAccountService accountService)
         {
             _logger = logger;
-            _accountRepository = accountRepository;
+            _accountService = accountService;
         }
         
         [HttpGet]
@@ -30,14 +30,14 @@ namespace WMMAPI.Controllers
             try
             {
                 // Get list of accounts
-                List<AccountModel> accountsWithBalance = _accountRepository
+                List<AccountModel> accountsWithBalance = _accountService
                     .GetList(Guid.Parse(User.Identity.Name))
                     .Select(x => new AccountModel(x)).ToList();
 
                 // Get balances
                 foreach (var item in accountsWithBalance)
                 {
-                    item.Balance = _accountRepository.GetBalance(item.AccountId, Guid.Parse(User.Identity.Name), item.IsAsset);
+                    item.Balance = _accountService.GetBalance(item.AccountId, Guid.Parse(User.Identity.Name), item.IsAsset);
                 }
 
                 return Ok(accountsWithBalance);
@@ -56,7 +56,7 @@ namespace WMMAPI.Controllers
             try
             {
                 var account = model.ToDB(Guid.Parse(User.Identity.Name));
-                _accountRepository.AddAccount(account);
+                _accountService.AddAccount(account);
 
                 //TODO: Need to add functionality for setting initial balance
                 //Can leverage transaction repo...
@@ -74,7 +74,7 @@ namespace WMMAPI.Controllers
             try
             {
                 var account = model.ToDB(Guid.Parse(User.Identity.Name));
-                _accountRepository.ModifyAccount(account);
+                _accountService.ModifyAccount(account);
 
                 //TODO: Add functionality for adjusting balance
                 return Ok();

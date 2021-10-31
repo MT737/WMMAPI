@@ -16,12 +16,12 @@ namespace WMMAPI.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ILogger<CategoryController> _logger;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly ICategoryService _categoryService;
         
-        public CategoryController(ILogger<CategoryController> logger, ICategoryRepository categoryRepo)
+        public CategoryController(ILogger<CategoryController> logger, ICategoryService categoryService)
         {
             _logger = logger;
-            _categoryRepository = categoryRepo;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
@@ -29,7 +29,7 @@ namespace WMMAPI.Controllers
         {            
             try
             {
-                List<CategoryModel> categories = _categoryRepository
+                List<CategoryModel> categories = _categoryService
                     .GetList(Guid.Parse(User.Identity.Name))
                     .Select(c => new CategoryModel(c)).ToList();
                 return Ok(categories);
@@ -48,7 +48,7 @@ namespace WMMAPI.Controllers
             try
             {
                 var category = model.ToDB(Guid.Parse(User.Identity.Name));
-                _categoryRepository.AddCategory(category);
+                _categoryService.AddCategory(category);
                 return Ok(new CategoryModel(category));
             }
             catch (Exception ex)
@@ -63,7 +63,7 @@ namespace WMMAPI.Controllers
             try
             {
                 Guid userId = Guid.Parse(User.Identity.Name);
-                _categoryRepository.ModifyCategory(model.ToDB(userId));
+                _categoryService.ModifyCategory(model.ToDB(userId));
                 return Ok();
             }
             catch (AppException ex)
@@ -77,7 +77,7 @@ namespace WMMAPI.Controllers
         {
             try
             {
-                _categoryRepository.DeleteCategory(
+                _categoryService.DeleteCategory(
                     model.AbsorbedId,
                     model.AbsorbingId,
                     Guid.Parse(User.Identity.Name));

@@ -1,19 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using WMMAPI.Database.Entities;
 
 namespace WMMAPI.Models.CategoryModels
 {
+    //TODO: Lots of similarities with VendorModel. Consider a base class?
     public class CategoryModel
     {
         [Required]
         public Guid CategoryId { get; set; }
 
-        [Required]
+        [Required, StringLength(100)]
         public string Name { get; set; }
+
+        [Required]
+        public bool IsDefault { get; set; }
 
         [Required]
         public bool IsDisplayed { get; set; }
@@ -23,6 +24,7 @@ namespace WMMAPI.Models.CategoryModels
             CategoryId = category.CategoryId;
             Name = category.Name;
             IsDisplayed = category.IsDisplayed;
+            IsDefault = category.IsDefault;
         }
 
         public Category ToDB(Guid userId)

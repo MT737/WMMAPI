@@ -8,7 +8,7 @@ using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
 {
-    public class CategoryRepository : BaseRepository<Category>, ICategoryRepository
+    public class CategoryRepository : BaseRepository<Category>, ICategoryService
     {
         public CategoryRepository(WMMContext context) : base(context)
         {

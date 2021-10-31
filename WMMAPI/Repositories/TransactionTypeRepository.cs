@@ -6,7 +6,7 @@ using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
 {
-    public class TransactionTypeRepository : BaseRepository<TransactionType>, ITransactionTypeRepository
+    public class TransactionTypeRepository : BaseRepository<TransactionType>
     {
         public TransactionTypeRepository(WMMContext context) : base(context)
         {

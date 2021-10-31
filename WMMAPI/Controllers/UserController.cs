@@ -23,13 +23,13 @@ namespace WMMAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
         private readonly AppSettings _appSettings;
 
-        public UserController(ILogger<UserController> logger, IUserRepository userRepository, IOptions<AppSettings> appSettings)
+        public UserController(ILogger<UserController> logger, IUserService userService, IOptions<AppSettings> appSettings)
         {
             _logger = logger;
-            _userRepository = userRepository;
+            _userService = userService;
             _appSettings = appSettings.Value;
         }
 
@@ -38,7 +38,7 @@ namespace WMMAPI.Controllers
         [ProducesResponseType(typeof(AuthenticatedUserModel), StatusCodes.Status200OK)]
         public IActionResult AuthenticateUser([FromBody] AuthenticateUserModel model)
         {
-            var user = _userRepository.Authenticate(model.EmailAddress, model.Password);
+            var user = _userService.Authenticate(model.EmailAddress, model.Password);
 
             if (user == null)
                 return BadRequest(new { message = "Email address and password combination is incorrect." });
@@ -70,7 +70,7 @@ namespace WMMAPI.Controllers
             {
                 // Create user
                 User dbUser = user.ToDB();
-                _userRepository.Create(dbUser, user.Password);
+                _userService.Create(dbUser, user.Password);
                 return Ok();
             }
             catch (AppException ex)
@@ -86,7 +86,7 @@ namespace WMMAPI.Controllers
         {
             try
             {
-                var result = _userRepository.GetById(Guid.Parse(User.Identity.Name));
+                var result = _userService.GetById(Guid.Parse(User.Identity.Name));
                 if (result != null)
                 {
                     return Ok(new UserModel(result));
@@ -105,7 +105,7 @@ namespace WMMAPI.Controllers
             try
             {
                 var dbUser = model.ToDB(Guid.Parse(User.Identity.Name));    
-                _userRepository.Modify(dbUser, model.Password);
+                _userService.Modify(dbUser, model.Password);
                 return Ok();
             }
             catch (AppException ex)
@@ -121,7 +121,7 @@ namespace WMMAPI.Controllers
             try
             {
                 //TODO: Update to a soft delete
-                _userRepository.Delete(Guid.Parse(User.Identity.Name));
+                _userService.RemoveUser(Guid.Parse(User.Identity.Name));
                 return Ok();
             }
             catch (AppException ex)

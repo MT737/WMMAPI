@@ -8,7 +8,7 @@ using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
 {
-    public class AccountRepository : BaseRepository<Account>, IAccountRepository
+    public class AccountRepository : BaseRepository<Account>, IAccountService
     {
         public AccountRepository(WMMContext context) : base(context)
         {
@@ -44,9 +44,11 @@ namespace WMMAPI.Repositories
         {
             // Validate account. Validation errors result in thrown exceptions.
             ValidateAccount(newAccount);
-            
+                        
             //If still here, validation passed. Add account.
             Add(newAccount);
+
+            //If no error, add transaction to set balance
         }
 
         public void ModifyAccount(Account account)

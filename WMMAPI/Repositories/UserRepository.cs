@@ -7,7 +7,7 @@ using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
 {
-    public class UserRepository : BaseRepository<User>, IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserService
     {
         public UserRepository(WMMContext context) : base(context)
         {
@@ -155,6 +155,12 @@ namespace WMMAPI.Repositories
             }
 
             return true;
+        }
+
+        public void RemoveUser(Guid userId)
+        {
+            //TODO: Additional validation?
+            Delete(userId);
         }
     }
 }

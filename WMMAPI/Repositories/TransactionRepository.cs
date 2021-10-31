@@ -9,7 +9,7 @@ using WMMAPI.Interfaces;
 
 namespace WMMAPI.Repositories
 {
-    public class TransactionRepository : BaseRepository<Transaction>, ITransactionRepository
+    public class TransactionRepository : BaseRepository<Transaction>, ITransactionService
     {
         public TransactionRepository(WMMContext context) : base(context)
         {
@@ -84,6 +84,12 @@ namespace WMMAPI.Repositories
         public bool UserOwnsTransaction(Guid id, Guid userId)
         {
             return Context.Transactions.Where(t => t.TransactionId == id && t.UserId == userId).Any();
+        }
+
+        public void AddTransaction(Transaction transaction)
+        {
+            //TODO: Validation?
+            Add(transaction);
         }
 
         public void ModifyTransaction(Transaction transaction)

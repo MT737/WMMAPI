@@ -12,7 +12,7 @@ namespace WMMAPI.Models.UserModels
         [StringLength(200)]
         public string LastName { get; set; }
 
-        public DateTime? DOB { get; set; }
+        public string DOB { get; set; }
 
         [EmailAddress, StringLength(200)]
         public string EmailAddress { get; set; }
@@ -21,15 +21,19 @@ namespace WMMAPI.Models.UserModels
         [StringLength(100)]
         public string Password { get; set; }
 
-
+        //TODO: Parse the dob datetime...Need to be able to handle nulls
         public User ToDB(Guid userId)
         {
+            // Convert DOB
+            DateTime dob;
+            var conversion = DateTime.TryParse(DOB, out dob);
+
             return new User
             {
                 UserId = userId,
                 FirstName = FirstName ?? " ",
                 LastName = LastName ?? " ",
-                DOB = DOB ?? DateTime.MinValue,
+                DOB = conversion ? dob : DateTime.MinValue,
                 EmailAddress = EmailAddress ?? " "
             };
         }

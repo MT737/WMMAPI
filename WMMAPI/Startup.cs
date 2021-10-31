@@ -54,7 +54,7 @@ namespace WMMAPI
                 {
                     OnTokenValidated = context =>
                     {
-                        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
                         var userId = Guid.Parse(context.Principal.Identity.Name);
                         var user = userService.GetById(userId);
                         if (user == null)
@@ -81,12 +81,11 @@ namespace WMMAPI
             //TODO: Add environment check to adjust db connection...
             services.AddScoped<WMMContext>();
 
-            services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<ITransactionRepository, TransactionRepository>();
-            services.AddScoped<ITransactionTypeRepository, TransactionTypeRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IVendorRepository, VendorRepository>();
+            services.AddScoped<IAccountService, AccountRepository>();
+            services.AddScoped<ICategoryService, CategoryRepository>();
+            services.AddScoped<ITransactionService, TransactionRepository>();
+            services.AddScoped<IUserService, UserRepository>();
+            services.AddScoped<IVendorService, VendorRepository>();
 
             //TODO: Consult the swagger documentation for greater familiarity with what this is doing
             services.AddSwaggerGen(c =>
