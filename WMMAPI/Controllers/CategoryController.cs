@@ -30,8 +30,7 @@ namespace WMMAPI.Controllers
             try
             {
                 List<CategoryModel> categories = _categoryService
-                    .GetList(Guid.Parse(User.Identity.Name))
-                    .Select(c => new CategoryModel(c)).ToList();
+                    .GetList(Guid.Parse(User.Identity.Name));
                 return Ok(categories);
             }
             catch (ApplicationException ex)

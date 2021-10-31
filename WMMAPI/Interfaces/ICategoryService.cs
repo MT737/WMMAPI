@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using WMMAPI.Database.Entities;
+using WMMAPI.Models.CategoryModels;
 
 namespace WMMAPI.Interfaces
 {
@@ -8,8 +9,8 @@ namespace WMMAPI.Interfaces
     {
         void AddCategory(Category category);
         void DeleteCategory(Guid absorbedId, Guid absorbingGuid, Guid userId);
-        Category Get(Guid id, Guid userId);
-        List<Category> GetList(Guid userId);
+        CategoryModel Get(Guid id, Guid userId);
+        List<CategoryModel> GetList(Guid userId);
         void ModifyCategory(Category category);
     }
 }

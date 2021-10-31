@@ -20,7 +20,7 @@ namespace WMMAPI.Services
         /// </summary>
         /// <param name="id">Guid: the AccountID of the account to be retrieved.</param>
         /// <param name="userId">Guid: the UserID of which account to be retrieved.</param>
-        /// <returns>Account model for the request account.</returns>
+        /// <returns>Account model for the requested account.</returns>
         public AccountModel Get(Guid id, Guid userId)
         {   
             var account = Context.Accounts
@@ -36,10 +36,10 @@ namespace WMMAPI.Services
         }
 
         /// <summary>
-        /// Retrieves a list of accounts that exist in the database.
+        /// Retrieves an IList of accounts that exist in the database.
         /// </summary>
         /// <param name="userID">Guid: UserID of which to pull accounts.</param>
-        /// <returns>Returns an IQueryable of Account entities.</returns>
+        /// <returns>An IList of Accounts with balances.</returns>
         public IList<AccountModel> GetList(Guid userId)
         {
             var accounts = Context.Accounts
@@ -59,7 +59,7 @@ namespace WMMAPI.Services
         /// <summary>
         /// Validates and adds account to the database.
         /// </summary>
-        /// <param name="newAccount">Adds Account to add to the database. Throws AppException if validation fails.</param>
+        /// <param name="newAccount">Account to add to the database. Throws AppException if validation fails.</param>
         public void AddAccount(Account newAccount)
         {
             // Validate account. Validation errors result in thrown exceptions.
@@ -78,7 +78,7 @@ namespace WMMAPI.Services
         public void ModifyAccount(Account account)
         {
             // Pull current account from DB
-            var currentAccount = Context.Accounts
+            Account currentAccount = Context.Accounts
                 .FirstOrDefault(a => a.AccountId == account.AccountId && a.UserId == account.UserId);            
             if (currentAccount == null)
                 throw new AppException("Account not found.");
