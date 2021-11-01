@@ -66,32 +66,19 @@ namespace WMMAPI.Services
         }
 
         /// <summary>
-        /// Returns an integer representing the count of transactions belonging to the passed user.
+        /// Adds transaction to the database
         /// </summary>
-        /// <param name="userID">Guid: UserId of which to get a count of transactions.</param>
-        /// <returns>Integer: count of transactions belonging to the user.</returns>
-        public int GetCount(Guid userId)
-        {
-            return Context.Transactions.Where(t => t.UserId == userId).Count();
-        }
-
-        /// <summary>
-        /// Idicates the user's ownership status of a given transaction.
-        /// </summary>
-        /// <param name="id">Guid: TransactionId of the transaction to be inspected.</param>
-        /// <param name="userId">Guid: UserId of the user to be compared to the transaction.</param>
-        /// <returns>Bool: true if the user does own the transaction and false if not.</returns>
-        public bool UserOwnsTransaction(Guid id, Guid userId)
-        {
-            return Context.Transactions.Where(t => t.TransactionId == id && t.UserId == userId).Any();
-        }
-
+        /// <param name="transaction">Transaction model representing the transaction to be added to the database.</param>
         public void AddTransaction(Transaction transaction)
         {
             //TODO: Validation?
             Add(transaction);
         }
 
+        /// <summary>
+        /// Validates changes and modifies the passed transaction.
+        /// </summary>
+        /// <param name="transaction"></param>
         public void ModifyTransaction(Transaction transaction)
         {
             Transaction currentTransaction = Context.Transactions
@@ -115,6 +102,11 @@ namespace WMMAPI.Services
             Update(currentTransaction);
         }
 
+        /// <summary>
+        /// Deletes the specified transaction.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="transactionId"></param>
         public void DeleteTransaction(Guid userId, Guid transactionId)
         {
             //TODO: This hits the DB twice. Better to just let the DB return an error and handle it?

@@ -62,6 +62,7 @@ namespace WMMAPI.Services
             return user;
         }
 
+        //TODO: Add summary
         public void Modify(User user, string password = null)
         {
             var currentUser = Context.Users
@@ -113,6 +114,15 @@ namespace WMMAPI.Services
                 .SingleOrDefault();
         }
 
+        //TODO: Add summary
+        public void RemoveUser(Guid userId)
+        {
+            //TODO: Additional validation?
+            Delete(userId);
+        }
+
+
+        #region Private Helpers
         /// <summary>
         /// Compares passed email string to emails in the db.
         /// </summary>
@@ -124,8 +134,7 @@ namespace WMMAPI.Services
                 .Any(u => u.EmailAddress.ToLower() == email.ToLower());
         }
 
-
-        // Private helper methods
+        //TODO: Add summary
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             if (password == null) throw new ArgumentNullException("password");
@@ -138,6 +147,7 @@ namespace WMMAPI.Services
             }
         }
         
+        //TODO: Add summary
         private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
         {
             if (password == null) throw new ArgumentNullException("password");
@@ -156,11 +166,6 @@ namespace WMMAPI.Services
 
             return true;
         }
-
-        public void RemoveUser(Guid userId)
-        {
-            //TODO: Additional validation?
-            Delete(userId);
-        }
+        #endregion
     }
 }
