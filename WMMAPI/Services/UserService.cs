@@ -41,7 +41,13 @@ namespace WMMAPI.Services
             return user;
         }
 
-        //TODO: Add Summary
+        /// <summary>
+        /// Creates a new user
+        /// </summary>
+        /// <param name="user">User object with completed required properties</param>
+        /// <param name="password">User password</param>
+        /// <returns>User model for newly created user</returns>
+        /// <exception cref="AppException">Throws AppException if validation fails</exception>
         public User Create(User user, string password)
         {
             // Validation
@@ -62,7 +68,12 @@ namespace WMMAPI.Services
             return user;
         }
 
-        //TODO: Add summary
+        /// <summary>
+        /// Modifies a user using the passed-in user values
+        /// </summary>
+        /// <param name="user">User to be modified</param>
+        /// <param name="password">New password if changed</param>
+        /// <exception cref="AppException">Throws AppException if user not found or email already in use</exception>
         public void Modify(User user, string password = null)
         {
             var currentUser = Context.Users
@@ -114,7 +125,10 @@ namespace WMMAPI.Services
                 .SingleOrDefault();
         }
 
-        //TODO: Add summary
+        /// <summary>
+        /// Removes user from the DB.
+        /// </summary>
+        /// <param name="userId">User ID of the user to be removed from the db</param>
         public void RemoveUser(Guid userId)
         {
             //TODO: Additional validation?
@@ -134,7 +148,14 @@ namespace WMMAPI.Services
                 .Any(u => u.EmailAddress.ToLower() == email.ToLower());
         }
 
-        //TODO: Add summary
+        /// <summary>
+        /// Creates a password hash based on the passed password.
+        /// </summary>
+        /// <param name="password">New password to be hashed</param>
+        /// <param name="passwordHash">Output hash</param>
+        /// <param name="passwordSalt">Ouput salt</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             if (password == null) throw new ArgumentNullException("password");
@@ -147,7 +168,15 @@ namespace WMMAPI.Services
             }
         }
         
-        //TODO: Add summary
+        /// <summary>
+        /// Verifies that the password passed in, once hashed, matches the stored hash.
+        /// </summary>
+        /// <param name="password">Password provided by the user attempting authorization</param>
+        /// <param name="storedHash">The stored password hash for the requested user</param>
+        /// <param name="storedSalt">The stored salt used to generate the original password hash</param>
+        /// <returns>Bool: true if the password hash is varified</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
         {
             if (password == null) throw new ArgumentNullException("password");

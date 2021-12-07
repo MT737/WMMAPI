@@ -208,7 +208,11 @@ namespace WMMAPI.Services
             return Context.Categories.Where(c => c.UserId == userId && c.IsDefault == true).Any();
         }
 
-        // Private helper methods
+        /// <summary>
+        /// Validates the passed category.
+        /// </summary>
+        /// <param name="category">Category to be validated</param>
+        /// <exception cref="AppException">Throws AppException if validation fails</exception>
         private void ValidateCategory(Category category)
         {
             if (NameExists(category))
