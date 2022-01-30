@@ -6,6 +6,7 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.AccountModels;
+using static WMMAPI.Helpers.Globals;
 
 namespace WMMAPI.Services
 {
@@ -106,14 +107,13 @@ namespace WMMAPI.Services
             decimal balance;
 
             //TODO: Further test account balances
-            //TODO: Replace magic string with reference to Global
             var paymentTo = Context.Transactions
-                 .Where(t => t.AccountId == accountId && t.TransactionType.Name == "Credit")
+                 .Where(t => t.AccountId == accountId && t.TransactionType.Name == TransactionTypes.Credit)
                  .ToList()
                  .Sum(t => t.Amount);
 
             var paymentFrom = Context.Transactions
-                .Where(t => t.AccountId == accountId && t.TransactionType.Name == "Debit")
+                .Where(t => t.AccountId == accountId && t.TransactionType.Name == TransactionTypes.Debit)
                 .ToList()
                 .Sum(t => t.Amount);
 
