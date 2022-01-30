@@ -16,6 +16,8 @@ namespace WMMAPI.Services
             Context = context;
         }
 
+        //TODO: Add get and get list. Can pass includes as an argument
+
         // CUD of CRUD
         /// <summary>
         /// Add entity to the DbSet and then save the changes to the database.

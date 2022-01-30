@@ -15,8 +15,6 @@ using WMMAPI.Models.UserModels;
 
 namespace WMMAPI.Controllers
 {
-    //TODO: Add additional exception handling...?
-
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
@@ -68,14 +66,12 @@ namespace WMMAPI.Controllers
         {
             try
             {
-                // Create user
                 User dbUser = user.ToDB();
                 _userService.Create(dbUser, user.Password);
                 return Ok();
             }
             catch (AppException ex)
             {
-                // Return error message is exception thrown.
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -110,7 +106,6 @@ namespace WMMAPI.Controllers
             }
             catch (AppException ex)
             {
-                // Return error message if there was an exception
                 return BadRequest( new { message = ex.Message });
             }
         }
@@ -120,7 +115,6 @@ namespace WMMAPI.Controllers
         {            
             try
             {
-                //TODO: Update to a soft delete
                 _userService.RemoveUser(Guid.Parse(User.Identity.Name));
                 return Ok();
             }

@@ -36,9 +36,8 @@ namespace WMMAPI.Controllers
                     .ToList();
                 return Ok(transactions);
             }
-            catch (Exception ex) //No app exceptions in this pathway
+            catch (Exception ex)
             {
-                //TODO: Add logging of exception. Only including in return for testing purposes.
                 return BadRequest(new { message = "There was an error processing your request.", ex.Message });
             }
         }
@@ -58,9 +57,8 @@ namespace WMMAPI.Controllers
 
                 return Ok(returnModel);
             }
-            catch (Exception ex) //No app exceptions in this pathway
+            catch (Exception ex)
             { 
-                //TODO: Add logging of exception. Only including in return for testing purposes.
                 return BadRequest(new { message = "There was an error processing your request.", ex.Message });
             }
         }

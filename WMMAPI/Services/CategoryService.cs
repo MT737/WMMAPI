@@ -9,7 +9,6 @@ using WMMAPI.Models.CategoryModels;
 
 namespace WMMAPI.Services
 {
-    //TODO: consider moving the Get list to the base...
     public class CategoryService : BaseService<Category>, ICategoryService
     {
         public CategoryService(WMMContext context) : base(context)

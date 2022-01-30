@@ -200,19 +200,6 @@ namespace WMMAPI.Services
             return Context.Vendors.Where(v => v.UserId == userId && v.IsDefault == true).Any();
         }
 
-        //TODO: Deprecated????
-        /// <summary>
-        /// Indicates if a user's vendor reference is a default vendor.
-        /// </summary>
-        /// <returns>Bool: True of the vendor is a default vendor. False otherwise.</returns>
-        //public bool IsDefault(Vendor vendor)
-        //{
-        //    return Context.Vendors
-        //        .First(v => v.VendorId == vendor.VendorId 
-        //            && v.UserId == vendor.UserId).IsDefault;
-        //}
-
-
         // Private helper methods
         private void ValidateVendor(Vendor vendor)
         {

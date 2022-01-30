@@ -132,6 +132,7 @@ namespace WMMAPI.Services
         public void RemoveUser(Guid userId)
         {
             //TODO: Additional validation?
+            //TODO: Update to a soft delete
             Delete(userId);
         }
 

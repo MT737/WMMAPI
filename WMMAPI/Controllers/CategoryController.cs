@@ -37,8 +37,6 @@ namespace WMMAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-
-            //TODO: Additional exception catching?
         }
 
         [HttpPost]

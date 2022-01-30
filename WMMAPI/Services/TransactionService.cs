@@ -71,7 +71,7 @@ namespace WMMAPI.Services
         /// <param name="transaction">Transaction model representing the transaction to be added to the database.</param>
         public void AddTransaction(Transaction transaction)
         {
-            //TODO: Validation?
+            //TODO: Add transaction validation
             Add(transaction);
         }
 
@@ -88,7 +88,7 @@ namespace WMMAPI.Services
             if (currentTransaction == null)
                 throw new AppException("Transaction not found.");
 
-            //TODO: Any validation required?
+            //TODO: Use validation that will be used in create
 
             // Update properties
             currentTransaction.TransactionDate = transaction.TransactionDate;
