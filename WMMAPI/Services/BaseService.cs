@@ -3,18 +3,20 @@ using System;
 using WMMAPI.Database;
 using WMMAPI.Interfaces;
 
-namespace WMMAPI.Repositories
+namespace WMMAPI.Services
 {
-    public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
+    public abstract class BaseService<TEntity> where TEntity : class
     {
         // Properties
         protected WMMContext Context { get; set; }
 
         // Base Constructor
-        public BaseRepository(WMMContext context)
+        public BaseService(WMMContext context)
         {
             Context = context;
         }
+
+        //TODO: Add get and get list. Can pass includes as an argument
 
         // CUD of CRUD
         /// <summary>

@@ -2,7 +2,7 @@ using NUnit.Framework;
 using System;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
-using WMMAPI.Repositories;
+using WMMAPI.Services;
 
 namespace WMMAPITests
 {
@@ -32,7 +32,7 @@ namespace WMMAPITests
                     DOB = new DateTime(1983, 12, 11),
                     EmailAddress = "mark.taylor737@gmail.com"
                 };
-                var userRepo = new UserRepository(db);
+                var userRepo = new UserService(db);
                 userRepo.Create(user, "testPassword");
 
 

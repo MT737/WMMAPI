@@ -16,12 +16,12 @@ namespace WMMAPI.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly ILogger<TransactionController> _logger;
-        private readonly ITransactionRepository _transactionRepository;
+        private readonly ITransactionService _transactionService;
 
-        public TransactionController(ILogger<TransactionController> logger, ITransactionRepository transactionRepo)
+        public TransactionController(ILogger<TransactionController> logger, ITransactionService transactionService)
         {
             _logger = logger;
-            _transactionRepository = transactionRepo;
+            _transactionService = transactionService;
         }
 
         [HttpGet]
@@ -30,15 +30,14 @@ namespace WMMAPI.Controllers
             try
             {
                 Guid userId = Guid.Parse(User.Identity.Name);
-                List<TransactionModel> transactions = _transactionRepository
+                List<TransactionModel> transactions = _transactionService
                     .GetList(userId, true)
                     .Select(t => new TransactionModel(t))
                     .ToList();
                 return Ok(transactions);
             }
-            catch (Exception ex) //No app exceptions in this pathway
+            catch (Exception ex)
             {
-                //TODO: Add logging of exception. Only including in return for testing purposes.
                 return BadRequest(new { message = "There was an error processing your request.", ex.Message });
             }
         }
@@ -50,17 +49,16 @@ namespace WMMAPI.Controllers
             {
                 Guid userId = Guid.Parse(User.Identity.Name);
                 var dbModel = model.ToDB(userId);
-                _transactionRepository.Add(dbModel);
+                _transactionService.AddTransaction(dbModel);
 
                 // Pull saved transaction from db in order to pull names (Convenience feature for API consumer)
-                TransactionModel returnModel = new TransactionModel(_transactionRepository
+                TransactionModel returnModel = new TransactionModel(_transactionService
                     .Get(userId, dbModel.TransactionId, true));
 
                 return Ok(returnModel);
             }
-            catch (Exception ex) //No app exceptions in this pathway
+            catch (Exception ex)
             { 
-                //TODO: Add logging of exception. Only including in return for testing purposes.
                 return BadRequest(new { message = "There was an error processing your request.", ex.Message });
             }
         }
@@ -72,7 +70,7 @@ namespace WMMAPI.Controllers
             {
                 Guid userId = Guid.Parse(User.Identity.Name);
                 var dbModel = model.ToDB(userId);
-                _transactionRepository.ModifyTransaction(dbModel);
+                _transactionService.ModifyTransaction(dbModel);
                 return Ok();
             }
             catch (AppException ex)
@@ -86,7 +84,7 @@ namespace WMMAPI.Controllers
         {
             try
             {
-                _transactionRepository.DeleteTransaction(Guid.Parse(User.Identity.Name), transactionId);
+                _transactionService.DeleteTransaction(Guid.Parse(User.Identity.Name), transactionId);
                 return Ok();
             }
             catch (Exception ex)

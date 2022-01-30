@@ -5,54 +5,80 @@ using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
+using WMMAPI.Models.AccountModels;
 
-namespace WMMAPI.Repositories
+namespace WMMAPI.Services
 {
-    public class AccountRepository : BaseRepository<Account>, IAccountRepository
+    public class AccountService : BaseService<Account>, IAccountService
     {
-        public AccountRepository(WMMContext context) : base(context)
+        public AccountService(WMMContext context) : base(context)
         {
         }
 
         /// <summary>
-        /// Retrieves a record of a single account. 
+        /// Retrieves the record of the requested account. 
         /// </summary>
         /// <param name="id">Guid: the AccountID of the account to be retrieved.</param>
         /// <param name="userId">Guid: the UserID of which account to be retrieved.</param>
-        /// <returns></returns>
-        public Account Get(Guid id, Guid userId)
-        {
-            return Context.Accounts
+        /// <returns>Account model for the requested account.</returns>
+        public AccountModel Get(Guid id, Guid userId)
+        {   
+            var account = Context.Accounts
                 .Where(a => a.AccountId == id && a.UserId == userId)
                 .SingleOrDefault();
+
+            if (account == null)
+                throw new AppException("Account not found.");
+
+            var model = new AccountModel(account);
+            model.Balance = GetBalance(model.AccountId, model.IsAsset);
+            return model;
         }
 
         /// <summary>
-        /// Retrieves a list of accounts that exist in the database.
+        /// Retrieves an IList of accounts that exist in the database.
         /// </summary>
         /// <param name="userID">Guid: UserID of which to pull accounts.</param>
-        /// <returns>Returns and IList of Account entities.</returns>
-        public IList<Account> GetList(Guid userId)
+        /// <returns>An IList of Accounts with balances.</returns>
+        public IList<AccountModel> GetList(Guid userId)
         {
-            return Context.Accounts
+            var accounts = Context.Accounts
                 .Where(a => a.UserId == userId)
                 .OrderBy(a => a.Name)
-                .ToList();
+                .Select(x => new AccountModel(x));
+
+            // Get balance
+            foreach(var account in accounts)
+            {
+                account.Balance = GetBalance(account.AccountId, account.IsAsset);
+            }
+
+            return accounts.ToList();
         }
 
+        /// <summary>
+        /// Validates and adds account to the database.
+        /// </summary>
+        /// <param name="newAccount">Account to add to the database. Throws AppException if validation fails.</param>
         public void AddAccount(Account newAccount)
         {
             // Validate account. Validation errors result in thrown exceptions.
             ValidateAccount(newAccount);
-            
+                        
             //If still here, validation passed. Add account.
             Add(newAccount);
+
+            //TODO: If no error, add transaction to set balance
         }
 
+        /// <summary>
+        /// Validates changes and modifies the passed account.
+        /// </summary>
+        /// <param name="account">Modifies passed account. Throws AppException if validation fails.</param>
         public void ModifyAccount(Account account)
         {
             // Pull current account from DB
-            var currentAccount = Context.Accounts
+            Account currentAccount = Context.Accounts
                 .FirstOrDefault(a => a.AccountId == account.AccountId && a.UserId == account.UserId);            
             if (currentAccount == null)
                 throw new AppException("Account not found.");
@@ -67,37 +93,14 @@ namespace WMMAPI.Repositories
             Update(currentAccount);
         }
 
-        /// <summary>
-        /// Retrieves the ID of the account based on the name.
-        /// </summary>
-        /// <param name="name">String: name of the account of which the ID is desired.</param>
-        /// <param name="userID">Guid: UserID of the account.</param>
-        /// <returns></returns>
-        public Guid GetId(string name, Guid userId)
-        {
-            return Context.Accounts
-                .Where(a => a.Name == name && a.UserId == userId)
-                .SingleOrDefault().AccountId;
-        }
-
-        /// <summary>
-        /// Gets a count of accounts in the database.
-        /// </summary>
-        /// <param name="userID">Guid: UserID of which to get a count of accounts.</param>
-        /// <returns>Returns an integer representing the count of accounts in the database.</returns>
-        public int GetCount(Guid userId)
-        {
-            return Context.Accounts.Where(a => a.UserId == userId).Count();
-        }
-
+        #region Private Helpers
         /// <summary>
         /// Calculates an account balance based on transactions in the database.
         /// </summary>
         /// <param name="accountId">Guid: AccountID of the account balance to be calculated.</param>
-        /// <param name="userID">Guid: UserID associated to the account. Only included here for security reasons.</param>
         /// <param name="isAsset">Bool: IsAsset classification of the account balance to be calculated.</param>
         /// <returns></returns>
-        public decimal GetBalance(Guid accountId, Guid userId, bool isAsset)
+        private decimal GetBalance(Guid accountId, bool isAsset)
         {
             //TODO: I really want to simplify this to a single query (there's already enough communications with the DB happening as is).
             decimal balance;
@@ -105,12 +108,12 @@ namespace WMMAPI.Repositories
             //TODO: Further test account balances
             //TODO: Replace magic string with reference to Global
             var paymentTo = Context.Transactions
-                 .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Credit")
+                 .Where(t => t.AccountId == accountId && t.TransactionType.Name == "Credit")
                  .ToList()
                  .Sum(t => t.Amount);
 
             var paymentFrom = Context.Transactions
-                .Where(t => t.AccountId == accountId && t.UserId == userId && t.TransactionType.Name == "Debit")
+                .Where(t => t.AccountId == accountId && t.TransactionType.Name == "Debit")
                 .ToList()
                 .Sum(t => t.Amount);
 
@@ -133,7 +136,7 @@ namespace WMMAPI.Repositories
         /// <param name="accountId">Guid: Account Id of which the name existence is desired.</param>
         /// <param name="userID">Guid: UserID of the account.</param>
         /// <returns>Bool: Indication of the account name's current existence in the user's DB profile.</returns>
-        public bool NameExists(Account account)
+        private bool NameExists(Account account)
         {
             return Context.Accounts
                  .Where(a => a.UserId == account.UserId
@@ -143,17 +146,9 @@ namespace WMMAPI.Repositories
         }
 
         /// <summary>
-        /// Indicates if the user owns the specified account.
+        /// Validates passed account model
         /// </summary>
-        /// <param name="id">Guid: ID of the specified account.</param>
-        /// <param name="userID">Guid: User's ID.</param>
-        /// <returns>Bool: Indication of the user's ownership fo the account.</returns>
-        public bool UserOwnsAccount(Guid id, Guid userID)
-        {
-            return Context.Accounts.Where(a => a.AccountId == id && a.UserId == userID).Any();
-        }
-
-        // Private helper methods
+        /// <param name="account">Account model to be validated.</param>
         private void ValidateAccount(Account account)
         {
             if (!String.IsNullOrWhiteSpace(account.Name))
@@ -162,5 +157,6 @@ namespace WMMAPI.Repositories
             if (NameExists(account))
                 throw new AppException($"Account name {account.Name} is already in use.");
         }
+        #endregion
     }
 }

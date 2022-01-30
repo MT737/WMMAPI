@@ -7,11 +7,11 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 
-namespace WMMAPI.Repositories
+namespace WMMAPI.Services
 {
-    public class TransactionRepository : BaseRepository<Transaction>, ITransactionRepository
+    public class TransactionService : BaseService<Transaction>, ITransactionService
     {
-        public TransactionRepository(WMMContext context) : base(context)
+        public TransactionService(WMMContext context) : base(context)
         {
         }
 
@@ -66,26 +66,19 @@ namespace WMMAPI.Repositories
         }
 
         /// <summary>
-        /// Returns an integer representing the count of transactions belonging to the passed user.
+        /// Adds transaction to the database
         /// </summary>
-        /// <param name="userID">Guid: UserId of which to get a count of transactions.</param>
-        /// <returns>Integer: count of transactions belonging to the user.</returns>
-        public int GetCount(Guid userId)
+        /// <param name="transaction">Transaction model representing the transaction to be added to the database.</param>
+        public void AddTransaction(Transaction transaction)
         {
-            return Context.Transactions.Where(t => t.UserId == userId).Count();
+            //TODO: Add transaction validation
+            Add(transaction);
         }
 
         /// <summary>
-        /// Idicates the user's ownership status of a given transaction.
+        /// Validates changes and modifies the passed transaction.
         /// </summary>
-        /// <param name="id">Guid: TransactionId of the transaction to be inspected.</param>
-        /// <param name="userId">Guid: UserId of the user to be compared to the transaction.</param>
-        /// <returns>Bool: true if the user does own the transaction and false if not.</returns>
-        public bool UserOwnsTransaction(Guid id, Guid userId)
-        {
-            return Context.Transactions.Where(t => t.TransactionId == id && t.UserId == userId).Any();
-        }
-
+        /// <param name="transaction"></param>
         public void ModifyTransaction(Transaction transaction)
         {
             Transaction currentTransaction = Context.Transactions
@@ -95,7 +88,7 @@ namespace WMMAPI.Repositories
             if (currentTransaction == null)
                 throw new AppException("Transaction not found.");
 
-            //TODO: Any validation required?
+            //TODO: Use validation that will be used in create
 
             // Update properties
             currentTransaction.TransactionDate = transaction.TransactionDate;
@@ -109,6 +102,11 @@ namespace WMMAPI.Repositories
             Update(currentTransaction);
         }
 
+        /// <summary>
+        /// Deletes the specified transaction.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="transactionId"></param>
         public void DeleteTransaction(Guid userId, Guid transactionId)
         {
             //TODO: This hits the DB twice. Better to just let the DB return an error and handle it?

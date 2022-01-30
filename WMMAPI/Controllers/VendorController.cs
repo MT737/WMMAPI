@@ -17,9 +17,9 @@ namespace WMMAPI.Controllers
     public class VendorController : ControllerBase
     {
         private readonly ILogger<VendorController> _logger;
-        private readonly IVendorRepository _vendorRepository;
+        private readonly IVendorService _vendorRepository;
 
-        public VendorController(ILogger<VendorController> logger, IVendorRepository vendorRepo)
+        public VendorController(ILogger<VendorController> logger, IVendorService vendorRepo)
         {
             _logger = logger;
             _vendorRepository = vendorRepo;
@@ -70,7 +70,6 @@ namespace WMMAPI.Controllers
             }
         }
 
-        //Delete Vendor
         [HttpDelete]
         public IActionResult DeleteVendor([FromBody] DeleteVendorModel model)
         {
