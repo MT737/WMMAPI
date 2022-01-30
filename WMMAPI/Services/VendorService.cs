@@ -74,7 +74,7 @@ namespace WMMAPI.Services
 
         }
 
-        //TODO: Much of this logic is shared with Category. Look into consolidation (generics?)
+        //TODO: Much of this logic is shared with Category. Look into consolidation
         public void DeleteVendor(Guid absorbedId, Guid absorbingId, Guid userId)
         {
             // Confirm vendors exist and are owned by the user
@@ -161,6 +161,7 @@ namespace WMMAPI.Services
         public void Absorption(Guid absorbedId, Guid absorbingId, Guid userId)
         {
             //TODO: this works for a small database, but for large scale, this method should be updated to perform a bulk update.
+            //TODO: Could use dapper to just manually generate the transaction script
             IQueryable<Transaction> vendorsToUpdate = Context.Transactions
                 .Where(v => v.VendorId == absorbedId && v.UserId == userId);
 

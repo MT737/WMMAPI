@@ -169,7 +169,7 @@ namespace WMMAPI.Services
         {
             if (!DefaultsExist(userId)) //Preventing duplication of defaults.
             {
-                // TODO: Replace these magic strings with a global constants.
+                // TODO: Replace these magic strings with global constants.
                 string[] categories = new string[] {"Account Transfer", "Account Correction", "New Account", "ATM Withdrawal", "Eating Out",
                 "Entertainment", "Gas", "Groceries/Sundries", "Income", "Shopping", "Returns/Deposits", "Other"};
 

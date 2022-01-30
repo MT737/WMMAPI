@@ -17,11 +17,9 @@ namespace WMMAPI.Models.UserModels
         [EmailAddress, StringLength(200)]
         public string EmailAddress { get; set; }
         
-        //TODO: stringlength for a password?
         [StringLength(100)]
         public string Password { get; set; }
 
-        //TODO: Parse the dob datetime...Need to be able to handle nulls
         public User ToDB(Guid userId)
         {
             // Convert DOB
