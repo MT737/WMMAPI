@@ -26,5 +26,8 @@ namespace WMMAPI.Database.Entities
 
         [Required]
         public byte[] PasswordSalt { get; set; }
+
+        [Required]
+        public bool IsDeleted { get; set; } = false;
     }
 }

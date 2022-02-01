@@ -6,7 +6,6 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.AccountModels;
-using WMMAPI.Models.AccountModels;
 using static WMMAPI.Helpers.Globals;
 
 namespace WMMAPI.Services
