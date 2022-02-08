@@ -103,24 +103,19 @@ namespace WMMAPI.Services
         /// <returns></returns>
         private decimal GetBalance(Guid accountId, bool isAsset)
         {
-            //TODO: I really want to simplify this to a single query (there's already enough communications with the DB happening as is).
-            decimal balance;
-
             //TODO: Further test account balances
             var paymentTo = Context.Transactions
                  .Where(t => t.AccountId == accountId && t.TransactionType.Name == TransactionTypes.Credit)
-                 .ToList()
                  .Sum(t => t.Amount);
 
             var paymentFrom = Context.Transactions
                 .Where(t => t.AccountId == accountId && t.TransactionType.Name == TransactionTypes.Debit)
-                .ToList()
                 .Sum(t => t.Amount);
 
             // Asset balance = payments to less payments from.
             if (isAsset)
             {
-                return balance = paymentTo - paymentFrom;
+                return paymentTo - paymentFrom;
             }
             // Liability balance = payments from - payments to.
             else
