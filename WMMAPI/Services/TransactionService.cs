@@ -109,7 +109,6 @@ namespace WMMAPI.Services
         /// <param name="transactionId"></param>
         public void DeleteTransaction(Guid userId, Guid transactionId)
         {
-            //TODO: This hits the DB twice. Better to just let the DB return an error and handle it?
             bool transactionExists = Context.Transactions.Any(t => t.UserId == userId && t.TransactionId == transactionId);
             if (!transactionExists)
                 throw new AppException("Transaction not found.");
