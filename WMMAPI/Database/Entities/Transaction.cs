@@ -35,14 +35,14 @@ namespace WMMAPI.Database.Entities
 
         
         //Navigation Properties
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
-        public TransactionType TransactionType { get; set; }
+        public virtual TransactionType TransactionType { get; set; }
         
-        public Account Account { get; set; }
+        public virtual Account Account { get; set; }
         
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
         
-        public Vendor Vendor { get; set; }
+        public virtual Vendor Vendor { get; set; }
     }
 }

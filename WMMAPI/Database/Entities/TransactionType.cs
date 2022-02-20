@@ -15,6 +15,6 @@ namespace WMMAPI.Database.Entities
 
 
         //Navigation Property
-        public ICollection<Transaction> Transactions { get; set; }
+        public virtual ICollection<Transaction> Transactions { get; set; }
     }
 }

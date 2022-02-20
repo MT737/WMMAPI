@@ -6,17 +6,17 @@ namespace WMMAPI.Database
     public class WMMContext : DbContext
     {
         // DT Sets
-        public DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<Account> Accounts { get; set; }
 
-        public DbSet<Category> Categories { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
 
-        public DbSet<Transaction> Transactions { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
 
-        public DbSet<TransactionType> TransactionTypes { get; set; }
+        public virtual DbSet<TransactionType> TransactionTypes { get; set; }
 
-        public DbSet<User> Users { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
-        public DbSet<Vendor> Vendors { get; set; }
+        public virtual DbSet<Vendor> Vendors { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
