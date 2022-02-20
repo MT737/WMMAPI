@@ -133,18 +133,6 @@ namespace WMMAPI.Services
         /// <param name="userId">User ID of the user to be removed from the db</param>
         public void RemoveUser(Guid userId)
         {
-            //TODO: Additional validation?
-            Delete(userId);
-        }
-
-
-        #region Private Helpers
-        /// <summary>
-        /// Removes user from the DB.
-        /// </summary>
-        /// <param name="userId">User ID of the user to be removed from the db</param>
-        public void RemoveUser(Guid userId)
-        {
             var currentUser = Context.Users
                 .FirstOrDefault(u => u.UserId == userId);
 
