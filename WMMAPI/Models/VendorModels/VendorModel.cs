@@ -4,6 +4,7 @@ using WMMAPI.Database.Entities;
 
 namespace WMMAPI.Models.VendorModels
 {
+    //TODO: Lots of similarities with CategoryModel. Consider a base class?
     public class VendorModel
     {
         [Required]
