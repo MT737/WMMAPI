@@ -27,7 +27,7 @@ namespace WMMAPI.Services
             }
 
             var user = Context.Users
-                .SingleOrDefault(u => u.EmailAddress == email);
+                .SingleOrDefault(u => u.EmailAddress == email && u.IsDeleted == false);
 
             // Check if email exists
             if (user == null)
@@ -110,6 +110,8 @@ namespace WMMAPI.Services
                 currentUser.PasswordSalt = passwordSalt;
             }
 
+            currentUser.IsDeleted = false;
+
             Update(currentUser);            
         }
 
@@ -135,6 +137,27 @@ namespace WMMAPI.Services
             Delete(userId);
         }
 
+
+        #region Private Helpers
+        /// <summary>
+        /// Removes user from the DB.
+        /// </summary>
+        /// <param name="userId">User ID of the user to be removed from the db</param>
+        public void RemoveUser(Guid userId)
+        {
+            var currentUser = Context.Users
+                .FirstOrDefault(u => u.UserId == userId);
+
+            if (currentUser == null)
+                throw new AppException("User not found");
+
+            currentUser.IsDeleted = true;
+
+            Update(currentUser);
+        }
+
+
+        // TODO Add email/account recovery for users that forget credentials and for previously deleted accounts.
 
         #region Private Helpers
         /// <summary>

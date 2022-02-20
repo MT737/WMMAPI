@@ -6,10 +6,10 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.CategoryModels;
+using static WMMAPI.Helpers.Globals;
 
 namespace WMMAPI.Services
 {
-    //TODO: consider moving the Get list to the base...
     public class CategoryService : BaseService<Category>, ICategoryService
     {
         public CategoryService(WMMContext context) : base(context)
@@ -170,9 +170,7 @@ namespace WMMAPI.Services
         {
             if (!DefaultsExist(userId)) //Preventing duplication of defaults.
             {
-                // TODO: Replace these magic strings with a global constants.
-                string[] categories = new string[] {"Account Transfer", "Account Correction", "New Account", "ATM Withdrawal", "Eating Out",
-                "Entertainment", "Gas", "Groceries/Sundries", "Income", "Shopping", "Returns/Deposits", "Other"};
+                string[] categories = DefaultCategories.GetAllDefaultCategories();
 
                 foreach (string category in categories)
                 {
@@ -183,8 +181,7 @@ namespace WMMAPI.Services
                         IsDefault = true,
                     };
 
-                    // TODO: Replace these magic strings with global constants.
-                    if (category == "Account Transfer" || category == "Account Correction" || category == "New Account" || category == "Income")
+                    if (DefaultCategories.GetAllNotDisplayedDefaultCategories().Contains(category))
                     {
                         cat.IsDisplayed = false;
                     }

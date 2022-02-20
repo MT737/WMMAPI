@@ -28,7 +28,7 @@ namespace WMMAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(); //TODO Research this
+            services.AddCors();
             services.AddControllers();
 
 
@@ -63,18 +63,15 @@ namespace WMMAPI
                 };
                 x.RequireHttpsMetadata = true;
                 x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                x.TokenValidationParameters = new TokenValidationParameters //TODO: Review these settings
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false, //TODO: Review these settings
+                    ValidateIssuer = false,
                     ValidateAudience = false
                 };
             });
 
-            //TODO: Look into this authentication pattern a bit more
-
-            //TODO: Add environment check to adjust db connection...
             services.AddScoped<WMMContext>();
 
             services.AddScoped<IAccountService, AccountService>();
@@ -83,7 +80,7 @@ namespace WMMAPI
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IVendorService, VendorService>();
 
-            //TODO: Consult the swagger documentation for greater familiarity with what this is doing
+            //TODO: Consult the swagger documentation for additional settings and options
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WMMAPI", Version = "v1" });
@@ -117,9 +114,7 @@ namespace WMMAPI
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            //TODO: Add db migration here so it happens automatically when run?
-
+        {            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -131,7 +126,6 @@ namespace WMMAPI
 
             app.UseRouting();
 
-            //TODO: Research this
             app.UseCors(x => x
                 .AllowAnyOrigin()
                 .AllowAnyMethod()

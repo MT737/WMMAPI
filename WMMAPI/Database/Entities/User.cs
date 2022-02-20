@@ -21,11 +21,13 @@ namespace WMMAPI.Database.Entities
         [Required, EmailAddress, StringLength(200)]
         public string EmailAddress { get; set; }
 
-        //TODO: Change nullability?
         [Required]
         public byte[] PasswordHash { get; set; }
 
         [Required]
         public byte[] PasswordSalt { get; set; }
+
+        [Required]
+        public bool IsDeleted { get; set; } = false;
     }
 }

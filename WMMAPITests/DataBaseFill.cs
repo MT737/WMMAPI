@@ -27,10 +27,10 @@ namespace WMMAPITests
                 var user = new User
                 {
                     UserId = Guid.NewGuid(),
-                    FirstName = "Mark",
-                    LastName = "Taylor",
-                    DOB = new DateTime(1983, 12, 11),
-                    EmailAddress = "mark.taylor737@gmail.com"
+                    FirstName = "Mr",
+                    LastName = "Test",
+                    DOB = new DateTime(1900, 11, 11),
+                    EmailAddress = "Test@test.com"
                 };
                 var userRepo = new UserService(db);
                 userRepo.Create(user, "testPassword");

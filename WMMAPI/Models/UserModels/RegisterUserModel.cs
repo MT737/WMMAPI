@@ -19,7 +19,6 @@ namespace WMMAPI.Models.UserModels
         [Required, EmailAddress, StringLength(200)]
         public string EmailAddress { get; set; }
 
-        //TODO: stringlength for a password?
         [Required, StringLength(100)]
         public string Password { get; set; }
 

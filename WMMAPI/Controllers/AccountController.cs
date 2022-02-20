@@ -21,7 +21,7 @@ namespace WMMAPI.Controllers
             _logger = logger;
             _accountService = accountService;
         }
-        
+
         [HttpGet]
         public IActionResult GetAccounts()
         {
@@ -39,8 +39,6 @@ namespace WMMAPI.Controllers
             }
         }
 
-        //TODO: Add endpoint for returning paged list?
-
         [HttpPost]
         public IActionResult AddAccount([FromBody] AddAccountModel model)
         {            
@@ -49,8 +47,7 @@ namespace WMMAPI.Controllers
                 var account = model.ToDB(Guid.Parse(User.Identity.Name));
                 _accountService.AddAccount(account);
 
-                //TODO: Need to add functionality for setting initial balance
-                //Can leverage transaction repo...
+                //TODO: Need to add functionality for setting initial balance                
                 return Ok(new AccountModel(account));
             }
             catch (AppException ex)

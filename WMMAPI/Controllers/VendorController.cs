@@ -70,7 +70,6 @@ namespace WMMAPI.Controllers
             }
         }
 
-        //Delete Vendor
         [HttpDelete]
         public IActionResult DeleteVendor([FromBody] DeleteVendorModel model)
         {
