@@ -46,5 +46,15 @@ namespace WMMAPITests
         }
 
         // Method for generating test transactions...
+        public static Transaction CreateTestTransaction(Account account, decimal amount, bool isDebit)
+        {
+            return new Transaction
+            {
+                UserId = account.UserId,
+                AccountId = account.AccountId,
+                IsDebit = isDebit,
+                Amount = amount
+            };
+        }
     }
 }

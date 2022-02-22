@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
+using WMMAPI.Models.AccountModels;
 using WMMAPI.Services;
 
 namespace WMMAPITests
@@ -34,17 +36,6 @@ namespace WMMAPITests
         }
 
 
-        [TestMethod]
-        public void TestingMock()
-        {   
-            var service = new AccountService(_mockContext.Object);
-
-            service.AddAccount(TestDataHelper.CreateTestAccount());
-
-            _mockAccountSet.Verify(m => m.Add(It.IsAny<Account>()), Times.Once());
-            _mockContext.Verify(m => m.SaveChanges(), Times.Once());
-        }
-
         #region TestingHelpers
         [TestMethod]
         public void TestNameExistsFalse()
@@ -65,10 +56,9 @@ namespace WMMAPITests
         public void TestNameExistsTrue()
         {
             // Fabricate test account
-            Account testAccount = TestDataHelper.CreateTestAccount();
-            testAccount.Name = _accounts.First().Name;
-            testAccount.UserId = _accounts.First().UserId;
-
+            Account account = _accounts.First();
+            Account testAccount = TestDataHelper.CreateTestAccount(account.UserId, account.Name);
+            
             // Initialize service and call method
             AccountService service = new AccountService(_mockContext.Object);
             bool result = service.NameExists(testAccount);
@@ -83,8 +73,7 @@ namespace WMMAPITests
         {
             // Fabricate test account
             Account testAccount = TestDataHelper.CreateTestAccount();
-            testAccount.Name = "Test";
-
+            
             // Initialize service and call method
             AccountService service = new AccountService(_mockContext.Object);
             service.ValidateAccount(testAccount);
@@ -98,9 +87,8 @@ namespace WMMAPITests
         public void TestValidationFailsNoNameThrowsException()
         {
             // Fabricate test account
-            Account testAccount = TestDataHelper.CreateTestAccount();
-            testAccount.Name = "   ";
-
+            Account testAccount = TestDataHelper.CreateTestAccount(accountName: "  ");
+            
             // Initialize service and call method
             AccountService service = new AccountService(_mockContext.Object);
             service.ValidateAccount(testAccount);
@@ -114,10 +102,9 @@ namespace WMMAPITests
         public void TestValidationFailsNameExistsThrowsException()
         {
             // Fabricate test account
-            Account testAccount = TestDataHelper.CreateTestAccount();
-            testAccount.Name = _accounts.First().Name;
-            testAccount.UserId = _accounts.First().UserId;
-
+            Account account = _accounts.First();
+            Account testAccount = TestDataHelper.CreateTestAccount(account.UserId, account.Name);
+            
             // Initialize service and call method
             AccountService service = new AccountService(_mockContext.Object);
             service.ValidateAccount(testAccount);
@@ -126,31 +113,75 @@ namespace WMMAPITests
             _mockContext.Verify(m => m.Accounts, Times.Once());
         }
 
-        // GetBalance
         [TestMethod]
-        public void TestGetBalanceSucceeds()
+        [DataRow(true, "75.25|credit;24.75|credit;10.00|debit;25.25|debit", 64.75)]
+        [DataRow(false, "10.00|credit;25.25|credit;75.25|debit;24.75|debit", 64.75)]
+        public void TestGetBalanceSucceeds(bool isAsset, string transStructure, double expectedBalance)
         {
-            // TODO Over in TestDataHelper; generate a method for generating a list of test transactions
-            // Build in such a way as to be able to set the balance...
-        }
+            // Fabricate account
+            Account account = TestDataHelper.CreateTestAccount();
+            account.IsAsset = isAsset;
+            
+            // Fabricate transactions
+            List<Transaction> transList = new List<Transaction>();
+            var transSplit = transStructure.Split(';');
+            foreach (var split in transSplit)
+            {
+                var tran = split.Split('|');
+                transList.Add(
+                    TestDataHelper.CreateTestTransaction(
+                        account, decimal.Parse(tran[0]), tran[1] == "debit"));
+            }
+            IQueryable<Transaction> trans = transList.AsQueryable();
 
+            // Arrange Mock transactions
+            Mock<DbSet<Transaction>> mockTransactionSet = new();
+            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.Provider).Returns(trans.Provider);
+            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.Expression).Returns(trans.Expression);
+            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.ElementType).Returns(trans.ElementType);
+            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.GetEnumerator()).Returns(trans.GetEnumerator());
+
+            _mockContext.Setup(m => m.Transactions).Returns(mockTransactionSet.Object);
+
+            // Initialize service and call method
+            AccountService service = new AccountService(_mockContext.Object);
+            decimal result =service.GetBalance(account.AccountId, isAsset);
+
+            // Confirm mock -- No assertion, exception expected
+            _mockContext.Verify(m => m.Transactions, Times.Exactly(2));
+            Assert.AreEqual((decimal)expectedBalance, result);
+        }
         #endregion
 
         // Get
+        [TestMethod]
+        public void TestGet()
+        {
+            Account testAccount = _accounts.First();
+            AccountService service = new AccountService(_mockContext.Object);
+            AccountModel result = service.Get(testAccount.AccountId, testAccount.UserId);
+
+            // TODO Account needs some transaction data so balance can be pulled.
+
+            _mockContext.Verify(m => m.Accounts, Times.Once());
+            Assert.AreEqual(testAccount.AccountId, result.AccountId);
+            Assert.AreEqual(testAccount.Name, result.Name);
+        }
 
         // GetList
 
-        // AddAccount
+        [TestMethod]
+        public void TestAddAccount()
+        {
+            var service = new AccountService(_mockContext.Object);
+
+            service.AddAccount(TestDataHelper.CreateTestAccount());
+
+            _mockAccountSet.Verify(m => m.Add(It.IsAny<Account>()), Times.Once());
+            _mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
 
         // ModifyAccount
-
-
-
-
-
-
-
-
 
 
 
