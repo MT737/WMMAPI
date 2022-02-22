@@ -13,12 +13,6 @@ namespace WMMAPI.Models.TransactionModels
         public DateTime TransactionDate { get; set; }
 
         [Required]
-        public Guid TransactionTypeId { get; set; }
-
-        [Required]
-        public string TransactionType { get; set; }
-
-        [Required]
         public Guid AccountId { get; set; }
 
         [Required]
@@ -36,6 +30,9 @@ namespace WMMAPI.Models.TransactionModels
         [Required]
         public string Vendor { get; set; }
 
+        [Required]
+        public bool IsDebit { get; set; }
+
         [Required, Range(0, 9999999999999999.99)]
         public decimal Amount { get; set; }
 
@@ -46,14 +43,13 @@ namespace WMMAPI.Models.TransactionModels
         {
             TransactionId = transaction.TransactionId;
             TransactionDate = transaction.TransactionDate;
-            TransactionTypeId = transaction.TransactionTypeId;
-            TransactionType = transaction.TransactionType.Name;
             AccountId = transaction.AccountId;
             Account = transaction.Account.Name;
             CategoryId = transaction.CategoryId;
             Category = transaction.Category.Name;
             VendorId = transaction.VendorId;
             Vendor = transaction.Vendor.Name;
+            IsDebit = transaction.IsDebit;
             Amount = transaction.Amount;
             Description = transaction.Description;
         }
@@ -63,8 +59,7 @@ namespace WMMAPI.Models.TransactionModels
             return new Transaction
             {
                 UserId = userId,
-                TransactionId = TransactionId,
-                TransactionTypeId = TransactionTypeId,
+                IsDebit = IsDebit,
                 AccountId = AccountId,
                 CategoryId = CategoryId,
                 VendorId = VendorId,

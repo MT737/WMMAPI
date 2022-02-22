@@ -12,8 +12,6 @@ namespace WMMAPI.Database
 
         public virtual DbSet<Transaction> Transactions { get; set; }
 
-        public virtual DbSet<TransactionType> TransactionTypes { get; set; }
-
         public virtual DbSet<User> Users { get; set; }
 
         public virtual DbSet<Vendor> Vendors { get; set; }
@@ -44,13 +42,6 @@ namespace WMMAPI.Database
                 .HasOne(e => e.Category)
                 .WithMany(e => e.Transactions)
                 .HasForeignKey(e => e.CategoryId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .IsRequired();
-
-            builder.Entity<Transaction>()
-                .HasOne(e => e.TransactionType)
-                .WithMany(e => e.Transactions)
-                .HasForeignKey(e => e.TransactionTypeId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
 

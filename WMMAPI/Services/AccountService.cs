@@ -105,11 +105,11 @@ namespace WMMAPI.Services
         {
             //TODO: Further test account balances
             var paymentTo = Context.Transactions
-                 .Where(t => t.AccountId == accountId && t.TransactionType.Name == TransactionTypes.Credit)
+                 .Where(t => t.AccountId == accountId && !t.IsDebit)
                  .Sum(t => t.Amount);
 
             var paymentFrom = Context.Transactions
-                .Where(t => t.AccountId == accountId && t.TransactionType.Name == TransactionTypes.Debit)
+                .Where(t => t.AccountId == accountId && t.IsDebit)
                 .Sum(t => t.Amount);
 
             // Asset balance = payments to less payments from.
