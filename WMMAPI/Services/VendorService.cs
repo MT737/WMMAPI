@@ -26,7 +26,7 @@ namespace WMMAPI.Services
         public Vendor Get(Guid id, Guid userId)
         {
             return Context.Vendors
-                .Where(v => v.VendorId == id && v.UserId == userId)
+                .Where(v => v.Id == id && v.UserId == userId)
                 .SingleOrDefault();
         }
 
@@ -55,7 +55,7 @@ namespace WMMAPI.Services
         public void ModifyVendor(Vendor vendor)
         {
             var currentVendor = Context.Vendors
-                .FirstOrDefault(v => v.VendorId == vendor.VendorId && v.UserId == vendor.UserId);
+                .FirstOrDefault(v => v.Id == vendor.Id && v.UserId == vendor.UserId);
 
             if (currentVendor == null)
                 throw new AppException("Vendor not found.");
@@ -78,13 +78,13 @@ namespace WMMAPI.Services
         public void DeleteVendor(Guid absorbedId, Guid absorbingId, Guid userId)
         {
             // Confirm vendors exist and are owned by the user
-            var absorbedVendorExists = Context.Vendors.FirstOrDefault(v => v.VendorId == absorbedId && v.UserId == userId);
+            var absorbedVendorExists = Context.Vendors.FirstOrDefault(v => v.Id == absorbedId && v.UserId == userId);
             if (absorbedVendorExists == null)
                 throw new AppException("Vendor selected for deletion not found.");
             if (absorbedVendorExists.IsDefault)
                 throw new AppException($"{absorbedVendorExists.Name} is a default vendor and cannot be deleted.");
 
-            var absorbingVendorExists = Context.Vendors.Any(v => v.VendorId == absorbingId && v.UserId == userId);
+            var absorbingVendorExists = Context.Vendors.Any(v => v.Id == absorbingId && v.UserId == userId);
             if (!absorbingVendorExists)
                 throw new AppException("Vendor selected to absorb deleted vendor not found.");
 
@@ -125,7 +125,7 @@ namespace WMMAPI.Services
         /// <returns>Bool: True if the user owns the vendor reference. False otherwise.</returns>
         public bool UserOwnsVendor(Guid vendorId, Guid userID)
         {
-            return Context.Vendors.Where(v => v.UserId == userID && v.VendorId == vendorId).Any();
+            return Context.Vendors.Where(v => v.UserId == userID && v.Id == vendorId).Any();
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace WMMAPI.Services
         public bool NameExists(Vendor vendor)
         {
             return Context.Vendors
-                .Where(v => v.UserId == vendor.UserId && v.Name.ToLower() == vendor.Name.ToLower() && v.VendorId != vendor.VendorId)
+                .Where(v => v.UserId == vendor.UserId && v.Name.ToLower() == vendor.Name.ToLower() && v.Id != vendor.Id)
                 .Any();
         }
 
@@ -149,7 +149,7 @@ namespace WMMAPI.Services
         {
             return Context.Vendors
                 .Where(v => v.Name == name && v.UserId == userID)
-                .SingleOrDefault().VendorId;
+                .SingleOrDefault().Id;
         }
 
         /// <summary>

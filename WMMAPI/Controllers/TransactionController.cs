@@ -53,7 +53,7 @@ namespace WMMAPI.Controllers
 
                 // Pull saved transaction from db in order to pull names (Convenience feature for API consumer)
                 TransactionModel returnModel = new TransactionModel(_transactionService
-                    .Get(userId, dbModel.TransactionId, true));
+                    .Get(userId, dbModel.Id, true));
 
                 return Ok(returnModel);
             }

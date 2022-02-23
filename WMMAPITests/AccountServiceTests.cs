@@ -36,7 +36,6 @@ namespace WMMAPITests
             _mockContext.Setup(m => m.Set<Account>()).Returns(_mockAccountSet.Object);          
         }
 
-
         #region TestingHelpers
         [TestMethod]
         public void TestNameExistsFalse()
@@ -130,14 +129,13 @@ namespace WMMAPITests
             // Arrange
             Mock<DbSet<Transaction>> trans = GenerateMockTrans(transStructure.Split(";"), testAccount);                        
             AccountService service = new AccountService(_mockContext.Object);
-            decimal result = service.GetBalance(testAccount.AccountId, isAsset);
+            decimal result = service.GetBalance(testAccount.Id, isAsset);
 
             // Confirm mock
             _mockContext.Verify(m => m.Transactions, Times.Exactly(2));
             Assert.AreEqual((decimal)expectedBalance, result);
         }
         #endregion
-
 
         #region Testing service methods
         [TestMethod]
@@ -150,12 +148,12 @@ namespace WMMAPITests
             string trans = "75.25|credit;24.75|credit;10.00|debit;25.25|debit";
             Mock<DbSet<Transaction>> mockTransactionSet = GenerateMockTrans(trans.Split(';'), testAccount);            
             AccountService service = new AccountService(_mockContext.Object);
-            AccountModel result = service.Get(testAccount.AccountId, testAccount.UserId);
+            AccountModel result = service.Get(testAccount.Id, testAccount.UserId);
             
             // Assert
             _mockContext.Verify(m => m.Accounts, Times.Once());
             _mockContext.Verify(m => m.Transactions, Times.Exactly(2));
-            Assert.AreEqual(testAccount.AccountId, result.AccountId);
+            Assert.AreEqual(testAccount.Id, result.Id);
             Assert.AreEqual(testAccount.Name, result.Name);
         }
 
@@ -205,7 +203,7 @@ namespace WMMAPITests
             Account testingAccount = new Account
             {
                 Name = "testAccount",
-                AccountId = dbAccount.AccountId,
+                Id = dbAccount.Id,
                 UserId = dbAccount.UserId
             };
 
@@ -221,8 +219,6 @@ namespace WMMAPITests
             service.ModifyAccount(TestDataHelper.CreateTestAccount());
         }
         #endregion
-
-
 
         #region private methods        
         private Mock<DbSet<Transaction>> GenerateMockTrans(string[] transStructure, Account account)

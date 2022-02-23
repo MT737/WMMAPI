@@ -7,7 +7,7 @@ namespace WMMAPI.Database.Entities
     {
         //Properties
         [Required]
-        public Guid UserId { get; set; }
+        public Guid Id { get; set; }
 
         [Required, StringLength(200)]
         public string FirstName { get; set; }

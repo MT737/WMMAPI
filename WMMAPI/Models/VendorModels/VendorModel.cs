@@ -8,7 +8,7 @@ namespace WMMAPI.Models.VendorModels
     public class VendorModel
     {
         [Required]
-        public Guid VendordId { get; set; }
+        public Guid Id { get; set; }
 
         [Required, StringLength(100)]
         public string Name { get; set; }
@@ -21,7 +21,7 @@ namespace WMMAPI.Models.VendorModels
 
         public VendorModel(Vendor vendor)
         {
-            VendordId = vendor.VendorId;
+            Id = vendor.Id;
             Name = vendor.Name;
             IsDefault = vendor.IsDefault;
             IsDisplayed = vendor.IsDisplayed;
@@ -31,7 +31,7 @@ namespace WMMAPI.Models.VendorModels
         {
             return new Vendor
             {
-                VendorId = VendordId,
+                Id = Id,
                 UserId = userId,
                 IsDefault = false, //placeholder
                 IsDisplayed = IsDisplayed

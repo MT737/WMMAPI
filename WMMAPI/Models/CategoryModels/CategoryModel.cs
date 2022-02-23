@@ -21,7 +21,7 @@ namespace WMMAPI.Models.CategoryModels
 
         public CategoryModel(Category category)
         {
-            CategoryId = category.CategoryId;
+            CategoryId = category.Id;
             Name = category.Name;
             IsDisplayed = category.IsDisplayed;
             IsDefault = category.IsDefault;
@@ -32,7 +32,7 @@ namespace WMMAPI.Models.CategoryModels
             return new Category
             {
                 UserId = userId,
-                CategoryId = CategoryId,
+                Id = CategoryId,
                 Name = Name,
                 IsDefault = false, //Placeholder
                 IsDisplayed = IsDisplayed

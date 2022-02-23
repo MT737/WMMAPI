@@ -77,7 +77,7 @@ namespace WMMAPI.Services
         public void Modify(User user, string password = null)
         {
             var currentUser = Context.Users
-                .FirstOrDefault(u => u.UserId == user.UserId);
+                .FirstOrDefault(u => u.Id == user.Id);
 
             if (currentUser == null)
                 throw new AppException("User not found");
@@ -85,7 +85,7 @@ namespace WMMAPI.Services
             // Confirm email is open or current email for user
             if (!String.IsNullOrWhiteSpace(user.EmailAddress))
             {
-                if (Context.Users.Any(u => u.EmailAddress == user.EmailAddress && u.UserId != user.UserId))
+                if (Context.Users.Any(u => u.EmailAddress == user.EmailAddress && u.Id != user.Id))
                     throw new AppException("Email is alread registered to an account");
                 
                 currentUser.EmailAddress = user.EmailAddress;
@@ -123,7 +123,7 @@ namespace WMMAPI.Services
         public User GetById(Guid id)
         {
             return Context.Users
-                .Where(u => u.UserId == id)
+                .Where(u => u.Id == id)
                 .SingleOrDefault();
         }
 
@@ -134,7 +134,7 @@ namespace WMMAPI.Services
         public void RemoveUser(Guid userId)
         {
             var currentUser = Context.Users
-                .FirstOrDefault(u => u.UserId == userId);
+                .FirstOrDefault(u => u.Id == userId);
 
             if (currentUser == null)
                 throw new AppException("User not found");

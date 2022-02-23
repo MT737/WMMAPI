@@ -13,7 +13,7 @@ namespace WMMAPI.Models.CategoryModels
         {
             return new Category
             {
-                CategoryId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 UserId = userId,
                 Name = Name,
                 IsDefault = false,

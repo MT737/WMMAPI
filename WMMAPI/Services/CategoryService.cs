@@ -25,7 +25,7 @@ namespace WMMAPI.Services
         public CategoryModel Get(Guid id, Guid userId)
         {
             var category = Context.Categories
-                .Where(c => c.CategoryId == id && c.UserId == userId)
+                .Where(c => c.Id == id && c.UserId == userId)
                 .SingleOrDefault();
 
             if (category == null)
@@ -70,7 +70,7 @@ namespace WMMAPI.Services
         {
 
             Category currentCategory = Context.Categories
-                .FirstOrDefault(c => c.CategoryId == category.CategoryId && c.UserId == category.UserId);
+                .FirstOrDefault(c => c.Id == category.Id && c.UserId == category.UserId);
 
             if (currentCategory == null)
                 throw new AppException("Category not found.");
@@ -96,13 +96,13 @@ namespace WMMAPI.Services
         public void DeleteCategory(Guid absorbedId, Guid absorbingId, Guid userId)
         {
             // Confirm categories exist and are owned by user
-            var absorbedCatExists = Context.Categories.FirstOrDefault(c => c.CategoryId == absorbedId && c.UserId == userId);
+            var absorbedCatExists = Context.Categories.FirstOrDefault(c => c.Id == absorbedId && c.UserId == userId);
             if (absorbedCatExists == null)
                 throw new AppException("Category selected for deletion not found.");
             if (absorbedCatExists.IsDefault)
                 throw new AppException($"{absorbedCatExists.Name} is a default category and cannot be deleted.");
             
-            var absorbingCatExists = Context.Categories.Any(c => c.CategoryId == absorbingId && c.UserId == userId);
+            var absorbingCatExists = Context.Categories.Any(c => c.Id == absorbingId && c.UserId == userId);
             if (!absorbingCatExists)
                 throw new AppException("Category selected to absorbed deleted category not found.");
 
@@ -127,7 +127,7 @@ namespace WMMAPI.Services
             return Context.Categories
                 .Where(c => c.UserId == category.UserId
                     && c.Name.ToLower() == category.Name.ToLower()
-                    && c.CategoryId == category.CategoryId)
+                    && c.Id == category.Id)
                 .Any();
         }
 

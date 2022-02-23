@@ -28,7 +28,7 @@ namespace WMMAPI.Models.UserModels
 
             return new User
             {
-                UserId = userId,
+                Id = userId,
                 FirstName = FirstName ?? " ",
                 LastName = LastName ?? " ",
                 DOB = conversion ? dob : DateTime.MinValue,

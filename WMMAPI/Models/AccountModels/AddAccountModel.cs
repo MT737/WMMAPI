@@ -22,7 +22,7 @@ namespace WMMAPI.Models.AccountModels
         {
             return new Account
             {
-                AccountId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 UserId = userId,
                 Name = Name,
                 IsAsset = IsAsset,

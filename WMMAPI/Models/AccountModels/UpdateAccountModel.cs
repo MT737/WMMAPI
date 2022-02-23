@@ -23,7 +23,7 @@ namespace WMMAPI.Models.AccountModels
             return new Account
             {
                 UserId = userId,
-                AccountId = AccountId,
+                Id = AccountId,
                 Name = Name,
                 IsAsset = false, //Using a placeholder for now //TODO: Should this be changeable?
                 IsActive = IsActive

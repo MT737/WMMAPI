@@ -26,7 +26,7 @@ namespace WMMAPI.Models.UserModels
         {
             User u = new()
             {
-                UserId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 FirstName = FirstName,
                 LastName = LastName,
                 DOB = DateTime.Parse(DOB),

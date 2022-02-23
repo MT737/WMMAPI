@@ -5,7 +5,7 @@ namespace WMMAPI.Models.UserModels
 {
     public class UserModel
     {
-        public Guid UserId { get; set; }
+        public Guid Id { get; set; }
 
         public string FirstName { get; set; }
 
@@ -17,7 +17,7 @@ namespace WMMAPI.Models.UserModels
 
         public UserModel(User user)
         {
-            UserId = user.UserId;
+            Id = user.Id;
             FirstName = user.FirstName;
             LastName = user.LastName;
             DOB = user.DOB;

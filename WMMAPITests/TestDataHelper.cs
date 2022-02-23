@@ -8,7 +8,7 @@ namespace WMMAPITests
     {  
 
         // Method for generating test accounts; 10 users with 10 accounts each = 100 accounts
-        public static List<Account> CreateTestAccounts()
+        internal static List<Account> CreateTestAccounts()
         {
             var accounts = new List<Account>();
             
@@ -21,7 +21,7 @@ namespace WMMAPITests
                     var id = Guid.NewGuid();
                     accounts.Add(new Account
                     {
-                        AccountId = id,
+                        Id = id,
                         UserId = userId,
                         Name = $"TestAccount: {id}",
                         IsAsset = true,
@@ -33,11 +33,16 @@ namespace WMMAPITests
             return accounts;
         }
 
-        public static Account CreateTestAccount(Guid? userid = null, string accountName = null)
+        internal static List<Category> CreateTestCategories()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal static Account CreateTestAccount(Guid? userid = null, string accountName = null)
         {
             return new Account
             {
-                AccountId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 UserId = userid ?? Guid.NewGuid(),
                 Name = accountName ?? "Test",
                 IsAsset = true,
@@ -46,12 +51,12 @@ namespace WMMAPITests
         }
 
         // Method for generating test transactions...
-        public static Transaction CreateTestTransaction(Account account, decimal amount, bool isDebit)
+        internal static Transaction CreateTestTransaction(Account account, decimal amount, bool isDebit)
         {
             return new Transaction
             {
                 UserId = account.UserId,
-                AccountId = account.AccountId,
+                AccountId = account.Id,
                 IsDebit = isDebit,
                 Amount = amount
             };

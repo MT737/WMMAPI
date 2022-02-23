@@ -5,7 +5,7 @@ namespace WMMAPI.Models.UserModels
 {
     public class AuthenticatedUserModel
     {
-        public Guid UserId { get; set; }
+        public Guid Id { get; set; }
 
         public string FirstName { get; set; }
 
@@ -19,7 +19,7 @@ namespace WMMAPI.Models.UserModels
      
         public AuthenticatedUserModel(User user, string token)
         {
-            UserId = user.UserId;
+            Id = user.Id;
             FirstName = user.FirstName;
             LastName = user.LastName;
             DOB = user.DOB;
