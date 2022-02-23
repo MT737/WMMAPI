@@ -46,7 +46,7 @@ namespace WMMAPI.Services
             var accounts = Context.Accounts
                 .Where(a => a.UserId == userId)
                 .OrderBy(a => a.Name)
-                .Select(x => new AccountModel(x));
+                .Select(x => new AccountModel(x)).ToList();
 
             // Get balance
             foreach(var account in accounts)

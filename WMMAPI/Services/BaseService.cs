@@ -30,13 +30,12 @@ namespace WMMAPI.Services
         }
 
         /// <summary>
-        /// Set entity's state to modified and save the changes to the database.
+        /// Save the changes to the database. Setting modified state is not required since all changes take place within the context.
         /// </summary>
         /// <param name="entity">Repository type</param>
         public void Update(TEntity entity)
         {
-            Context.Entry(entity).State = EntityState.Modified;
-            Context.SaveChanges();
+            Context.SaveChanges();            
         }
 
         /// <summary>
