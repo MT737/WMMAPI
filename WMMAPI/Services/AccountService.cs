@@ -46,7 +46,7 @@ namespace WMMAPI.Services
             var accounts = Context.Accounts
                 .Where(a => a.UserId == userId)
                 .OrderBy(a => a.Name)
-                .Select(x => new AccountModel(x));
+                .Select(x => new AccountModel(x)).ToList();
 
             // Get balance
             foreach(var account in accounts)
@@ -94,22 +94,22 @@ namespace WMMAPI.Services
             Update(currentAccount);
         }
 
-        #region Private Helpers
+        #region Helpers
         /// <summary>
         /// Calculates an account balance based on transactions in the database.
         /// </summary>
         /// <param name="accountId">Guid: AccountID of the account balance to be calculated.</param>
         /// <param name="isAsset">Bool: IsAsset classification of the account balance to be calculated.</param>
         /// <returns></returns>
-        private decimal GetBalance(Guid accountId, bool isAsset)
+        public decimal GetBalance(Guid accountId, bool isAsset)
         {
             //TODO: Further test account balances
             var paymentTo = Context.Transactions
-                 .Where(t => t.AccountId == accountId && t.TransactionType.Name == TransactionTypes.Credit)
+                 .Where(t => t.AccountId == accountId && !t.IsDebit)
                  .Sum(t => t.Amount);
 
             var paymentFrom = Context.Transactions
-                .Where(t => t.AccountId == accountId && t.TransactionType.Name == TransactionTypes.Debit)
+                .Where(t => t.AccountId == accountId && t.IsDebit)
                 .Sum(t => t.Amount);
 
             // Asset balance = payments to less payments from.
@@ -131,7 +131,7 @@ namespace WMMAPI.Services
         /// <param name="accountId">Guid: Account Id of which the name existence is desired.</param>
         /// <param name="userID">Guid: UserID of the account.</param>
         /// <returns>Bool: Indication of the account name's current existence in the user's DB profile.</returns>
-        private bool NameExists(Account account)
+        public bool NameExists(Account account)
         {
             return Context.Accounts
                  .Where(a => a.UserId == account.UserId
@@ -144,9 +144,9 @@ namespace WMMAPI.Services
         /// Validates passed account model
         /// </summary>
         /// <param name="account">Account model to be validated.</param>
-        private void ValidateAccount(Account account)
+        public void ValidateAccount(Account account)
         {
-            if (!String.IsNullOrWhiteSpace(account.Name))
+            if (String.IsNullOrWhiteSpace(account.Name))
                 throw new AppException("Account name cannot be empty or whitespace only string.");
 
             if (NameExists(account))

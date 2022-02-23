@@ -4,13 +4,6 @@ namespace WMMAPI.Helpers
 {
     public class Globals
     {
-
-        public struct TransactionTypes
-        {
-            public const string Debit = "Debit";
-            public const string Credit = "Credit";
-        }
-
         public readonly struct DefaultCategories
         {
             public const string AccountTransfer = "Account Transfer";
