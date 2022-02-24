@@ -135,7 +135,9 @@ namespace WMMAPI.Services
         public bool NameExists(Vendor vendor)
         {
             return Context.Vendors
-                .Where(v => v.UserId == vendor.UserId && v.Name.ToLower() == vendor.Name.ToLower() && v.Id != vendor.Id)
+                .Where(v => v.UserId == vendor.UserId
+                    && v.Name.ToLower() == vendor.Name.ToLower()
+                    && v.Id != vendor.Id)
                 .Any();
         }
 

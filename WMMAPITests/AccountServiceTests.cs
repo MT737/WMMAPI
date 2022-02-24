@@ -7,7 +7,6 @@ using System.Linq;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
-using WMMAPI.Interfaces;
 using WMMAPI.Models.AccountModels;
 using WMMAPI.Services;
 
