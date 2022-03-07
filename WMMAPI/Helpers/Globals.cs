@@ -30,5 +30,15 @@ namespace WMMAPI.Helpers
                 return new string[] { AccountTransfer, AccountCorrection, NewAccount, Income };
             }
         }
+
+        public readonly struct DefaultVendors
+        {
+            public const string NA = "N/A";
+
+            public static string[] GetAllDevaultVendors()
+            {
+                return new string[] { NA };
+            }
+        }
     }
 }

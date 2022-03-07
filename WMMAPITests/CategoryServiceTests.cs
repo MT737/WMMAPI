@@ -38,7 +38,7 @@ namespace WMMAPITests
         {
             // Fabricate test category
             Category cat = _categories.First();
-            Category testCategory = TestDataHelper.CreateTestCategory(cat.Name, true, cat.UserId);
+            Category testCategory = TestDataHelper.CreateTestCategory(true, cat.Name, cat.UserId);
             testCategory.Id = cat.Id;
 
             // Initialize service and call method
@@ -55,7 +55,7 @@ namespace WMMAPITests
         {
             // Fabricate test category
             Category cat = _categories.First();
-            Category testCategory = TestDataHelper.CreateTestCategory(cat.Name, true, cat.UserId);
+            Category testCategory = TestDataHelper.CreateTestCategory(true, cat.Name, cat.UserId);
 
             // Initialize service an call method
             CategoryService service = new CategoryService(_mockContext.Object);
