@@ -126,6 +126,7 @@ namespace WMMAPI
 
             app.UseRouting();
 
+            // TODO Consider adding cors policies to restrict access to only owned domains
             app.UseCors(x => x
                 .AllowAnyOrigin()
                 .AllowAnyMethod()

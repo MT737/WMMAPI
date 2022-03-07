@@ -8,7 +8,7 @@ namespace WMMAPITests
 {
     internal static class TestDataHelper
     {
-        internal static User CreateTestuser(string firstName, string lastName, string email, bool isDeleted)
+        internal static User CreateTestUser(string firstName = null, string lastName = null, string email = null, bool isDeleted = false)
         {
             Random random = new Random();
             int rand = random.Next(0, 1000);
@@ -18,13 +18,14 @@ namespace WMMAPITests
                 FirstName = firstName ?? $"FirstName{rand}",
                 LastName = lastName ?? $"LastName{rand}",
                 EmailAddress = $"testemail{rand}@address.com",
-                DOB = DateTime.Now.AddYears(random.Next(-22, -55)),
+                DOB = DateTime.Now.AddYears(random.Next(-55, -25)),
                 //PasswordHash = "",
                 //PasswordSalt = "",
                 IsDeleted = isDeleted,
                 Accounts = new List<Account>(),
                 Categories = new List<Category>(),
-                Vendors = new List<Vendor>()
+                Vendors = new List<Vendor>(),
+                Transactions = new List<Transaction>()
             };
 
             user.Accounts = CreateTestAccounts();

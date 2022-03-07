@@ -15,11 +15,13 @@ namespace WMMAPITests
         private IQueryable<Category> _categories;
         private Mock<WMMContext> _mockContext;
         private Mock<DbSet<Category>> _mockCategorySet;
+        private User _userData;
 
         [TestInitialize]
         public void Init()
         {
-            _categories = TestDataHelper.CreateDefaultCategoriesSet().AsQueryable();
+            _userData = TestDataHelper.CreateTestUser();
+            _categories = _userData.Categories.AsQueryable();
             _mockContext = new Mock<WMMContext>();
 
             _mockCategorySet = new Mock<DbSet<Category>>();
@@ -69,6 +71,9 @@ namespace WMMAPITests
         [TestMethod]
         public void TestGetCategorySpending()
         {
+            // Need a category Id for a category that's been used or I need to fabricate some transactions
+            // Need a user Id
+
             throw new NotImplementedException();
         }
 

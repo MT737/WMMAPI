@@ -18,11 +18,13 @@ namespace WMMAPITests
         private IQueryable<Account> _accounts;
         private Mock<WMMContext> _mockContext;
         private Mock<DbSet<Account>> _mockAccountSet;
+        private User _userData;
         
         [TestInitialize]
         public void Init()
         {
-            _accounts = TestDataHelper.CreateTestAccounts().AsQueryable();
+            _userData = TestDataHelper.CreateTestUser();
+            _accounts = _userData.Accounts.AsQueryable();
             _mockContext = new Mock<WMMContext>();
             
             _mockAccountSet = new Mock<DbSet<Account>>();
