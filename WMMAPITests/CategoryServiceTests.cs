@@ -29,6 +29,8 @@ namespace WMMAPITests
             _categories = _userData.Categories.AsQueryable();
             _transactions = _userData.Transactions.AsQueryable();
 
+            // TODO This is becoming too redundant. What about a context helper class? Context builder?
+
             _mockCategorySet = new Mock<DbSet<Category>>();
             _mockCategorySet.As<IQueryable<Category>>().Setup(m => m.Provider).Returns(_categories.Provider);
             _mockCategorySet.As<IQueryable<Category>>().Setup(m => m.Expression).Returns(_categories.Expression);
@@ -82,8 +84,8 @@ namespace WMMAPITests
         }
 
         [TestMethod]
-        [DataRow(1126.80, 40.00, Globals.DefaultCategories.Entertainment)]
-        public void TestGetCategorySpending(double debit, double credit, string category)
+        [DataRow(1126.80, Globals.DefaultCategories.Entertainment)]
+        public void TestGetCategorySpending(double spending, string category)
         {
             // Fabricate test transactions for the given category
             Guid categoryId = _userData.Categories.First(c => c.Name == category).Id;
@@ -93,15 +95,7 @@ namespace WMMAPITests
                 Account account = _userData.Accounts.ElementAt(TestDataHelper._random.Next(_userData.Accounts.Count()));
                 Guid vendorId = _userData.Vendors.ElementAt(TestDataHelper._random.Next(_userData.Vendors.Count())).Id;
                 
-                _userData.Transactions.Add(TestDataHelper.CreateTestTransaction(account, true, (decimal)debit / 4, categoryId, vendorId));
-            }
-
-            for (int i = 0; i < 4; i++)
-            {
-                Account account = _userData.Accounts.ElementAt(TestDataHelper._random.Next(_userData.Accounts.Count()));
-                Guid vendorId = _userData.Vendors.ElementAt(TestDataHelper._random.Next(_userData.Vendors.Count())).Id;
-
-                _userData.Transactions.Add(TestDataHelper.CreateTestTransaction(account, true, (decimal)credit / 4, categoryId, vendorId));
+                _userData.Transactions.Add(TestDataHelper.CreateTestTransaction(account, true, (decimal)spending / 4, categoryId, vendorId));
             }
 
             // Initialize service and call method
@@ -110,7 +104,7 @@ namespace WMMAPITests
 
             // Confirm mock and assert
             _mockContext.Verify(m => m.Transactions, Times.Once());
-            Assert.AreEqual(debit - credit, result);
+            Assert.AreEqual((decimal)spending, result);
         }
 
         [TestMethod]
