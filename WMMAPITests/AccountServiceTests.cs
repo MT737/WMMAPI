@@ -9,6 +9,7 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Models.AccountModels;
 using WMMAPI.Services;
+using WMMAPITests.DataHelpers;
 
 namespace WMMAPITests
 {
@@ -128,7 +129,7 @@ namespace WMMAPITests
             testAccount.IsAsset = isAsset;
 
             // Arrange
-            Mock<DbSet<Transaction>> trans = GenerateMockTrans(transStructure.Split(";"), testAccount);                        
+            GenerateMockTrans(transStructure.Split(";"), testAccount);                        
             AccountService service = new AccountService(_mockContext.Object);
             decimal result = service.GetBalance(testAccount.Id, isAsset);
 
@@ -147,7 +148,7 @@ namespace WMMAPITests
             
             // Arrange
             string trans = "75.25|credit;24.75|credit;10.00|debit;25.25|debit";
-            Mock<DbSet<Transaction>> mockTransactionSet = GenerateMockTrans(trans.Split(';'), testAccount);            
+            GenerateMockTrans(trans.Split(';'), testAccount);            
             AccountService service = new AccountService(_mockContext.Object);
             AccountModel result = service.Get(testAccount.Id, testAccount.UserId);
             
@@ -171,7 +172,7 @@ namespace WMMAPITests
 
             // Arrange
             string transSample = "75.25|credit;24.75|credit;10.00|debit;25.25|debit";
-            Mock<DbSet<Transaction>> mockTransactionSet = GenerateMockTrans(transSample.Split(';'), testAccounts.First());            
+            GenerateMockTrans(transSample.Split(';'), testAccounts.First());            
             AccountService service = new AccountService(_mockContext.Object);
             ICollection<AccountModel> results = service.GetList(userId);
 
@@ -222,7 +223,7 @@ namespace WMMAPITests
         #endregion
 
         #region private methods        
-        private Mock<DbSet<Transaction>> GenerateMockTrans(string[] transStructure, Account account)
+        private void GenerateMockTrans(string[] transStructure, Account account)
         {
             List<Transaction> transList = new();
             foreach (var split in transStructure)
@@ -230,7 +231,7 @@ namespace WMMAPITests
                 var tran = split.Split('|');
                 transList.Add(
                     TestDataHelper.CreateTestTransaction(
-                        account, decimal.Parse(tran[0]), tran[1] == "debit"));
+                        account, tran[1] == "debit", decimal.Parse(tran[0]), Guid.NewGuid(), Guid.NewGuid()));
             }
 
             Mock<DbSet<Transaction>> mockTransactionSet = new();
@@ -239,8 +240,6 @@ namespace WMMAPITests
             mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.ElementType).Returns(transList.AsQueryable().ElementType);
             mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.GetEnumerator()).Returns(transList.AsQueryable().GetEnumerator());
             _mockContext.Setup(m => m.Transactions).Returns(mockTransactionSet.Object);
-
-            return mockTransactionSet;
         }
         #endregion
     }

@@ -4,21 +4,22 @@ using System.Linq;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 
-namespace WMMAPITests
+namespace WMMAPITests.DataHelpers
 {
     internal static class TestDataHelper
     {
+        internal static Random _random = new Random();
+       
         internal static User CreateTestUser(string firstName = null, string lastName = null, string email = null, bool isDeleted = false)
         {
-            Random random = new Random();
-            int rand = random.Next(0, 1000);
+            int rand = _random.Next(0, 1000);
             User user = new User
             {
                 Id = Guid.NewGuid(),
                 FirstName = firstName ?? $"FirstName{rand}",
                 LastName = lastName ?? $"LastName{rand}",
                 EmailAddress = $"testemail{rand}@address.com",
-                DOB = DateTime.Now.AddYears(random.Next(-55, -25)),
+                DOB = DateTime.Now.AddYears(_random.Next(-55, -25)),
                 //PasswordHash = "",
                 //PasswordSalt = "",
                 IsDeleted = isDeleted,
@@ -28,7 +29,7 @@ namespace WMMAPITests
                 Transactions = new List<Transaction>()
             };
 
-            user.Accounts = CreateTestAccounts();
+            user.Accounts = CreateTestAccounts(user.Id);
             user.Categories = CreateDefaultCategories(user.Id);
             user.Vendors = CreateDefaultVendors(user.Id);
 
@@ -39,19 +40,26 @@ namespace WMMAPITests
 
             foreach (var acc in user.Accounts)
             {
-                user.Transactions.Add(CreateTestTransaction(acc, random.Next(250, 7000), false, "Initial Account Setup"));
+                user.Transactions.Add(
+                    CreateTestTransaction(
+                        acc,
+                        false,
+                        _random.Next(250, 7000),
+                        user.Categories.First(c => c.Name == Globals.DefaultCategories.NewAccount).Id,
+                        user.Vendors.First(v => v.Name == Globals.DefaultVendors.NA).Id,
+                        "Initial Account Setup"
+                        )
+                    );
             }
 
             return user;
         }
 
-        // Method for generating test accounts; 10 users with 10 accounts each = 100 accounts
-        internal static List<Account> CreateTestAccounts()
+        internal static List<Account> CreateTestAccounts(Guid userId)
         {
             List<Account> accounts = new();
             for (int i = 0; i < 10; i++)
             {
-                Guid userId = Guid.NewGuid();
                 for (int x = 0; x < 10; x++)
                 {
                     accounts.Add(CreateTestAccount(userId, $"TestAccount{x}"));
@@ -73,21 +81,20 @@ namespace WMMAPITests
             };
         }
 
-        // Create default categories for 10 random users
-        internal static List<Category> CreateDefaultCategoriesSet()
+        internal static List<Category> CreateDefaultCategoriesSet(Guid userId)
         {
             List<Category> categoriesSet = new();
             for (int i = 0; i < 10; i++)
             {
-                categoriesSet = categoriesSet.Union(CreateDefaultCategories()).ToList();
+                categoriesSet = categoriesSet.Union(CreateDefaultCategories(userId)).ToList();
             }
 
             return categoriesSet;
         }
 
-        internal static List<Category> CreateDefaultCategories(Guid? userGuid = null)
+        internal static List<Category> CreateDefaultCategories(Guid? userid = null)
         {
-            Guid userId = userGuid ?? Guid.NewGuid();
+            Guid userId = userid ?? Guid.NewGuid();
             List<Category> categories = new();
             string[] defaultCats = Globals.DefaultCategories.GetAllDefaultCategories();
             string[] notDisplayedCats = Globals.DefaultCategories.GetAllNotDisplayedDefaultCategories();
@@ -106,12 +113,11 @@ namespace WMMAPITests
 
         internal static Category CreateTestCategory(bool isDisplayed, string name = null, Guid? userId = null, bool isDefault = true)
         {
-            Random random = new Random();
             return new Category
             {
                 Id = Guid.NewGuid(),
                 UserId = userId ?? Guid.NewGuid(),
-                Name = name ?? $"TestName{random.Next(0, 1000)}",
+                Name = name ?? $"TestName{_random.Next(0, 1000)}",
                 IsDefault = isDefault,
                 IsDisplayed = isDisplayed
             };
@@ -139,28 +145,27 @@ namespace WMMAPITests
 
         internal static Vendor CreateTestVendor(bool isDisplayed, Guid? userId = null, string name = null, bool isDefault = true)
         {
-            Random random = new Random();
             return new Vendor
             {
                 Id = Guid.NewGuid(),
                 UserId = userId ?? Guid.NewGuid(),
-                Name = name ?? $"TestName{random.Next(0, 1000)}",
+                Name = name ?? $"TestName{_random.Next(0, 1000)}",
                 IsDisplayed = isDisplayed,
                 IsDefault = isDefault
             };
         }
 
-        internal static Transaction CreateTestTransaction(Account account, decimal amount, bool isDebit, string description = null)
+        internal static Transaction CreateTestTransaction(Account account, bool isDebit, decimal amount, Guid categoryId, Guid vendorId, string description = null)
         {
             return new Transaction
             {
                 UserId = account.UserId,
                 AccountId = account.Id,
+                TransactionDate = DateTime.UtcNow,
                 IsDebit = isDebit,
                 Amount = amount,
-                TransactionDate = DateTime.UtcNow,
-                //CategoryId = ,
-                //VendorId = ,
+                CategoryId = categoryId,
+                VendorId = categoryId,
                 Description = description ?? "No description provided"
             };
         }       
