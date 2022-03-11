@@ -6,28 +6,69 @@ using WMMAPI.Helpers;
 
 namespace WMMAPITests.DataHelpers
 {
-    internal static class TestDataHelper
+    internal class TestData
     {
+        internal IQueryable<User> Users { get; set; }
+        internal IQueryable<Account> Accounts { get; set; }
+        internal IQueryable<Transaction> Transactions { get; set; }
+        internal IQueryable<Category> Categories { get; set; }
+        internal IQueryable<Vendor> Vendors { get; set; }
+
+        
         internal static Random _random = new Random();
-       
-        internal static User CreateTestUser(string firstName = null, string lastName = null, string email = null, bool isDeleted = false)
+
+        internal TestData()
         {
+            CreateTestUsers();
+            
+        }
+       
+        internal void CreateTestUsers(string firstName = null, string lastName = null, string email = null, bool isDeleted = false)
+        {
+            List<User> users = new List<User>();
+            List<Account> accounts = new List<Account>();
+            List<Transaction> transactions = new List<Transaction>();
+            List<Category> categories = new List<Category>();
+            List<Vendor> vendors = new List<Vendor>();
+
             int rand = _random.Next(0, 1000);
-            User user = new User
+            for (int i = 0; i < 10; i++)
             {
-                Id = Guid.NewGuid(),
-                FirstName = firstName ?? $"FirstName{rand}",
-                LastName = lastName ?? $"LastName{rand}",
-                EmailAddress = $"testemail{rand}@address.com",
-                DOB = DateTime.Now.AddYears(_random.Next(-55, -25)),
-                //PasswordHash = "",
-                //PasswordSalt = "",
-                IsDeleted = isDeleted,
-                Accounts = new List<Account>(),
-                Categories = new List<Category>(),
-                Vendors = new List<Vendor>(),
-                Transactions = new List<Transaction>()
-            };
+                users.Add( new User
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = firstName ?? $"FirstName{rand}",
+                    LastName = lastName ?? $"LastName{rand}",
+                    EmailAddress = $"testemail{rand}@address.com",
+                    DOB = DateTime.Now.AddYears(_random.Next(-55, -25)),
+                    //PasswordHash = "",
+                    //PasswordSalt = "",
+                    IsDeleted = isDeleted,
+                    //Accounts = new List<Account>(),
+                    //Categories = new List<Category>(),
+                    //Vendors = new List<Vendor>(),
+                    //Transactions = new List<Transaction>()
+                });
+            }
+
+            foreach (User user in users)
+            {
+                accounts.Concat(CreateTestAccounts(user.Id));
+                categories.Concat(CreateDefaultCategories(user.Id));
+                vendors.Concat(CreateDefaultVendors(user.Id));
+
+                List<Vendor> vend = new();
+                for (int i = 0; i < 10; i++)
+                {
+                    vend.Add(CreateTestVendor(true, user.Id));
+                }
+                vendors.Concat(vend);
+
+                foreach (Account account in user.Accounts)
+                {
+
+                }
+            }
 
             user.Accounts = CreateTestAccounts(user.Id);
             user.Categories = CreateDefaultCategories(user.Id);
@@ -52,10 +93,14 @@ namespace WMMAPITests.DataHelpers
                     );
             }
 
-            return user;
+            Users = Users.Concat(user);
+            Accounts = Accounts.Concat(user.Accounts);
+            Transactions = Transactions.Concat(user.Transactions);
+            Categories = Categories.Concat(user.Categories);
+            Vendors = Vendors.Concat(user.Vendors);
         }
 
-        internal static List<Account> CreateTestAccounts(Guid userId)
+        internal List<Account> CreateTestAccounts(Guid userId)
         {
             List<Account> accounts = new();
             for (int i = 0; i < 10; i++)
@@ -69,7 +114,7 @@ namespace WMMAPITests.DataHelpers
             return accounts;
         }
 
-        internal static Account CreateTestAccount(Guid? userid = null, string accountName = null)
+        internal Account CreateTestAccount(Guid? userid = null, string accountName = null)
         {
             return new Account
             {
@@ -81,7 +126,7 @@ namespace WMMAPITests.DataHelpers
             };
         }
 
-        internal static List<Category> CreateDefaultCategoriesSet(Guid userId)
+        internal List<Category> CreateDefaultCategoriesSet(Guid userId)
         {
             List<Category> categoriesSet = new();
             for (int i = 0; i < 10; i++)
@@ -92,7 +137,7 @@ namespace WMMAPITests.DataHelpers
             return categoriesSet;
         }
 
-        internal static List<Category> CreateDefaultCategories(Guid? userid = null)
+        internal List<Category> CreateDefaultCategories(Guid? userid = null)
         {
             Guid userId = userid ?? Guid.NewGuid();
             List<Category> categories = new();
@@ -111,7 +156,7 @@ namespace WMMAPITests.DataHelpers
             return categories;
         }
 
-        internal static Category CreateTestCategory(bool isDisplayed, string name = null, Guid? userId = null, bool isDefault = true)
+        internal Category CreateTestCategory(bool isDisplayed, string name = null, Guid? userId = null, bool isDefault = true)
         {
             return new Category
             {
@@ -123,7 +168,7 @@ namespace WMMAPITests.DataHelpers
             };
         }
 
-        internal static List<Vendor> CreateDefaultVendors(Guid? userGuid = null)
+        internal List<Vendor> CreateDefaultVendors(Guid? userGuid = null)
         {
             Guid userId = userGuid ?? Guid.NewGuid();
             List<Vendor> vendors = new();
@@ -155,7 +200,7 @@ namespace WMMAPITests.DataHelpers
             };
         }
 
-        internal static Transaction CreateTestTransaction(Account account, bool isDebit, decimal amount, Guid categoryId, Guid vendorId, string description = null)
+        internal Transaction CreateTestTransaction(Account account, bool isDebit, decimal amount, Guid categoryId, Guid vendorId, string description = null)
         {
             return new Transaction
             {

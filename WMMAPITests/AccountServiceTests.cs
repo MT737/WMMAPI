@@ -19,21 +19,19 @@ namespace WMMAPITests
         private IQueryable<Account> _accounts;
         private Mock<WMMContext> _mockContext;
         private Mock<DbSet<Account>> _mockAccountSet;
+        private TestData _testData;
         private User _userData;
         
         [TestInitialize]
         public void Init()
         {
-            _userData = TestDataHelper.CreateTestUser();
+            _testData = new TestData();
+            _userData = _testData.CreateTestUser();
+
             _accounts = _userData.Accounts.AsQueryable();
-            _mockContext = new Mock<WMMContext>();
-            
-            _mockAccountSet = new Mock<DbSet<Account>>();
-            _mockAccountSet.As<IQueryable<Account>>().Setup(m => m.Provider).Returns(_accounts.Provider);
-            _mockAccountSet.As<IQueryable<Account>>().Setup(m => m.Expression).Returns(_accounts.Expression);
-            _mockAccountSet.As<IQueryable<Account>>().Setup(m => m.ElementType).Returns(_accounts.ElementType);
-            _mockAccountSet.As<IQueryable<Account>>().Setup(m => m.GetEnumerator()).Returns(_accounts.GetEnumerator());
+            _mockAccountSet = TestDataContextHelper.GenerateMoqDbSet(_accounts);
            
+            _mockContext = new Mock<WMMContext>();
             _mockContext.Setup(m => m.Accounts).Returns(_mockAccountSet.Object);
             _mockContext.Setup(m => m.Set<Account>()).Returns(_mockAccountSet.Object);          
         }
@@ -234,11 +232,7 @@ namespace WMMAPITests
                         account, tran[1] == "debit", decimal.Parse(tran[0]), Guid.NewGuid(), Guid.NewGuid()));
             }
 
-            Mock<DbSet<Transaction>> mockTransactionSet = new();
-            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.Provider).Returns(transList.AsQueryable().Provider);
-            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.Expression).Returns(transList.AsQueryable().Expression);
-            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.ElementType).Returns(transList.AsQueryable().ElementType);
-            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.GetEnumerator()).Returns(transList.AsQueryable().GetEnumerator());
+            Mock<DbSet<Transaction>> mockTransactionSet = TestDataContextHelper.GenerateMoqDbSet(transList.AsQueryable());
             _mockContext.Setup(m => m.Transactions).Returns(mockTransactionSet.Object);
         }
         #endregion
