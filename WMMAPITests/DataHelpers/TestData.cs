@@ -8,31 +8,24 @@ namespace WMMAPITests.DataHelpers
 {
     internal class TestData
     {
-        internal IQueryable<User> Users { get; set; }
-        internal IQueryable<Account> Accounts { get; set; }
-        internal IQueryable<Transaction> Transactions { get; set; }
-        internal IQueryable<Category> Categories { get; set; }
-        internal IQueryable<Vendor> Vendors { get; set; }
-
-        
+        internal IQueryable<User> Users { get; set; } = new List<User>().AsQueryable();
+        internal IQueryable<Account> Accounts { get; set; } = new List<Account>().AsQueryable();
+        internal IQueryable<Transaction> Transactions { get; set; } = new List<Transaction>().AsQueryable();
+        internal IQueryable<Category> Categories { get; set; } = new List<Category>().AsQueryable();
+        internal IQueryable<Vendor> Vendors { get; set; } = new List<Vendor>().AsQueryable();
+                
         internal static Random _random = new Random();
 
         internal TestData()
         {
-            CreateTestUsers();
-            
+            CreateTestUsers();            
         }
        
         internal void CreateTestUsers(string firstName = null, string lastName = null, string email = null, bool isDeleted = false)
         {
-            List<User> users = new List<User>();
-            List<Account> accounts = new List<Account>();
-            List<Transaction> transactions = new List<Transaction>();
-            List<Category> categories = new List<Category>();
-            List<Vendor> vendors = new List<Vendor>();
-
+            List<User> users = new List<User>();            
             int rand = _random.Next(0, 1000);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 2; i++)
             {
                 users.Add( new User
                 {
@@ -50,13 +43,14 @@ namespace WMMAPITests.DataHelpers
                     //Transactions = new List<Transaction>()
                 });
             }
-
-            foreach (User user in users)
+            
+            Users = users.AsQueryable();            
+            foreach (User user in Users)
             {
-                accounts.Concat(CreateTestAccounts(user.Id));
-                categories.Concat(CreateDefaultCategories(user.Id));
-                vendors.Concat(CreateDefaultVendors(user.Id));
+                List<Account> accounts = CreateTestAccounts(user.Id);
+                List<Category> categories = CreateDefaultCategories(user.Id);
 
+                List<Vendor> vendors = CreateDefaultVendors(user.Id);
                 List<Vendor> vend = new();
                 for (int i = 0; i < 10; i++)
                 {
@@ -64,40 +58,26 @@ namespace WMMAPITests.DataHelpers
                 }
                 vendors.Concat(vend);
 
-                foreach (Account account in user.Accounts)
+                List<Transaction> transactions = new List<Transaction>();
+                foreach (Account account in accounts)
                 {
-
-                }
-            }
-
-            user.Accounts = CreateTestAccounts(user.Id);
-            user.Categories = CreateDefaultCategories(user.Id);
-            user.Vendors = CreateDefaultVendors(user.Id);
-
-            for (int i = 0; i < 10; i++)
-            {
-                user.Vendors.Add(CreateTestVendor(true, user.Id));
-            }
-
-            foreach (var acc in user.Accounts)
-            {
-                user.Transactions.Add(
+                    transactions.Add(
                     CreateTestTransaction(
-                        acc,
+                        account,
                         false,
                         _random.Next(250, 7000),
-                        user.Categories.First(c => c.Name == Globals.DefaultCategories.NewAccount).Id,
-                        user.Vendors.First(v => v.Name == Globals.DefaultVendors.NA).Id,
+                        categories.First(c => c.Name == Globals.DefaultCategories.NewAccount).Id,
+                        vendors.First(v => v.Name == Globals.DefaultVendors.NA).Id,
                         "Initial Account Setup"
                         )
                     );
-            }
+                }
 
-            Users = Users.Concat(user);
-            Accounts = Accounts.Concat(user.Accounts);
-            Transactions = Transactions.Concat(user.Transactions);
-            Categories = Categories.Concat(user.Categories);
-            Vendors = Vendors.Concat(user.Vendors);
+                Accounts = Accounts.Concat(accounts);
+                Categories = Categories.Concat(categories);
+                Vendors = Vendors.Concat(vendors);
+                Transactions = Transactions.Concat(transactions);
+            }            
         }
 
         internal List<Account> CreateTestAccounts(Guid userId)
@@ -105,10 +85,7 @@ namespace WMMAPITests.DataHelpers
             List<Account> accounts = new();
             for (int i = 0; i < 10; i++)
             {
-                for (int x = 0; x < 10; x++)
-                {
-                    accounts.Add(CreateTestAccount(userId, $"TestAccount{x}"));
-                }
+                accounts.Add(CreateTestAccount(userId, $"TestAccount{i}"));                
             }
 
             return accounts;
@@ -126,6 +103,7 @@ namespace WMMAPITests.DataHelpers
             };
         }
 
+        // TODO Still needed?
         internal List<Category> CreateDefaultCategoriesSet(Guid userId)
         {
             List<Category> categoriesSet = new();

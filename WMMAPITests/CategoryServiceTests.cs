@@ -1,10 +1,8 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Services;
@@ -15,38 +13,15 @@ namespace WMMAPITests
     [TestClass]
     public class CategoryServiceTests
     {
-        private User _userData;
-        private IQueryable<Category> _categories;
-        private IQueryable<Transaction> _transactions;
-        private Mock<DbSet<Category>> _mockCategorySet;
-        private Mock<DbSet<Transaction>> _mockTransactionSet;
-        private Mock<WMMContext> _mockContext;
+        private TestData _testData;
+        private TestDataContext _tdc;
 
         [TestInitialize]
         public void Init()
         {
-            _userData = TestDataHelper.CreateTestUser();
-            _categories = _userData.Categories.AsQueryable();
-            _transactions = _userData.Transactions.AsQueryable();
-
-            // TODO This is becoming too redundant. What about a context helper class? Context builder?
-
-            _mockCategorySet = new Mock<DbSet<Category>>();
-            _mockCategorySet.As<IQueryable<Category>>().Setup(m => m.Provider).Returns(_categories.Provider);
-            _mockCategorySet.As<IQueryable<Category>>().Setup(m => m.Expression).Returns(_categories.Expression);
-            _mockCategorySet.As<IQueryable<Category>>().Setup(m => m.ElementType).Returns(_categories.ElementType);
-            _mockCategorySet.As<IQueryable<Category>>().Setup(m => m.GetEnumerator()).Returns(_categories.GetEnumerator());
-
-            _mockTransactionSet = new Mock<DbSet<Transaction>>();
-            _mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.Provider).Returns(_transactions.Provider);
-            _mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.Expression).Returns(_transactions.Expression);
-            _mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.ElementType).Returns(_transactions.ElementType);
-            _mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.GetEnumerator()).Returns(_transactions.GetEnumerator());
-
-            _mockContext = new Mock<WMMContext>();
-            _mockContext.Setup(m => m.Categories).Returns(_mockCategorySet.Object);
-            _mockContext.Setup(m => m.Set<Category>()).Returns(_mockCategorySet.Object);
-            _mockContext.Setup(m => m.Transactions).Returns(_mockTransactionSet.Object);
+            _testData = new TestData();
+            _tdc = new TestDataContext(_testData);
+            _tdc.WMMContext.Setup(m => m.Set<Category>()).Returns(_tdc.CategorySet.Object);
         }
 
         #region TestingHelperMethods
@@ -54,16 +29,16 @@ namespace WMMAPITests
         public void TestNameExistsFalse()
         {
             // Fabricate test category
-            Category cat = _categories.First();
-            Category testCategory = TestDataHelper.CreateTestCategory(true, cat.Name, cat.UserId);
+            Category cat = _testData.Categories.First();
+            Category testCategory = _testData.CreateTestCategory(true, cat.Name, cat.UserId);
             testCategory.Id = cat.Id;
 
             // Initialize service and call method
-            CategoryService service = new CategoryService(_mockContext.Object);
+            CategoryService service = new CategoryService(_tdc.WMMContext.Object);
             bool result = service.NameExists(testCategory);
 
             // Confirm mock and assert
-            _mockContext.Verify(m => m.Categories, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Categories, Times.Once());
             Assert.IsFalse(result);
         }
         
@@ -71,15 +46,15 @@ namespace WMMAPITests
         public void TestNameExistsTrue()
         {
             // Fabricate test category
-            Category cat = _categories.First();
-            Category testCategory = TestDataHelper.CreateTestCategory(true, cat.Name, cat.UserId);
+            Category cat = _testData.Categories.First();
+            Category testCategory = _testData.CreateTestCategory(true, cat.Name, cat.UserId);
 
             // Initialize service and call method
-            CategoryService service = new CategoryService(_mockContext.Object);
+            CategoryService service = new CategoryService(_tdc.WMMContext.Object);
             bool result = service.NameExists(testCategory);
 
             // Confirm mock and assert
-            _mockContext.Verify(m => m.Categories, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Categories, Times.Once());
             Assert.IsTrue(result);
         }
 
@@ -88,22 +63,28 @@ namespace WMMAPITests
         public void TestGetCategorySpending(double spending, string category)
         {
             // Fabricate test transactions for the given category
-            Guid categoryId = _userData.Categories.First(c => c.Name == category).Id;
-            
+            Category cat = _testData.Categories.First(c => c.Name == category);
+            List<Account> accounts = _testData.Accounts.Where(a => a.UserId == cat.UserId).ToList();
+            List<Vendor> vendors = _testData.Vendors.Where(v => v.UserId == cat.UserId).ToList();
+
+            List<Transaction> trans = new();
             for (int i = 0; i < 4; i++)
             {
-                Account account = _userData.Accounts.ElementAt(TestDataHelper._random.Next(_userData.Accounts.Count()));
-                Guid vendorId = _userData.Vendors.ElementAt(TestDataHelper._random.Next(_userData.Vendors.Count())).Id;
-                
-                _userData.Transactions.Add(TestDataHelper.CreateTestTransaction(account, true, (decimal)spending / 4, categoryId, vendorId));
+                Account account = accounts.ElementAt(TestData._random.Next(accounts.Count()));
+                Guid vendorId = vendors.ElementAt(TestData._random.Next(vendors.Count())).Id;
+
+                trans.Add(_testData.CreateTestTransaction(account, true, (decimal)spending / 4, cat.Id, vendorId));
             }
 
+            _testData.Transactions = _testData.Transactions.Concat(trans);
+
             // Initialize service and call method
-            CategoryService service = new CategoryService(_mockContext.Object);
-            var result = service.GetCategorySpending(categoryId, _userData.Id);
+            TestDataContext tdc = new(_testData);
+            CategoryService service = new CategoryService(tdc.WMMContext.Object);
+            var result = service.GetCategorySpending(cat.Id, cat.UserId);
 
             // Confirm mock and assert
-            _mockContext.Verify(m => m.Transactions, Times.Once());
+            tdc.WMMContext.Verify(m => m.Transactions, Times.Once());
             Assert.AreEqual((decimal)spending, result);
         }
 
