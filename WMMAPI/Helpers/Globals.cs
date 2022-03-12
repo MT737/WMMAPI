@@ -22,12 +22,22 @@ namespace WMMAPI.Helpers
             public static string[] GetAllDefaultCategories()
             {
                 return new string[] { AccountTransfer, AccountCorrection, NewAccount, Income, ATMWithdrawal,
-                    EatingOut, GroceriesSundries, Shopping, ReturnsDeposits, Other };
+                    EatingOut, Entertainment, GroceriesSundries, Shopping, ReturnsDeposits, Other };
             }
 
             public static string[] GetAllNotDisplayedDefaultCategories()
             {
                 return new string[] { AccountTransfer, AccountCorrection, NewAccount, Income };
+            }
+        }
+
+        public readonly struct DefaultVendors
+        {
+            public const string NA = "N/A";
+
+            public static string[] GetAllDevaultVendors()
+            {
+                return new string[] { NA };
             }
         }
     }

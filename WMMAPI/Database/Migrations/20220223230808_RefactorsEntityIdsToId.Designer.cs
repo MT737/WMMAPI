@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WMMAPI.Database;
 
 namespace WMMAPI.Database.Migrations
 {
     [DbContext(typeof(WMMContext))]
-    partial class WMMContextModelSnapshot : ModelSnapshot
+    [Migration("20220223230808_RefactorsEntityIdsToId")]
+    partial class RefactorsEntityIdsToId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -190,7 +192,7 @@ namespace WMMAPI.Database.Migrations
             modelBuilder.Entity("WMMAPI.Database.Entities.Account", b =>
                 {
                     b.HasOne("WMMAPI.Database.Entities.User", "User")
-                        .WithMany("Accounts")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -201,7 +203,7 @@ namespace WMMAPI.Database.Migrations
             modelBuilder.Entity("WMMAPI.Database.Entities.Category", b =>
                 {
                     b.HasOne("WMMAPI.Database.Entities.User", "User")
-                        .WithMany("Categories")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -224,7 +226,7 @@ namespace WMMAPI.Database.Migrations
                         .IsRequired();
 
                     b.HasOne("WMMAPI.Database.Entities.User", "User")
-                        .WithMany("Transactions")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -247,7 +249,7 @@ namespace WMMAPI.Database.Migrations
             modelBuilder.Entity("WMMAPI.Database.Entities.Vendor", b =>
                 {
                     b.HasOne("WMMAPI.Database.Entities.User", "User")
-                        .WithMany("Vendors")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -263,17 +265,6 @@ namespace WMMAPI.Database.Migrations
             modelBuilder.Entity("WMMAPI.Database.Entities.Category", b =>
                 {
                     b.Navigation("Transactions");
-                });
-
-            modelBuilder.Entity("WMMAPI.Database.Entities.User", b =>
-                {
-                    b.Navigation("Accounts");
-
-                    b.Navigation("Categories");
-
-                    b.Navigation("Transactions");
-
-                    b.Navigation("Vendors");
                 });
 
             modelBuilder.Entity("WMMAPI.Database.Entities.Vendor", b =>

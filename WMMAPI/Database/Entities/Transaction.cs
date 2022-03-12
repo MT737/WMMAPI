@@ -7,16 +7,13 @@ namespace WMMAPI.Database.Entities
     {
         //Properties   
         [Required]
-        public Guid TransactionId { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public Guid UserId { get; set; }
 
         [Required]
         public DateTime TransactionDate { get; set; }
-
-        [Required]
-        public Guid TransactionTypeId { get; set; }
 
         [Required]
         public Guid AccountId { get; set; }

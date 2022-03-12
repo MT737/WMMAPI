@@ -10,9 +10,6 @@ namespace WMMAPI.Models.TransactionModels
         public DateTime TransactionDate { get; set; }
 
         [Required]
-        public Guid TransactionTypeId { get; set; }
-
-        [Required]
         public Guid AccountId { get; set; }
 
         [Required]
@@ -31,10 +28,9 @@ namespace WMMAPI.Models.TransactionModels
         {
             return new Transaction
             {
-                TransactionId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 UserId = userId,
                 TransactionDate = TransactionDate,
-                TransactionTypeId = TransactionTypeId,
                 AccountId = AccountId,
                 CategoryId = CategoryId,
                 VendorId = VendorId,

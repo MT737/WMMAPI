@@ -25,14 +25,14 @@ namespace WMMAPI.Services
         public AccountModel Get(Guid id, Guid userId)
         {   
             var account = Context.Accounts
-                .Where(a => a.AccountId == id && a.UserId == userId)
+                .Where(a => a.Id == id && a.UserId == userId)
                 .SingleOrDefault();
 
             if (account == null)
                 throw new AppException("Account not found.");
 
             var model = new AccountModel(account);
-            model.Balance = GetBalance(model.AccountId, model.IsAsset);
+            model.Balance = GetBalance(model.Id, model.IsAsset);
             return model;
         }
 
@@ -51,7 +51,7 @@ namespace WMMAPI.Services
             // Get balance
             foreach(var account in accounts)
             {
-                account.Balance = GetBalance(account.AccountId, account.IsAsset);
+                account.Balance = GetBalance(account.Id, account.IsAsset);
             }
 
             return accounts.ToList();
@@ -80,7 +80,7 @@ namespace WMMAPI.Services
         {
             // Pull current account from DB
             Account currentAccount = Context.Accounts
-                .FirstOrDefault(a => a.AccountId == account.AccountId && a.UserId == account.UserId);            
+                .FirstOrDefault(a => a.Id == account.Id && a.UserId == account.UserId);            
             if (currentAccount == null)
                 throw new AppException("Account not found.");
 
@@ -136,7 +136,7 @@ namespace WMMAPI.Services
             return Context.Accounts
                  .Where(a => a.UserId == account.UserId
                     && a.Name.ToLower() == account.Name.ToLower()
-                    && a.AccountId != account.AccountId)
+                    && a.Id != account.Id)
                  .Any();
         }
 

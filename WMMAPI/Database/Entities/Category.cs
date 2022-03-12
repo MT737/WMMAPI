@@ -8,7 +8,7 @@ namespace WMMAPI.Database.Entities
     {
         //Properties
         [Required]
-        public Guid CategoryId { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public Guid UserId { get; set; }

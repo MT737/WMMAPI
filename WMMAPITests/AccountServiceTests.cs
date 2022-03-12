@@ -1,55 +1,43 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
-using WMMAPI.Interfaces;
 using WMMAPI.Models.AccountModels;
 using WMMAPI.Services;
+using WMMAPITests.DataHelpers;
 
 namespace WMMAPITests
 {
     [TestClass]
     public class AccountServiceTests
     {
-        private IQueryable<Account> _accounts;
-        private Mock<WMMContext> _mockContext;
-        private Mock<DbSet<Account>> _mockAccountSet;
+        private TestData _testData;
+        private TestDataContext _tdc;
         
         [TestInitialize]
         public void Init()
         {
-            _accounts = TestDataHelper.CreateTestAccounts().AsQueryable();
-            _mockContext = new Mock<WMMContext>();
-            
-            _mockAccountSet = new Mock<DbSet<Account>>();
-            _mockAccountSet.As<IQueryable<Account>>().Setup(m => m.Provider).Returns(_accounts.Provider);
-            _mockAccountSet.As<IQueryable<Account>>().Setup(m => m.Expression).Returns(_accounts.Expression);
-            _mockAccountSet.As<IQueryable<Account>>().Setup(m => m.ElementType).Returns(_accounts.ElementType);
-            _mockAccountSet.As<IQueryable<Account>>().Setup(m => m.GetEnumerator()).Returns(_accounts.GetEnumerator());
-           
-            _mockContext.Setup(m => m.Accounts).Returns(_mockAccountSet.Object);
-            _mockContext.Setup(m => m.Set<Account>()).Returns(_mockAccountSet.Object);          
+            _testData = new TestData();            
+            _tdc = new TestDataContext(_testData);
+            _tdc.WMMContext.Setup(m => m.Set<Account>()).Returns(_tdc.AccountSet.Object);          
         }
-
 
         #region TestingHelpers
         [TestMethod]
         public void TestNameExistsFalse()
         {
             // Fabricate test account
-            Account testAccount = TestDataHelper.CreateTestAccount();
+            Account testAccount = _testData.CreateTestAccount();
 
             // Initialize service and call method
-            AccountService service = new AccountService(_mockContext.Object);
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
             bool reuslt = service.NameExists(testAccount);
 
             // Confirm mock and assert
-            _mockContext.Verify(m => m.Accounts, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
             Assert.IsFalse(reuslt);
         }
 
@@ -57,15 +45,15 @@ namespace WMMAPITests
         public void TestNameExistsTrue()
         {
             // Fabricate test account
-            Account account = _accounts.First();
-            Account testAccount = TestDataHelper.CreateTestAccount(account.UserId, account.Name);
+            Account account = _testData.Accounts.First();
+            Account testAccount = _testData.CreateTestAccount(account.UserId, account.Name);
             
             // Initialize service and call method
-            AccountService service = new AccountService(_mockContext.Object);
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
             bool result = service.NameExists(testAccount);
 
             // Confirm mock and assert
-            _mockContext.Verify(m => m.Accounts, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
             Assert.IsTrue(result);
         }
 
@@ -73,14 +61,14 @@ namespace WMMAPITests
         public void TestValidationPasses()
         {
             // Fabricate test account
-            Account testAccount = TestDataHelper.CreateTestAccount();
+            Account testAccount = _testData.CreateTestAccount();
             
             // Initialize service and call method
-            AccountService service = new AccountService(_mockContext.Object);
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
             service.ValidateAccount(testAccount);
 
             // Confirm mock -- No assert. Fail state is exception thrown
-            _mockContext.Verify(m => m.Accounts, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
         }
 
         [TestMethod]
@@ -88,14 +76,14 @@ namespace WMMAPITests
         public void TestValidationFailsNoNameThrowsException()
         {
             // Fabricate test account
-            Account testAccount = TestDataHelper.CreateTestAccount(accountName: "  ");
+            Account testAccount = _testData.CreateTestAccount(accountName: "  ");
             
             // Initialize service and call method
-            AccountService service = new AccountService(_mockContext.Object);
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
             service.ValidateAccount(testAccount);
 
             // Confirm mock -- No assertion, exception expected
-            _mockContext.Verify(m => m.Accounts, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
         }
 
         [TestMethod]
@@ -103,18 +91,18 @@ namespace WMMAPITests
         public void TestValidationFailsNameExistsThrowsException()
         {
             // Fabricate test account
-            Account account = _accounts.First();
-            Account testAccount = TestDataHelper.CreateTestAccount(account.UserId, account.Name);
+            Account account = _testData.Accounts.First();
+            Account testAccount = _testData.CreateTestAccount(account.UserId, account.Name);
             
             // Initialize service and call method
-            AccountService service = new AccountService(_mockContext.Object);
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
             service.ValidateAccount(testAccount);
 
             // Confirm mock -- No assertion, exception expected
-            _mockContext.Verify(m => m.Accounts, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
         }
 
-        [TestMethod]
+        [DataTestMethod]
         [DataRow(true, "75.25|credit;24.75|credit;10.00|debit;25.25|debit", 64.75)]
         [DataRow(false, "10.00|credit;25.25|credit;75.25|debit;24.75|debit", 64.75)]
         [DataRow(true, "10.00|credit;25.25|credit", 35.25)]
@@ -124,46 +112,57 @@ namespace WMMAPITests
         public void TestGetBalanceSucceeds(bool isAsset, string transStructure, double expectedBalance)
         {
             // Fabricate account
-            Account testAccount = TestDataHelper.CreateTestAccount();
+            Account testAccount = _testData.CreateTestAccount();
             testAccount.IsAsset = isAsset;
 
             // Arrange
-            Mock<DbSet<Transaction>> trans = GenerateMockTrans(transStructure.Split(";"), testAccount);                        
-            AccountService service = new AccountService(_mockContext.Object);
-            decimal result = service.GetBalance(testAccount.AccountId, isAsset);
+            GenerateMockTrans(transStructure.Split(";"), testAccount);
+            _tdc = new(_testData);
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
+            decimal result = service.GetBalance(testAccount.Id, isAsset);
 
             // Confirm mock
-            _mockContext.Verify(m => m.Transactions, Times.Exactly(2));
+            _tdc.WMMContext.Verify(m => m.Transactions, Times.Exactly(2));
             Assert.AreEqual((decimal)expectedBalance, result);
         }
         #endregion
-
 
         #region Testing service methods
         [TestMethod]
         public void TestGet()
         {
-            // Get test account
-            Account testAccount = _accounts.First();
+            // Create test account with transactions
+            Account testAccount = new Account
+            {
+                Id = Guid.NewGuid(),
+                Name = "TestingGetAccount",
+                UserId = _testData.Users.First().Id,
+                IsAsset = true,
+                IsActive = true
+            };
+            _testData.Accounts = _testData.Accounts.Concat( new List<Account> { testAccount });            
             
-            // Arrange
             string trans = "75.25|credit;24.75|credit;10.00|debit;25.25|debit";
-            Mock<DbSet<Transaction>> mockTransactionSet = GenerateMockTrans(trans.Split(';'), testAccount);            
-            AccountService service = new AccountService(_mockContext.Object);
-            AccountModel result = service.Get(testAccount.AccountId, testAccount.UserId);
+            GenerateMockTrans(trans.Split(';'), testAccount);
+                        
+            // Arrange; Need to update the dbsets with the new data
+            _tdc = new(_testData);
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
+            AccountModel result = service.Get(testAccount.Id, testAccount.UserId);
             
             // Assert
-            _mockContext.Verify(m => m.Accounts, Times.Once());
-            _mockContext.Verify(m => m.Transactions, Times.Exactly(2));
-            Assert.AreEqual(testAccount.AccountId, result.AccountId);
+            _tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Transactions, Times.Exactly(2));
+            Assert.AreEqual(testAccount.Id, result.Id);
             Assert.AreEqual(testAccount.Name, result.Name);
+            Assert.AreEqual((decimal)(75.25 + 24.75) - (decimal)(10 + 25.25), result.Balance); // TO DO Improve this use of values
         }
 
         [TestMethod]
         public void TestGetList()
         {
             // Get test accounts
-            List<Account> testAccounts = _accounts.Take(4).ToList();
+            List<Account> testAccounts = _testData.Accounts.Take(4).ToList();
             Guid userId = Guid.NewGuid();
             foreach (var account in testAccounts)
             {
@@ -172,13 +171,13 @@ namespace WMMAPITests
 
             // Arrange
             string transSample = "75.25|credit;24.75|credit;10.00|debit;25.25|debit";
-            Mock<DbSet<Transaction>> mockTransactionSet = GenerateMockTrans(transSample.Split(';'), testAccounts.First());            
-            AccountService service = new AccountService(_mockContext.Object);
+            GenerateMockTrans(transSample.Split(';'), testAccounts.First());            
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
             ICollection<AccountModel> results = service.GetList(userId);
 
             // Assert
-            _mockContext.Verify(m => m.Accounts, Times.Once());
-            _mockContext.Verify(m => m.Transactions, Times.Exactly(8));
+            _tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Transactions, Times.Exactly(8));
             foreach (var result in results)
             {
                 Assert.IsTrue(testAccounts.Any(a => a.Name == result.Name));
@@ -188,62 +187,52 @@ namespace WMMAPITests
         [TestMethod]
         public void TestAddAccount()
         {
-            var service = new AccountService(_mockContext.Object);
+            var service = new AccountService(_tdc.WMMContext.Object);
 
-            service.AddAccount(TestDataHelper.CreateTestAccount());
+            service.AddAccount(_testData.CreateTestAccount());
 
-            _mockAccountSet.Verify(m => m.Add(It.IsAny<Account>()), Times.Once());
-            _mockContext.Verify(m => m.SaveChanges(), Times.Once());
+            _tdc.AccountSet.Verify(m => m.Add(It.IsAny<Account>()), Times.Once());
+            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
         }
-
         
         [TestMethod]
         public void TestModifyAccountSucceeds()
         {
-            var service = new AccountService(_mockContext.Object);
-            Account dbAccount = _accounts.First();
+            var service = new AccountService(_tdc.WMMContext.Object);
+            Account dbAccount = _testData.Accounts.First();
             Account testingAccount = new Account
             {
                 Name = "testAccount",
-                AccountId = dbAccount.AccountId,
+                Id = dbAccount.Id,
                 UserId = dbAccount.UserId
             };
 
             service.ModifyAccount(testingAccount);
-            _mockContext.Verify(m => m.SaveChanges(), Times.Once());
+            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
         }
 
         [TestMethod]
         [ExpectedException(typeof(AppException))]
         public void TestModifyAccountFailsDueToNotExisting()
         {
-            var service = new AccountService(_mockContext.Object);
-            service.ModifyAccount(TestDataHelper.CreateTestAccount());
+            var service = new AccountService(_tdc.WMMContext.Object);
+            service.ModifyAccount(_testData.CreateTestAccount());
         }
         #endregion
 
-
-
         #region private methods        
-        private Mock<DbSet<Transaction>> GenerateMockTrans(string[] transStructure, Account account)
+        private void GenerateMockTrans(string[] transStructure, Account account)
         {
             List<Transaction> transList = new();
             foreach (var split in transStructure)
             {
                 var tran = split.Split('|');
                 transList.Add(
-                    TestDataHelper.CreateTestTransaction(
-                        account, decimal.Parse(tran[0]), tran[1] == "debit"));
+                    _testData.CreateTestTransaction(
+                        account, tran[1] == "debit", decimal.Parse(tran[0]), Guid.NewGuid(), Guid.NewGuid()));
             }
-
-            Mock<DbSet<Transaction>> mockTransactionSet = new();
-            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.Provider).Returns(transList.AsQueryable().Provider);
-            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.Expression).Returns(transList.AsQueryable().Expression);
-            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.ElementType).Returns(transList.AsQueryable().ElementType);
-            mockTransactionSet.As<IQueryable<Transaction>>().Setup(m => m.GetEnumerator()).Returns(transList.AsQueryable().GetEnumerator());
-            _mockContext.Setup(m => m.Transactions).Returns(mockTransactionSet.Object);
-
-            return mockTransactionSet;
+                        
+            _testData.Transactions = _testData.Transactions.Concat(transList);
         }
         #endregion
     }

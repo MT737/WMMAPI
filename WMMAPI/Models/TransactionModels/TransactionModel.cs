@@ -7,7 +7,7 @@ namespace WMMAPI.Models.TransactionModels
     public class TransactionModel
     {
         [Required]
-        public Guid TransactionId { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public DateTime TransactionDate { get; set; }
@@ -41,7 +41,7 @@ namespace WMMAPI.Models.TransactionModels
 
         public TransactionModel(Transaction transaction)
         {
-            TransactionId = transaction.TransactionId;
+            Id = transaction.Id;
             TransactionDate = transaction.TransactionDate;
             AccountId = transaction.AccountId;
             Account = transaction.Account.Name;

@@ -35,7 +35,7 @@ namespace WMMAPI.Services
             }
 
             return transaction
-                .Where(t => t.TransactionId == id && t.UserId == userId)
+                .Where(t => t.Id == id && t.UserId == userId)
                 .SingleOrDefault();
         }
 
@@ -80,7 +80,7 @@ namespace WMMAPI.Services
         public void ModifyTransaction(Transaction transaction)
         {
             Transaction currentTransaction = Context.Transactions
-                .FirstOrDefault(t => t.TransactionId == transaction.TransactionId 
+                .FirstOrDefault(t => t.Id == transaction.Id 
                     && t.UserId == transaction.UserId);
 
             if (currentTransaction == null)
@@ -90,7 +90,6 @@ namespace WMMAPI.Services
 
             // Update properties
             currentTransaction.TransactionDate = transaction.TransactionDate;
-            currentTransaction.TransactionTypeId = transaction.TransactionTypeId;
             currentTransaction.AccountId = transaction.AccountId;
             currentTransaction.CategoryId = transaction.CategoryId;
             currentTransaction.VendorId = transaction.VendorId;
@@ -107,7 +106,7 @@ namespace WMMAPI.Services
         /// <param name="transactionId"></param>
         public void DeleteTransaction(Guid userId, Guid transactionId)
         {
-            bool transactionExists = Context.Transactions.Any(t => t.UserId == userId && t.TransactionId == transactionId);
+            bool transactionExists = Context.Transactions.Any(t => t.UserId == userId && t.Id == transactionId);
             if (!transactionExists)
                 throw new AppException("Transaction not found.");
 

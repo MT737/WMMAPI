@@ -25,7 +25,7 @@ namespace WMMAPI.Services
         public CategoryModel Get(Guid id, Guid userId)
         {
             var category = Context.Categories
-                .Where(c => c.CategoryId == id && c.UserId == userId)
+                .Where(c => c.Id == id && c.UserId == userId)
                 .SingleOrDefault();
 
             if (category == null)
@@ -70,7 +70,7 @@ namespace WMMAPI.Services
         {
 
             Category currentCategory = Context.Categories
-                .FirstOrDefault(c => c.CategoryId == category.CategoryId && c.UserId == category.UserId);
+                .FirstOrDefault(c => c.Id == category.Id && c.UserId == category.UserId);
 
             if (currentCategory == null)
                 throw new AppException("Category not found.");
@@ -96,13 +96,13 @@ namespace WMMAPI.Services
         public void DeleteCategory(Guid absorbedId, Guid absorbingId, Guid userId)
         {
             // Confirm categories exist and are owned by user
-            var absorbedCatExists = Context.Categories.FirstOrDefault(c => c.CategoryId == absorbedId && c.UserId == userId);
+            var absorbedCatExists = Context.Categories.FirstOrDefault(c => c.Id == absorbedId && c.UserId == userId);
             if (absorbedCatExists == null)
                 throw new AppException("Category selected for deletion not found.");
             if (absorbedCatExists.IsDefault)
                 throw new AppException($"{absorbedCatExists.Name} is a default category and cannot be deleted.");
             
-            var absorbingCatExists = Context.Categories.Any(c => c.CategoryId == absorbingId && c.UserId == userId);
+            var absorbingCatExists = Context.Categories.Any(c => c.Id == absorbingId && c.UserId == userId);
             if (!absorbingCatExists)
                 throw new AppException("Category selected to absorbed deleted category not found.");
 
@@ -122,12 +122,12 @@ namespace WMMAPI.Services
         /// <param name="categoryId">Category Id of which the name existence is desired</param>
         /// <param name="userId">Guid: UserID of the account.</param>
         /// <returns>Bool: Indication of the category name's current existence in the user's DB profile.</returns>
-        private bool NameExists(Category category)
+        public bool NameExists(Category category)
         {
             return Context.Categories
                 .Where(c => c.UserId == category.UserId
                     && c.Name.ToLower() == category.Name.ToLower()
-                    && c.CategoryId == category.CategoryId)
+                    && c.Id != category.Id)
                 .Any();
         }
 
@@ -137,7 +137,7 @@ namespace WMMAPI.Services
         /// <param name="categoryId">Guid: Category Id for which to get total spending.</param>
         /// <param name="userId">Guid: User Id for which to get category total spending.</param>
         /// <returns>Decimal: total user specific spending for the category.</returns>
-        private decimal GetCategorySpending(Guid categoryId, Guid userId)
+        public decimal GetCategorySpending(Guid categoryId, Guid userId)
         {
             return Context.Transactions
                 .Where(t => t.CategoryId == categoryId && t.UserId == userId)
@@ -150,7 +150,7 @@ namespace WMMAPI.Services
         /// <param name="absorbedId">Guid: category Id that is being absorbed.</param>
         /// <param name="absorbingId">Guid: category Id that is absorbing.</param>
         /// <param name="userId">Guid: User Id of the owner of the categories being adjusted.</param>
-        private void Absorption(Guid absorbedId, Guid absorbingId, Guid userId)
+        public void Absorption(Guid absorbedId, Guid absorbingId, Guid userId)
         {
             IQueryable<Transaction> transactionCategoriesToUpdate = Context.Transactions
                 .Where(c => c.CategoryId == absorbedId && c.UserId == userId);
@@ -166,11 +166,12 @@ namespace WMMAPI.Services
         /// Generates default categories for the user if they do not exist in the user's DB profile.
         /// </summary>
         /// <param name="userId">Guid: Id of the user for which to generate default categories.</param>
-        private void CreateDefaults(Guid userId)
+        public void CreateDefaults(Guid userId)
         {
             if (!DefaultsExist(userId)) //Preventing duplication of defaults.
             {
                 string[] categories = DefaultCategories.GetAllDefaultCategories();
+                string[] notDisplayed = DefaultCategories.GetAllNotDisplayedDefaultCategories();
 
                 foreach (string category in categories)
                 {
@@ -179,19 +180,14 @@ namespace WMMAPI.Services
                         UserId = userId,
                         Name = category,
                         IsDefault = true,
+                        IsDisplayed = !notDisplayed.Contains(category) // TODO refactor to remove double neg?
                     };
 
-                    if (DefaultCategories.GetAllNotDisplayedDefaultCategories().Contains(category))
-                    {
-                        cat.IsDisplayed = false;
-                    }
-                    else
-                    {
-                        cat.IsDisplayed = true;
-                    }
-
-                    Add(cat);
+                    Add(cat, false);
                 }
+
+                // Save categories to the db
+                SaveChanges();
             }
         }
 
@@ -200,7 +196,7 @@ namespace WMMAPI.Services
         /// </summary>
         /// <param name="userId">Guid: Id of the user for which to look for default categories.</param>
         /// <returns>Bool: Indication of the existence of default categories in the user's DB profile.</returns>
-        private bool DefaultsExist(Guid userId)
+        public bool DefaultsExist(Guid userId)
         {
             return Context.Categories.Where(c => c.UserId == userId && c.IsDefault == true).Any();
         }
@@ -210,7 +206,7 @@ namespace WMMAPI.Services
         /// </summary>
         /// <param name="category">Category to be validated</param>
         /// <exception cref="AppException">Throws AppException if validation fails</exception>
-        private void ValidateCategory(Category category)
+        public void ValidateCategory(Category category)
         {
             if (NameExists(category))
                 throw new AppException($"{category.Name} already exists.");

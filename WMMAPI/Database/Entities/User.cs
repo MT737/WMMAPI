@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace WMMAPI.Database.Entities
@@ -7,7 +8,7 @@ namespace WMMAPI.Database.Entities
     {
         //Properties
         [Required]
-        public Guid UserId { get; set; }
+        public Guid Id { get; set; }
 
         [Required, StringLength(200)]
         public string FirstName { get; set; }
@@ -29,5 +30,11 @@ namespace WMMAPI.Database.Entities
 
         [Required]
         public bool IsDeleted { get; set; } = false;
+
+        //Navigation Properties
+        public virtual ICollection<Account> Accounts { get; set; }
+        public virtual ICollection<Category> Categories { get; set; }
+        public virtual ICollection<Transaction> Transactions { get; set; }
+        public virtual ICollection<Vendor> Vendors { get; set; }
     }
 }

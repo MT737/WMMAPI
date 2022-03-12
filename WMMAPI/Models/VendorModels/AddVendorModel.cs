@@ -19,8 +19,8 @@ namespace WMMAPI.Models.VendorModels
         {
             return new Vendor
             {
+                Id = Guid.NewGuid(),
                 UserId = userId,
-                VendorId = Guid.NewGuid(),
                 Name = Name,
                 IsDisplayed = IsDisplayed,
                 IsDefault = false
