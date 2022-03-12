@@ -18,30 +18,15 @@ namespace WMMAPITests.DataHelpers
 
         internal TestData()
         {
-            CreateTestUsers();            
+            CreateTestData();            
         }
        
-        internal void CreateTestUsers(string firstName = null, string lastName = null, string email = null, bool isDeleted = false)
+        internal void CreateTestData()
         {
-            List<User> users = new List<User>();            
-            int rand = _random.Next(0, 1000);
+            List<User> users = new List<User>();
             for (int i = 0; i < 2; i++)
             {
-                users.Add( new User
-                {
-                    Id = Guid.NewGuid(),
-                    FirstName = firstName ?? $"FirstName{rand}",
-                    LastName = lastName ?? $"LastName{rand}",
-                    EmailAddress = $"testemail{rand}@address.com",
-                    DOB = DateTime.Now.AddYears(_random.Next(-55, -25)),
-                    //PasswordHash = "",
-                    //PasswordSalt = "",
-                    IsDeleted = isDeleted,
-                    //Accounts = new List<Account>(),
-                    //Categories = new List<Category>(),
-                    //Vendors = new List<Vendor>(),
-                    //Transactions = new List<Transaction>()
-                });
+                users.Add(CreateTestUser());
             }
             
             Users = users.AsQueryable();            
@@ -49,6 +34,10 @@ namespace WMMAPITests.DataHelpers
             {
                 List<Account> accounts = CreateTestAccounts(user.Id);
                 List<Category> categories = CreateDefaultCategories(user.Id);
+                for (int i = 0; i < 3; i++)
+                {
+                    categories.Add(CreateTestCategory(true, null, user.Id, false));
+                }
 
                 List<Vendor> vendors = CreateDefaultVendors(user.Id);
                 for (int i = 0; i < 10; i++)
@@ -78,6 +67,22 @@ namespace WMMAPITests.DataHelpers
             }            
         }
 
+        internal User CreateTestUser(string firstName = null, string lastName = null, string email = null, bool isDeleted = false)
+        {
+            int rand = _random.Next(0, 1000);
+            return new User
+            {
+                Id = Guid.NewGuid(),
+                FirstName = firstName ?? $"FirstName{rand}",
+                LastName = lastName ?? $"LastName{rand}",
+                EmailAddress = $"testemail{rand}@address.com",
+                DOB = DateTime.Now.AddYears(_random.Next(-55, -25)),
+                //PasswordHash = "",
+                //PasswordSalt = "",
+                IsDeleted = isDeleted
+            };
+        }
+
         internal List<Account> CreateTestAccounts(Guid userId)
         {
             List<Account> accounts = new();
@@ -99,18 +104,6 @@ namespace WMMAPITests.DataHelpers
                 IsAsset = true,
                 IsActive = true
             };
-        }
-
-        // TODO Still needed?
-        internal List<Category> CreateDefaultCategoriesSet(Guid userId)
-        {
-            List<Category> categoriesSet = new();
-            for (int i = 0; i < 10; i++)
-            {
-                categoriesSet = categoriesSet.Union(CreateDefaultCategories(userId)).ToList();
-            }
-
-            return categoriesSet;
         }
 
         internal List<Category> CreateDefaultCategories(Guid? userid = null)

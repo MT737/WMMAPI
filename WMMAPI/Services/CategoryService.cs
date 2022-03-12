@@ -177,7 +177,6 @@ namespace WMMAPI.Services
                 {
                     Category cat = new Category
                     {
-                        Id = Guid.NewGuid(),
                         UserId = userId,
                         Name = category,
                         IsDefault = true,
