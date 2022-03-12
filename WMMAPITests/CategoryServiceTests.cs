@@ -58,7 +58,7 @@ namespace WMMAPITests
             Assert.IsTrue(result);
         }
 
-        [TestMethod]
+        [DataTestMethod]
         [DataRow(1126.80, Globals.DefaultCategories.Entertainment)]
         public void TestGetCategorySpending(double spending, string category)
         {
@@ -79,19 +79,49 @@ namespace WMMAPITests
             _testData.Transactions = _testData.Transactions.Concat(trans);
 
             // Initialize service and call method
-            TestDataContext tdc = new(_testData);
-            CategoryService service = new CategoryService(tdc.WMMContext.Object);
+            _tdc = new(_testData);
+            CategoryService service = new CategoryService(_tdc.WMMContext.Object);
             var result = service.GetCategorySpending(cat.Id, cat.UserId);
 
             // Confirm mock and assert
-            tdc.WMMContext.Verify(m => m.Transactions, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Transactions, Times.Once());
             Assert.AreEqual((decimal)spending, result);
         }
 
         [TestMethod]
         public void TestAbsorption()
         {
-            throw new NotImplementedException();
+            // Fabricate test categories and transactions
+            Guid userId = _testData.Users.First().Id;
+            Category absorbCat = _testData.CreateTestCategory(true, "absorbingCat", userId, false);
+            Category absorbedCat = _testData.CreateTestCategory(true, "absorbedCat", userId, false);
+            List<Category> cats = new List<Category> { absorbCat, absorbedCat };
+            _testData.Categories = _testData.Categories.Concat(cats);
+
+            List<Transaction> transactions = new();
+            foreach (Category cat in cats)
+            {
+                // Loop 4 times for each category
+                for (int i = 0; i < 4; i++)
+                {
+                    transactions.Add(_testData.CreateTestTransaction(
+                        _testData.Accounts.Where(a => a.UserId == userId).First(),
+                        true, 25.00M, cat.Id,
+                        _testData.Vendors.Where(v => v.UserId == userId).Skip(2).First().Id
+                        ));
+                }
+            }
+            _testData.Transactions = _testData.Transactions.Concat(transactions);
+
+            // Initialize and call method
+            _tdc = new TestDataContext(_testData);
+            CategoryService service = new CategoryService(_tdc.WMMContext.Object);
+            service.Absorption(absorbedCat.Id, absorbCat.Id, userId);
+
+            // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
+            Assert.IsTrue(_testData.Transactions.Any(t => t.CategoryId == absorbCat.Id));
+            Assert.IsFalse(_testData.Transactions.Any(t => t.CategoryId == absorbedCat.Id));
         }
 
         [TestMethod]

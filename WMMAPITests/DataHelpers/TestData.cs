@@ -51,12 +51,10 @@ namespace WMMAPITests.DataHelpers
                 List<Category> categories = CreateDefaultCategories(user.Id);
 
                 List<Vendor> vendors = CreateDefaultVendors(user.Id);
-                List<Vendor> vend = new();
                 for (int i = 0; i < 10; i++)
                 {
-                    vend.Add(CreateTestVendor(true, user.Id));
+                    vendors.Add(CreateTestVendor(true, user.Id));
                 }
-                vendors.Concat(vend);
 
                 List<Transaction> transactions = new List<Transaction>();
                 foreach (Account account in accounts)
