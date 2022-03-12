@@ -171,27 +171,24 @@ namespace WMMAPI.Services
             if (!DefaultsExist(userId)) //Preventing duplication of defaults.
             {
                 string[] categories = DefaultCategories.GetAllDefaultCategories();
+                string[] notDisplayed = DefaultCategories.GetAllNotDisplayedDefaultCategories();
 
                 foreach (string category in categories)
                 {
                     Category cat = new Category
                     {
+                        Id = Guid.NewGuid(),
                         UserId = userId,
                         Name = category,
                         IsDefault = true,
+                        IsDisplayed = !notDisplayed.Contains(category) // TODO refactor to remove double neg?
                     };
 
-                    if (DefaultCategories.GetAllNotDisplayedDefaultCategories().Contains(category))
-                    {
-                        cat.IsDisplayed = false;
-                    }
-                    else
-                    {
-                        cat.IsDisplayed = true;
-                    }
-
-                    Add(cat);
+                    Add(cat, false);
                 }
+
+                // Save categories to the db
+                SaveChanges();
             }
         }
 

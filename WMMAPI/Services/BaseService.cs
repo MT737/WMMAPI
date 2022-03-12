@@ -23,10 +23,14 @@ namespace WMMAPI.Services
         /// Add entity to the DbSet and then save the changes to the database.
         /// </summary>
         /// <param name="entity">Repository type</param>
-        public void Add(TEntity entity)
+        public void Add(TEntity entity, bool saveImmediately = true)
         {
             Context.Set<TEntity>().Add(entity);
-            Context.SaveChanges();
+
+            if (saveImmediately)
+            {
+                Context.SaveChanges();
+            }
         }
 
         /// <summary>
@@ -47,6 +51,14 @@ namespace WMMAPI.Services
             var set = Context.Set<TEntity>();
             var entity = set.Find(id);
             set.Remove(entity);
+            Context.SaveChanges();
+        }
+
+        /// <summary>
+        /// Calls save changes on current context.
+        /// </summary>
+        public void SaveChanges()
+        {
             Context.SaveChanges();
         }
     }
