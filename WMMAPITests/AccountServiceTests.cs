@@ -102,7 +102,7 @@ namespace WMMAPITests
             _tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
         }
 
-        [TestMethod]
+        [DataTestMethod]
         [DataRow(true, "75.25|credit;24.75|credit;10.00|debit;25.25|debit", 64.75)]
         [DataRow(false, "10.00|credit;25.25|credit;75.25|debit;24.75|debit", 64.75)]
         [DataRow(true, "10.00|credit;25.25|credit", 35.25)]
@@ -117,12 +117,12 @@ namespace WMMAPITests
 
             // Arrange
             GenerateMockTrans(transStructure.Split(";"), testAccount);
-            TestDataContext tdc = new(_testData);
-            AccountService service = new AccountService(tdc.WMMContext.Object);
+            _tdc = new(_testData);
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
             decimal result = service.GetBalance(testAccount.Id, isAsset);
 
             // Confirm mock
-            tdc.WMMContext.Verify(m => m.Transactions, Times.Exactly(2));
+            _tdc.WMMContext.Verify(m => m.Transactions, Times.Exactly(2));
             Assert.AreEqual((decimal)expectedBalance, result);
         }
         #endregion
@@ -146,13 +146,13 @@ namespace WMMAPITests
             GenerateMockTrans(trans.Split(';'), testAccount);
                         
             // Arrange; Need to update the dbsets with the new data
-            TestDataContext tdc = new(_testData);
-            AccountService service = new AccountService(tdc.WMMContext.Object);
+            _tdc = new(_testData);
+            AccountService service = new AccountService(_tdc.WMMContext.Object);
             AccountModel result = service.Get(testAccount.Id, testAccount.UserId);
             
             // Assert
-            tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
-            tdc.WMMContext.Verify(m => m.Transactions, Times.Exactly(2));
+            _tdc.WMMContext.Verify(m => m.Accounts, Times.Once());
+            _tdc.WMMContext.Verify(m => m.Transactions, Times.Exactly(2));
             Assert.AreEqual(testAccount.Id, result.Id);
             Assert.AreEqual(testAccount.Name, result.Name);
             Assert.AreEqual((decimal)(75.25 + 24.75) - (decimal)(10 + 25.25), result.Balance); // TO DO Improve this use of values
