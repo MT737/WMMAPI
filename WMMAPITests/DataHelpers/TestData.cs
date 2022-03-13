@@ -173,13 +173,14 @@ namespace WMMAPITests.DataHelpers
         {
             return new Transaction
             {
+                Id = Guid.NewGuid(),
                 UserId = account.UserId,
                 AccountId = account.Id,
                 TransactionDate = DateTime.UtcNow,
                 IsDebit = isDebit,
                 Amount = amount,
                 CategoryId = categoryId,
-                VendorId = categoryId,
+                VendorId = vendorId,
                 Description = description ?? "No description provided"
             };
         }       

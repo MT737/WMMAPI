@@ -70,6 +70,7 @@ namespace WMMAPI.Services
         public void AddTransaction(Transaction transaction)
         {
             //TODO: Add transaction validation
+                // Such as checking for account/category/vendor existence??
             Add(transaction);
         }
 

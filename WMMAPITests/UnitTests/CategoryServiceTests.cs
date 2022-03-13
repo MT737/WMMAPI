@@ -8,7 +8,7 @@ using WMMAPI.Helpers;
 using WMMAPI.Services;
 using WMMAPITests.DataHelpers;
 
-namespace WMMAPITests
+namespace WMMAPITests.UnitTests
 {
     [TestClass]
     public class CategoryServiceTests

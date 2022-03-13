@@ -9,7 +9,7 @@ using WMMAPI.Models.AccountModels;
 using WMMAPI.Services;
 using WMMAPITests.DataHelpers;
 
-namespace WMMAPITests
+namespace WMMAPITests.UnitTests
 {
     [TestClass]
     public class AccountServiceTests
