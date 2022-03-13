@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Linq;
@@ -176,27 +175,64 @@ namespace WMMAPITests.UnitTests
         [TestMethod]
         public void TestModifyTransactionSucceeds()
         {
-            throw new NotImplementedException();
+            // Fabricate test
+            var testTransaction = _testData.Transactions.First();
+            testTransaction.TransactionDate = DateTime.Now.AddDays(2);
+            testTransaction.Description = "test modification";
+            testTransaction.Amount = 111.22M;
+
+            // Initialize service and call method
+            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            service.ModifyTransaction(testTransaction);
+
+            // Confirm mock and assert (no asserts, just verify mock)
+            _tdc.WMMContext.Verify(m => m.Transactions, Times.Once());
+            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
         }
 
         [TestMethod]
         [ExpectedException(typeof(AppException))]
         public void TestModifyTransactionFailsTransNotFound()
         {
-            throw new NotImplementedException();
+            // Fabricate test
+            var testTransaction = _testData
+                .CreateTestTransaction(_testData.Accounts.First(), true, 100.00M, Guid.NewGuid(), Guid.NewGuid());
+
+            // Initialize service and call method
+            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            service.ModifyTransaction(testTransaction);
+
+            // Confirm mock and assert (not needed, exception expected)
         }
 
         [TestMethod]
         public void TestDeleteTransactionSucceeds()
         {
-            throw new NotImplementedException();
+            // Fabricate test
+            var testTransaction = _testData.Transactions.First();
+            _tdc.TransactionSet.Setup(m => m.Find(It.IsAny<Guid>())).Returns(testTransaction);
+
+            // Initialize service and call method
+            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            service.DeleteTransaction(testTransaction.UserId, testTransaction.Id);
+
+            // Confirm mock and assert
+            _tdc.TransactionSet.Verify(m => m.Remove(testTransaction), Times.Once());
+            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
         }
 
         [TestMethod]
         [ExpectedException(typeof(AppException))]
         public void TestDeleteTransactionFailsNotFound()
         {
-            throw new NotImplementedException();
+            // Fabricate test
+            var testTransaction = _testData.Transactions.First();
+
+            // Initialize service and call method
+            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            service.DeleteTransaction(testTransaction.UserId, Guid.NewGuid());
+
+            // Confirm mock and assert (not needed, exception expected)
         }
     }
 }
