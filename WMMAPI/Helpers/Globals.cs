@@ -34,8 +34,16 @@ namespace WMMAPI.Helpers
         public readonly struct DefaultVendors
         {
             public const string NA = "N/A";
+            public const string Amazon = "Amazon";
+            public const string TMobile = "T-Mobile";
+            public const string LibertyMutual = "Liberty Mutual";
 
             public static string[] GetAllDevaultVendors()
+            {
+                return new string[] { NA, Amazon, TMobile, LibertyMutual };
+            }
+
+            public static string[] GetAllNotDisplayedDefaultVendors()
             {
                 return new string[] { NA };
             }

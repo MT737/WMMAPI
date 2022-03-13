@@ -157,7 +157,7 @@ namespace WMMAPITests.DataHelpers
             return vendors;
         }
 
-        internal static Vendor CreateTestVendor(bool isDisplayed, Guid? userId = null, string name = null, bool isDefault = true)
+        internal Vendor CreateTestVendor(bool isDisplayed, Guid? userId = null, string name = null, bool isDefault = true)
         {
             return new Vendor
             {
