@@ -16,13 +16,13 @@ namespace WMMAPI.Services
         {
         }
 
+        #region ServiceMethods
         /// <summary>
         /// Returns the Vendor entity associated to the passed vendor Id.
         /// </summary>
         /// <param name="id">Guid: VendorId associated to the desired vendor.</param>
         /// <param name="userId">Guid: Id of the user that owns the vendor.</param>
         /// <returns>Vendor entity with the passed VendorId.</returns>
-
         public Vendor Get(Guid id, Guid userId)
         {
             return Context.Vendors
@@ -92,18 +92,9 @@ namespace WMMAPI.Services
             Absorption(absorbedId, absorbingId, userId);
             Delete(absorbedId);
         }
+        #endregion
 
-
-        /// <summary>
-        /// Returns the number of vendors in the DB tied to the user's profile.
-        /// </summary>
-        /// <param name="userID">Guid: Id of the user for which to pull the count of vendors.</param>
-        /// <returns>Int: integer representing the number of vendors in the DB tied to the user's profile.</returns>
-        public int GetCount(Guid userId)
-        {
-            return Context.Vendors.Where(v => v.UserId == userId).Count();
-        }
-
+        #region HelperMethods
         /// <summary>
         /// Calculates the amount of user spending at a given vendor.
         /// </summary>
@@ -118,17 +109,6 @@ namespace WMMAPI.Services
         }
 
         /// <summary>
-        /// Indicates if the user owns the specified vendor.
-        /// </summary>
-        /// <param name="vendorId">Guid: VendorId of the specified vendor.</param>
-        /// <param name="userID">Guid: User's ID.</param>
-        /// <returns>Bool: True if the user owns the vendor reference. False otherwise.</returns>
-        public bool UserOwnsVendor(Guid vendorId, Guid userID)
-        {
-            return Context.Vendors.Where(v => v.UserId == userID && v.Id == vendorId).Any();
-        }
-
-        /// <summary>
         /// Determines if the vendor name currently exits in the DB.
         /// </summary>
         /// <returns>Bool: True if the vendor name already exists in the DB. False otherwise.</returns>
@@ -139,19 +119,6 @@ namespace WMMAPI.Services
                     && v.Name.ToLower() == vendor.Name.ToLower()
                     && v.Id != vendor.Id)
                 .Any();
-        }
-
-        /// <summary>
-        /// Returns the VendorID containing the passed vendor name.
-        /// </summary>
-        /// <param name="name">String: Vendor name for which to retrieve a VendorId.</param>
-        /// <param name="userID">Guid: Id of the user for which to pull the VendorId.</param>
-        /// <returns>Int: VendorID associated to the passed vendor name.</returns>
-        public Guid GetID(string name, Guid userID)
-        {
-            return Context.Vendors
-                .Where(v => v.Name == name && v.UserId == userID)
-                .SingleOrDefault().Id;
         }
 
         /// <summary>
@@ -212,5 +179,6 @@ namespace WMMAPI.Services
             if (String.IsNullOrWhiteSpace(vendor.Name))
                 throw new AppException("Vendor name cannot be empty or whitespace only string.");
         }
+        #endregion
     }
 }
