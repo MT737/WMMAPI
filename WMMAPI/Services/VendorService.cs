@@ -182,7 +182,7 @@ namespace WMMAPI.Services
         }
 
         // Private helper methods
-        private void ValidateVendor(Vendor vendor)
+        public void ValidateVendor(Vendor vendor)
         {
             if (NameExists(vendor))
                 throw new AppException($"Vendor {vendor.Name} already exists.");
