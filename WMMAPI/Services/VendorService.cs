@@ -5,6 +5,7 @@ using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
+using static WMMAPI.Helpers.Globals;
 
 namespace WMMAPI.Services
 {
@@ -101,7 +102,7 @@ namespace WMMAPI.Services
         /// <param name="vendorID">Guid: VendorId for which to determine total spending.</param>
         /// <param name="userID">Guid: UserId for which to determine total spending.</param>
         /// <returns>Decimal: amount of user spending with the given vendor.</returns>
-        public decimal GetAmount(Guid vendorID, Guid userID)
+        public decimal GetVendorSpending(Guid vendorID, Guid userID)
         {
             return Context.Transactions
                 .Where(t => t.VendorId == vendorID && t.UserId == userID)
@@ -149,14 +150,24 @@ namespace WMMAPI.Services
         {
             if (!DefaultsExist(userId)) //Preventing duplication of defaults.
             {
-                Vendor vend = new Vendor
+                string[] vendors = DefaultVendors.GetAllDevaultVendors();
+                string[] notDisplayed = DefaultVendors.GetAllNotDisplayedDefaultVendors();
+
+                foreach (string vendor in vendors)
                 {
-                    UserId = userId,
-                    Name = "N/A",
-                    IsDefault = true,
-                    IsDisplayed = false
-                };
-                Add(vend);
+                    Vendor vend = new Vendor
+                    {
+                        UserId = userId,
+                        Name = vendor,
+                        IsDefault = true,
+                        IsDisplayed = !notDisplayed.Contains(vendor) // TODO refactor to remove double neg?
+                    };
+
+                    Add(vend, false);
+                }
+
+                // Save vendors to the db
+                SaveChanges();
             }
         }
 
