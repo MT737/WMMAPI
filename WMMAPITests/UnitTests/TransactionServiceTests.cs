@@ -20,7 +20,6 @@ namespace WMMAPITests.UnitTests
         {
             _testData = new TestData();
             _tdc = new TestDataContext(_testData);
-            _tdc.WMMContext.Setup(m => m.Set<Transaction>()).Returns(_tdc.TransactionSet.Object);
         }
 
 

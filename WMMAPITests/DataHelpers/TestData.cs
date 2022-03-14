@@ -42,7 +42,7 @@ namespace WMMAPITests.DataHelpers
                 List<Vendor> vendors = CreateDefaultVendors(user.Id);
                 for (int i = 0; i < 10; i++)
                 {
-                    vendors.Add(CreateTestVendor(true, user.Id));
+                    vendors.Add(CreateTestVendor(true, user.Id, false));
                 }
 
                 List<Transaction> transactions = new List<Transaction>();
@@ -157,7 +157,7 @@ namespace WMMAPITests.DataHelpers
             return vendors;
         }
 
-        internal static Vendor CreateTestVendor(bool isDisplayed, Guid? userId = null, string name = null, bool isDefault = true)
+        internal Vendor CreateTestVendor(bool isDisplayed, Guid? userId = null, bool isDefault = true, string name = null)
         {
             return new Vendor
             {

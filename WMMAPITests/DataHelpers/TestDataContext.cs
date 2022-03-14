@@ -22,24 +22,24 @@ namespace WMMAPITests.DataHelpers
 
         private void GenerateMoqContext(TestData testData)
         {
-            AccountSet = GenerateMoqDbSet(testData.Accounts.AsQueryable());
-            CategorySet = GenerateMoqDbSet(testData.Categories.AsQueryable());
-            UserSet = GenerateMoqDbSet(testData.Users.AsQueryable());
-            VendorSet = GenerateMoqDbSet(testData.Vendors.AsQueryable());
-            TransactionSet = GenerateMoqDbSet(testData.Transactions.AsQueryable());
+            UserSet = GenerateMoqDbSet(testData.Users);
+            VendorSet = GenerateMoqDbSet(testData.Vendors);
+            AccountSet = GenerateMoqDbSet(testData.Accounts);
+            CategorySet = GenerateMoqDbSet(testData.Categories);
+            TransactionSet = GenerateMoqDbSet(testData.Transactions);
 
             WMMContext = new Mock<WMMContext>();
-            WMMContext.Setup(m => m.Accounts).Returns(AccountSet.Object);
-            WMMContext.Setup(m => m.Categories).Returns(CategorySet.Object);
             WMMContext.Setup(m => m.Users).Returns(UserSet.Object);
             WMMContext.Setup(m => m.Vendors).Returns(VendorSet.Object);
+            WMMContext.Setup(m => m.Accounts).Returns(AccountSet.Object);
+            WMMContext.Setup(m => m.Categories).Returns(CategorySet.Object);
             WMMContext.Setup(m => m.Transactions).Returns(TransactionSet.Object);
 
+            WMMContext.Setup(m => m.Set<User>()).Returns(UserSet.Object);
+            WMMContext.Setup(m => m.Set<Vendor>()).Returns(VendorSet.Object);
             WMMContext.Setup(m => m.Set<Account>()).Returns(AccountSet.Object);
             WMMContext.Setup(m => m.Set<Category>()).Returns(CategorySet.Object);
-            WMMContext.Setup(m => m.Set<Vendor>()).Returns(VendorSet.Object);
             WMMContext.Setup(m => m.Set<Transaction>()).Returns(TransactionSet.Object);
-            WMMContext.Setup(m => m.Set<User>()).Returns(UserSet.Object);
         }
 
         internal Mock<DbSet<T>> GenerateMoqDbSet<T>(IQueryable<T> dataSet) where T : class // TODO class is too open?

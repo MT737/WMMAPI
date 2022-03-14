@@ -21,7 +21,6 @@ namespace WMMAPITests.UnitTests
         {
             _testData = new TestData();
             _tdc = new TestDataContext(_testData);
-            _tdc.WMMContext.Setup(m => m.Set<Category>()).Returns(_tdc.CategorySet.Object);
         }
 
         #region TestingHelperMethods

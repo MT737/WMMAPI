@@ -5,6 +5,7 @@ using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
+using static WMMAPI.Helpers.Globals;
 
 namespace WMMAPI.Services
 {
@@ -16,13 +17,13 @@ namespace WMMAPI.Services
         {
         }
 
+        #region ServiceMethods
         /// <summary>
         /// Returns the Vendor entity associated to the passed vendor Id.
         /// </summary>
         /// <param name="id">Guid: VendorId associated to the desired vendor.</param>
         /// <param name="userId">Guid: Id of the user that owns the vendor.</param>
         /// <returns>Vendor entity with the passed VendorId.</returns>
-
         public Vendor Get(Guid id, Guid userId)
         {
             return Context.Vendors
@@ -92,40 +93,20 @@ namespace WMMAPI.Services
             Absorption(absorbedId, absorbingId, userId);
             Delete(absorbedId);
         }
+        #endregion
 
-
-        /// <summary>
-        /// Returns the number of vendors in the DB tied to the user's profile.
-        /// </summary>
-        /// <param name="userID">Guid: Id of the user for which to pull the count of vendors.</param>
-        /// <returns>Int: integer representing the number of vendors in the DB tied to the user's profile.</returns>
-        public int GetCount(Guid userId)
-        {
-            return Context.Vendors.Where(v => v.UserId == userId).Count();
-        }
-
+        #region HelperMethods
         /// <summary>
         /// Calculates the amount of user spending at a given vendor.
         /// </summary>
         /// <param name="vendorID">Guid: VendorId for which to determine total spending.</param>
         /// <param name="userID">Guid: UserId for which to determine total spending.</param>
         /// <returns>Decimal: amount of user spending with the given vendor.</returns>
-        public decimal GetAmount(Guid vendorID, Guid userID)
+        public decimal GetVendorSpending(Guid vendorID, Guid userID)
         {
             return Context.Transactions
                 .Where(t => t.VendorId == vendorID && t.UserId == userID)
                 .ToList().Sum(t => t.Amount);
-        }
-
-        /// <summary>
-        /// Indicates if the user owns the specified vendor.
-        /// </summary>
-        /// <param name="vendorId">Guid: VendorId of the specified vendor.</param>
-        /// <param name="userID">Guid: User's ID.</param>
-        /// <returns>Bool: True if the user owns the vendor reference. False otherwise.</returns>
-        public bool UserOwnsVendor(Guid vendorId, Guid userID)
-        {
-            return Context.Vendors.Where(v => v.UserId == userID && v.Id == vendorId).Any();
         }
 
         /// <summary>
@@ -139,19 +120,6 @@ namespace WMMAPI.Services
                     && v.Name.ToLower() == vendor.Name.ToLower()
                     && v.Id != vendor.Id)
                 .Any();
-        }
-
-        /// <summary>
-        /// Returns the VendorID containing the passed vendor name.
-        /// </summary>
-        /// <param name="name">String: Vendor name for which to retrieve a VendorId.</param>
-        /// <param name="userID">Guid: Id of the user for which to pull the VendorId.</param>
-        /// <returns>Int: VendorID associated to the passed vendor name.</returns>
-        public Guid GetID(string name, Guid userID)
-        {
-            return Context.Vendors
-                .Where(v => v.Name == name && v.UserId == userID)
-                .SingleOrDefault().Id;
         }
 
         /// <summary>
@@ -182,14 +150,24 @@ namespace WMMAPI.Services
         {
             if (!DefaultsExist(userId)) //Preventing duplication of defaults.
             {
-                Vendor vend = new Vendor
+                string[] vendors = DefaultVendors.GetAllDevaultVendors();
+                string[] notDisplayed = DefaultVendors.GetAllNotDisplayedDefaultVendors();
+
+                foreach (string vendor in vendors)
                 {
-                    UserId = userId,
-                    Name = "N/A",
-                    IsDefault = true,
-                    IsDisplayed = false
-                };
-                Add(vend);
+                    Vendor vend = new Vendor
+                    {
+                        UserId = userId,
+                        Name = vendor,
+                        IsDefault = true,
+                        IsDisplayed = !notDisplayed.Contains(vendor) // TODO refactor to remove double neg?
+                    };
+
+                    Add(vend, false);
+                }
+
+                // Save vendors to the db
+                SaveChanges();
             }
         }
 
@@ -204,7 +182,7 @@ namespace WMMAPI.Services
         }
 
         // Private helper methods
-        private void ValidateVendor(Vendor vendor)
+        public void ValidateVendor(Vendor vendor)
         {
             if (NameExists(vendor))
                 throw new AppException($"Vendor {vendor.Name} already exists.");
@@ -212,5 +190,6 @@ namespace WMMAPI.Services
             if (String.IsNullOrWhiteSpace(vendor.Name))
                 throw new AppException("Vendor name cannot be empty or whitespace only string.");
         }
+        #endregion
     }
 }
