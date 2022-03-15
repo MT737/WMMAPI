@@ -77,7 +77,7 @@ namespace WMMAPI.Services
         /// <param name="user">User to be modified</param>
         /// <param name="password">New password if changed</param>
         /// <exception cref="AppException">Throws AppException if user not found or email already in use</exception>
-        public void Modify(User user, string password = null)
+        public void Modify(User user, string password)
         {
             var currentUser = Context.Users
                 .FirstOrDefault(u => u.Id == user.Id);

@@ -3,8 +3,6 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
@@ -235,17 +233,126 @@ namespace WMMAPITests.UnitTests
         }
         #endregion
 
-        // Modify
-        // succeeds
-        // user not found
-        // email used by other user
+        #region Modify
+        [TestMethod]
+        public void TestModifySucceeds()
+        {
+            // Fabricate test
+            User testUser = _testData.Users.First();
+            testUser.FirstName = "ModifiedFirstName";
+            testUser.LastName = "ModifiedLastName";
+            testUser.DOB = DateTime.Now.AddYears(-60);
+            string password = "newPassword";
 
-        // GetById
-        // Succeeds
-        // Returns null as user doesn't exist
+            // Initiate service and call method
+            IUserService service = new UserService(_tdc.WMMContext.Object);
+            service.Modify(testUser, password);
 
-        // Remove User
-        // Succeeds
-        // user not found
+            // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.Users, Times.Exactly(2));
+            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
+
+            User contextUser = _tdc.WMMContext.Object.Users.First(u => u.Id == testUser.Id);
+            Assert.AreEqual(testUser.FirstName, contextUser.FirstName);
+            Assert.AreEqual(testUser.LastName, contextUser.LastName);
+            Assert.AreEqual(testUser.DOB, contextUser.DOB);
+            // TODO Is there a way to easily confirm the password is updated?
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AppException))]
+        public void TestModifyUserNotFound()
+        {
+            // Fabricate Test
+            User testUser = _testData.CreateTestUser();
+
+            // Initiate service and call method
+            IUserService service = new UserService(_tdc.WMMContext.Object);
+            service.Modify(testUser, null);
+
+            // Confirm mock and assert (no need, exception expected)
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AppException))]
+        public void TestModifyEmailAlreadyInUse()
+        {
+            // Fabricate Test
+            User testUser = _testData.Users.First();
+            string usedEmail = _testData.Users.Last().EmailAddress;
+            testUser.EmailAddress = usedEmail;
+
+            // Initiate service and call method
+            IUserService service = new UserService(_tdc.WMMContext.Object);
+            service.Modify(testUser, null);
+
+            // Confirm mock and assert (no need, exception expected)
+        }
+        #endregion
+
+        #region GetById
+        [TestMethod]
+        public void TestGetByIdSucceeds()
+        {
+            // Fabricate test
+            User user = _testData.Users.First();
+
+            // Initialize service and call method
+            IUserService service = new UserService(_tdc.WMMContext.Object);
+            User result = service.GetById(user.Id);
+
+            // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.Users, Times.Once());
+            Assert.AreEqual(user.Id, result.Id);
+            Assert.AreEqual(user.FirstName, result.FirstName);
+        }
+
+        [TestMethod]
+        public void TestGetByIdReturnsNullAsUserDoesNotExist()
+        {
+            // Fabricate test
+            Guid userId = Guid.NewGuid();
+
+            // Initialize service and call method
+            IUserService service = new UserService(_tdc.WMMContext.Object);
+            User result = service.GetById(userId);
+
+            // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.Users, Times.Once());
+            Assert.IsNull(result);
+        }
+        #endregion
+
+        #region RemoveUser
+        [TestMethod]
+        public void TestRemoveUserSucceeds()
+        {
+            // Fabricate test
+            Guid userId = _testData.Users.First().Id;
+
+            // Initialize service and call method
+            IUserService service = new UserService(_tdc.WMMContext.Object);
+            service.RemoveUser(userId);
+
+            // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.Users, Times.Once());
+            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
+            Assert.IsTrue(_tdc.WMMContext.Object.Users.First(u => u.Id == userId).IsDeleted);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AppException))]
+        public void TestRemoveUserUserNotFound()
+        {
+            // Fabricate Test
+            Guid userId = Guid.NewGuid();
+
+            // Initialize service and call method
+            IUserService service = new UserService(_tdc.WMMContext.Object);
+            service.RemoveUser(userId);
+
+            // Confirm mock and assert (not needed, exception expected)
+        }
+        #endregion
     }
 }
