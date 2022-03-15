@@ -9,7 +9,6 @@ namespace WMMAPI.Interfaces
         User Create(User user, string password);
         void Modify(User user, string password);
         User GetById(Guid id);
-        bool EmailExists(string email);
         void RemoveUser(Guid userId);
     }
 }
