@@ -23,9 +23,9 @@ namespace WMMAPITests.UnitTests
         {
             _testData = new TestData();            
             _tdc = new TestDataContext(_testData);
-        }       
+        }
 
-        #region Testing service methods
+        #region Get
         [DataTestMethod]
         [DataRow(false, "10.00|credit;25.25|credit;75.25|debit;24.75|debit", 64.75)]
         [DataRow(true, "75.25|debit;24.75|debit", -100.00)]
@@ -127,7 +127,9 @@ namespace WMMAPITests.UnitTests
 
             // Confirm mock and assert (not needed, exception expected)
         }
+        #endregion
 
+        #region Add
         [TestMethod]
         public void TestAddAccountSucceeds()
         {
@@ -169,7 +171,9 @@ namespace WMMAPITests.UnitTests
             IAccountService service = new AccountService(_tdc.WMMContext.Object);
             service.AddAccount(account);
         }
-        
+        #endregion
+
+        #region Modify
         [TestMethod]
         public void TestModifyAccountSucceeds()
         {
