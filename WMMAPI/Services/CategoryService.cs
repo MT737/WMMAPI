@@ -113,55 +113,6 @@ namespace WMMAPI.Services
             Delete(absorbedId);
         }
 
-
-        #region Private Helpers
-        /// <summary>
-        /// Indicates the existence of a the category.
-        /// </summary>
-        /// <param name="desiredCategoryName">String: Desired category name.</param>
-        /// <param name="categoryId">Category Id of which the name existence is desired</param>
-        /// <param name="userId">Guid: UserID of the account.</param>
-        /// <returns>Bool: Indication of the category name's current existence in the user's DB profile.</returns>
-        public bool NameExists(Category category)
-        {
-            return Context.Categories
-                .Where(c => c.UserId == category.UserId
-                    && c.Name.ToLower() == category.Name.ToLower()
-                    && c.Id != category.Id)
-                .Any();
-        }
-
-        /// <summary>
-        /// Returns total spending in the specified category for the specified user.
-        /// </summary>
-        /// <param name="categoryId">Guid: Category Id for which to get total spending.</param>
-        /// <param name="userId">Guid: User Id for which to get category total spending.</param>
-        /// <returns>Decimal: total user specific spending for the category.</returns>
-        public decimal GetCategorySpending(Guid categoryId, Guid userId)
-        {
-            return Context.Transactions
-                .Where(t => t.CategoryId == categoryId && t.UserId == userId)
-                .ToList().Sum(t => t.Amount);
-        }
-
-        /// <summary>
-        /// Converts the absorbed category Id field in all transactions to the absorbing category Id.
-        /// </summary>
-        /// <param name="absorbedId">Guid: category Id that is being absorbed.</param>
-        /// <param name="absorbingId">Guid: category Id that is absorbing.</param>
-        /// <param name="userId">Guid: User Id of the owner of the categories being adjusted.</param>
-        public void Absorption(Guid absorbedId, Guid absorbingId, Guid userId)
-        {
-            IQueryable<Transaction> transactionCategoriesToUpdate = Context.Transactions
-                .Where(c => c.CategoryId == absorbedId && c.UserId == userId);
-
-            foreach (Transaction transaction in transactionCategoriesToUpdate)
-            {
-                transaction.CategoryId = absorbingId;
-            }
-            Context.SaveChanges();
-        }
-
         /// <summary>
         /// Generates default categories for the user if they do not exist in the user's DB profile.
         /// </summary>
@@ -191,12 +142,48 @@ namespace WMMAPI.Services
             }
         }
 
+
+        #region Private Helpers
+        /// <summary>
+        /// Indicates the existence of a the category.
+        /// </summary>
+        /// <param name="desiredCategoryName">String: Desired category name.</param>
+        /// <param name="categoryId">Category Id of which the name existence is desired</param>
+        /// <param name="userId">Guid: UserID of the account.</param>
+        /// <returns>Bool: Indication of the category name's current existence in the user's DB profile.</returns>
+        private bool NameExists(Category category)
+        {
+            return Context.Categories
+                .Where(c => c.UserId == category.UserId
+                    && c.Name.ToLower() == category.Name.ToLower()
+                    && c.Id != category.Id)
+                .Any();
+        }
+
+        /// <summary>
+        /// Converts the absorbed category Id field in all transactions to the absorbing category Id.
+        /// </summary>
+        /// <param name="absorbedId">Guid: category Id that is being absorbed.</param>
+        /// <param name="absorbingId">Guid: category Id that is absorbing.</param>
+        /// <param name="userId">Guid: User Id of the owner of the categories being adjusted.</param>
+        private void Absorption(Guid absorbedId, Guid absorbingId, Guid userId)
+        {
+            IQueryable<Transaction> transactionCategoriesToUpdate = Context.Transactions
+                .Where(c => c.CategoryId == absorbedId && c.UserId == userId);
+
+            foreach (Transaction transaction in transactionCategoriesToUpdate)
+            {
+                transaction.CategoryId = absorbingId;
+            }
+            Context.SaveChanges();
+        }
+
         /// <summary>
         /// Indicates the existing of default categories in the user's DB profile.
         /// </summary>
         /// <param name="userId">Guid: Id of the user for which to look for default categories.</param>
         /// <returns>Bool: Indication of the existence of default categories in the user's DB profile.</returns>
-        public bool DefaultsExist(Guid userId)
+        private bool DefaultsExist(Guid userId)
         {
             return Context.Categories.Where(c => c.UserId == userId && c.IsDefault == true).Any();
         }
@@ -206,7 +193,7 @@ namespace WMMAPI.Services
         /// </summary>
         /// <param name="category">Category to be validated</param>
         /// <exception cref="AppException">Throws AppException if validation fails</exception>
-        public void ValidateCategory(Category category)
+        private void ValidateCategory(Category category)
         {
             if (NameExists(category))
                 throw new AppException($"{category.Name} already exists.");
