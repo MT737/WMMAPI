@@ -48,13 +48,16 @@ namespace WMMAPI.Services
                 .OrderBy(a => a.Name)
                 .Select(x => new AccountModel(x)).ToList();
 
+            if (accounts.Count == 0)
+                throw new AppException("No accounts found.");
+            
             // Get balance
             foreach(var account in accounts)
             {
                 account.Balance = GetBalance(account.Id, account.IsAsset);
             }
 
-            return accounts.ToList();
+            return accounts;
         }
 
         /// <summary>
@@ -104,6 +107,7 @@ namespace WMMAPI.Services
         private decimal GetBalance(Guid accountId, bool isAsset)
         {
             //TODO: Further test account balances
+            // TODO: Replace this whole method with a method to get balances for a list a transactions in order to prevent multiple calls to the db
             var paymentTo = Context.Transactions
                  .Where(t => t.AccountId == accountId && !t.IsDebit)
                  .Sum(t => t.Amount);
