@@ -67,18 +67,27 @@ namespace WMMAPITests.DataHelpers
             }            
         }
 
-        internal User CreateTestUser(string firstName = null, string lastName = null, string email = null, bool isDeleted = false)
+        internal User CreateTestUser(string password = null, string firstName = null, string lastName = null, string email = null, bool isDeleted = false)
         {
+            password = password ?? Guid.NewGuid().ToString();            
+            byte[] passwordSalt;
+            byte[] passwordHash;
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+
             int rand = _random.Next(0, 1000);
             return new User
             {
                 Id = Guid.NewGuid(),
                 FirstName = firstName ?? $"FirstName{rand}",
                 LastName = lastName ?? $"LastName{rand}",
-                EmailAddress = $"testemail{rand}@address.com",
+                EmailAddress = email ?? $"testemail{rand}@address.com",
                 DOB = DateTime.Now.AddYears(_random.Next(-55, -25)),
-                //PasswordHash = "",
-                //PasswordSalt = "",
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
                 IsDeleted = isDeleted
             };
         }

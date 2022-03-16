@@ -21,7 +21,7 @@ namespace WMMAPI.Services
         /// <returns>Null if failure to authenticate. User model if authentication succeeds.</returns>
         public User Authenticate(string email, string password)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
                 return null;
             }
@@ -29,7 +29,7 @@ namespace WMMAPI.Services
             var user = Context.Users
                 .SingleOrDefault(u => u.EmailAddress == email && u.IsDeleted == false);
 
-            // Check if email exists
+            // Check if user exists
             if (user == null)
                 return null;
 
@@ -54,6 +54,9 @@ namespace WMMAPI.Services
             if (string.IsNullOrWhiteSpace(password))
                 throw new AppException("Password is required");
 
+            if (string.IsNullOrWhiteSpace(user.EmailAddress))
+                throw new AppException("Email is required");
+
             if (EmailExists(user.EmailAddress))
                 throw new AppException($"Email address {user.EmailAddress} is already registered to an account.");
 
@@ -74,7 +77,7 @@ namespace WMMAPI.Services
         /// <param name="user">User to be modified</param>
         /// <param name="password">New password if changed</param>
         /// <exception cref="AppException">Throws AppException if user not found or email already in use</exception>
-        public void Modify(User user, string password = null)
+        public void Modify(User user, string password)
         {
             var currentUser = Context.Users
                 .FirstOrDefault(u => u.Id == user.Id);
@@ -153,7 +156,7 @@ namespace WMMAPI.Services
         /// </summary>
         /// <param name="email"></param>
         /// <returns>Returns bool stating if the past email already exists in the db.</returns>
-        public bool EmailExists(string email)
+        private bool EmailExists(string email)
         {
             return Context.Users
                 .Any(u => u.EmailAddress.ToLower() == email.ToLower());
