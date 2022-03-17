@@ -93,54 +93,6 @@ namespace WMMAPI.Services
             Absorption(absorbedId, absorbingId, userId);
             Delete(absorbedId);
         }
-        #endregion
-
-        #region HelperMethods
-        /// <summary>
-        /// Calculates the amount of user spending at a given vendor.
-        /// </summary>
-        /// <param name="vendorID">Guid: VendorId for which to determine total spending.</param>
-        /// <param name="userID">Guid: UserId for which to determine total spending.</param>
-        /// <returns>Decimal: amount of user spending with the given vendor.</returns>
-        public decimal GetVendorSpending(Guid vendorID, Guid userID)
-        {
-            return Context.Transactions
-                .Where(t => t.VendorId == vendorID && t.UserId == userID)
-                .ToList().Sum(t => t.Amount);
-        }
-
-        /// <summary>
-        /// Determines if the vendor name currently exits in the DB.
-        /// </summary>
-        /// <returns>Bool: True if the vendor name already exists in the DB. False otherwise.</returns>
-        public bool NameExists(Vendor vendor)
-        {
-            return Context.Vendors
-                .Where(v => v.UserId == vendor.UserId
-                    && v.Name.ToLower() == vendor.Name.ToLower()
-                    && v.Id != vendor.Id)
-                .Any();
-        }
-
-        /// <summary>
-        /// Replaces all Transactions table instances of the aborbedId with the absorbingId.
-        /// </summary>
-        /// <param name="absorbedId">Guid: the vendorId of the vendor being absorbed(deleted).</param>
-        /// <param name="absorbingId">Guid: the vendorId of the vendor absorbing the absorbed VendorId.</param>
-        /// <param name="userId">Guid: UserId of the owner of the vendors being adjusted.</param>
-        public void Absorption(Guid absorbedId, Guid absorbingId, Guid userId)
-        {
-            //TODO: this works for a small database, but for large scale, this method should be updated to perform a bulk update.
-            //TODO: Could use dapper to just manually generate the transaction script
-            IQueryable<Transaction> vendorsToUpdate = Context.Transactions
-                .Where(v => v.VendorId == absorbedId && v.UserId == userId);
-
-            foreach (Transaction transaction in vendorsToUpdate)
-            {
-                transaction.VendorId = absorbingId;
-            }
-            Context.SaveChanges();
-        }
 
         /// <summary>
         /// Creates default vendor data for the user.
@@ -170,19 +122,54 @@ namespace WMMAPI.Services
                 SaveChanges();
             }
         }
+        #endregion
+
+        #region HelperMethods
+        /// <summary>
+        /// Determines if the vendor name currently exits in the DB.
+        /// </summary>
+        /// <returns>Bool: True if the vendor name already exists in the DB. False otherwise.</returns>
+        private bool NameExists(Vendor vendor)
+        {
+            return Context.Vendors
+                .Where(v => v.UserId == vendor.UserId
+                    && v.Name.ToLower() == vendor.Name.ToLower()
+                    && v.Id != vendor.Id)
+                .Any();
+        }
+
+        /// <summary>
+        /// Replaces all Transactions table instances of the aborbedId with the absorbingId.
+        /// </summary>
+        /// <param name="absorbedId">Guid: the vendorId of the vendor being absorbed(deleted).</param>
+        /// <param name="absorbingId">Guid: the vendorId of the vendor absorbing the absorbed VendorId.</param>
+        /// <param name="userId">Guid: UserId of the owner of the vendors being adjusted.</param>
+        private void Absorption(Guid absorbedId, Guid absorbingId, Guid userId)
+        {
+            //TODO: this works for a small database, but for large scale, this method should be updated to perform a bulk update.
+            //TODO: Could use dapper to just manually generate the transaction script
+            IQueryable<Transaction> vendorsToUpdate = Context.Transactions
+                .Where(v => v.VendorId == absorbedId && v.UserId == userId);
+
+            foreach (Transaction transaction in vendorsToUpdate)
+            {
+                transaction.VendorId = absorbingId;
+            }
+            Context.SaveChanges();
+        }
 
         /// <summary>
         /// Indicates the existence of default vendors in the user's DB profile.
         /// </summary>
         /// <param name="userId">Guid: Id of the user for whom to check for default vendors.</param>
         /// <returns>Bool: True if the user's DB profile contains default vendors. Otherwise false.</returns>
-        public bool DefaultsExist(Guid userId)
+        private bool DefaultsExist(Guid userId)
         {
             return Context.Vendors.Where(v => v.UserId == userId && v.IsDefault == true).Any();
         }
 
         // Private helper methods
-        public void ValidateVendor(Vendor vendor)
+        private void ValidateVendor(Vendor vendor)
         {
             if (NameExists(vendor))
                 throw new AppException($"Vendor {vendor.Name} already exists.");

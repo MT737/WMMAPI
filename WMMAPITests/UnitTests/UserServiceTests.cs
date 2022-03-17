@@ -323,7 +323,7 @@ namespace WMMAPITests.UnitTests
         }
         #endregion
 
-        #region RemoveUser
+        #region Remove
         [TestMethod]
         public void TestRemoveUserSucceeds()
         {
