@@ -24,7 +24,7 @@ namespace WMMAPITests.UnitTests
             _tdc = new TestDataContext(_testData);
         }
 
-        #region TestingServiceMethods
+        #region Get
         [TestMethod]
         public void TestGetSucceeds()
         {
@@ -51,7 +51,9 @@ namespace WMMAPITests.UnitTests
             // Confirm mock and assert
             _tdc.WMMContext.Verify(m => m.Categories, Times.Once());
         }
+        #endregion
 
+        #region GetList
         [TestMethod]
         public void TestGetList()
         {
@@ -85,13 +87,33 @@ namespace WMMAPITests.UnitTests
             _tdc.WMMContext.Verify(m => m.Categories, Times.Once());
             Assert.IsTrue(result.Count == 0);
         }
+        #endregion
 
+        #region CreateDefaults
+        [TestMethod]
+        public void TestCreateDefaultsSucceeds()
+        {
+            // Fabricate test data
+            Guid userId = Guid.NewGuid(); // New user so no defaults
+
+            // Initialize service and call method
+            ICategoryService service = new CategoryService(_tdc.WMMContext.Object);
+            service.CreateDefaults(userId);
+
+            // Verify mock and assert (just verify, nothing to assert)
+            int defaultCatCount = Globals.DefaultCategories.GetAllDefaultCategories().Count();
+            _tdc.CategorySet.Verify(m => m.Add(It.IsAny<Category>()), Times.Exactly(defaultCatCount));
+            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
+        #endregion
+
+        #region Add
         [TestMethod]
         public void TestAddCategory()
         {
             // Fabricate test data
             Guid userId = _testData.Users.First().Id;
-            Category category = _testData.CreateTestCategory(true, "testCategory", userId, false);           
+            Category category = _testData.CreateTestCategory(true, "testCategory", userId, false);
 
             // Initialize and call method
             ICategoryService service = new CategoryService(_tdc.WMMContext.Object);
@@ -134,7 +156,9 @@ namespace WMMAPITests.UnitTests
 
             // Confirm mock and assert (not needed; exception expected)
         }
+        #endregion
 
+        #region Modify
         [TestMethod]
         public void TestModifyCategorySucceeds()
         {
@@ -158,7 +182,7 @@ namespace WMMAPITests.UnitTests
         {
             // Fabricate test data
             Category testCateogry = _testData.CreateTestCategory(true, "testCategory", null, false);
-            
+
             // Initialize and call method
             ICategoryService service = new CategoryService(_tdc.WMMContext.Object);
             service.ModifyCategory(testCateogry);
@@ -188,7 +212,7 @@ namespace WMMAPITests.UnitTests
             // Fabricate test data            
             Category testCategory = _testData.Categories.Where(c => !c.IsDefault).First();
             testCategory.Name = _testData.Categories.First(
-                c => !c.IsDefault 
+                c => !c.IsDefault
                 && c.UserId == testCategory.UserId
                 && c.Id != testCategory.Id).Name;
 
@@ -216,7 +240,9 @@ namespace WMMAPITests.UnitTests
 
             // Confirm and call method (no need, expecting exception)
         }
+        #endregion
 
+        #region Delete
         [TestMethod]
         public void TestDeleteCategorySucceeds()
         {            

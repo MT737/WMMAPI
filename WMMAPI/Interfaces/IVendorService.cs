@@ -11,5 +11,6 @@ namespace WMMAPI.Interfaces
         Vendor Get(Guid id, Guid userId);
         IList<Vendor> GetList(Guid userId);
         void ModifyVendor(Vendor vendor);
+        void CreateDefaults(Guid userId);
     }
 }
