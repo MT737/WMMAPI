@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
+using WMMAPI.Interfaces;
 using WMMAPI.Services;
 using WMMAPITests.DataHelpers;
 
@@ -22,7 +23,7 @@ namespace WMMAPITests.UnitTests
             _tdc = new TestDataContext(_testData);
         }
 
-
+        #region Get
         [TestMethod]
         public void TestGetSucceeds()
         {
@@ -31,10 +32,11 @@ namespace WMMAPITests.UnitTests
             _tdc.WMMContext.Setup(m => m.Transactions.AsQueryable()).Returns(_testData.Transactions);
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             var result = service.Get(testTransaction.Id, testTransaction.UserId, false);
 
             // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.Transactions.AsQueryable(), Times.Once());
             Assert.AreEqual(testTransaction.Id, result.Id);
             Assert.AreEqual(testTransaction.UserId, result.UserId);
             Assert.AreEqual(testTransaction.Amount, result.Amount);
@@ -44,8 +46,6 @@ namespace WMMAPITests.UnitTests
         public void TestGetSucceedsWithRelatedEntities()
         {
             // Fabricate test
-            // TODO Come back to this queryable issue
-            // Arrange relationships (moq context can't handle queryable includes)
             foreach (var transaction in _testData.Transactions)
             {
                 transaction.User = _testData.Users.First(u => u.Id == transaction.UserId);
@@ -57,32 +57,35 @@ namespace WMMAPITests.UnitTests
             _tdc.WMMContext.Setup(m => m.Transactions.AsQueryable()).Returns(_testData.Transactions);
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             var result = service.Get(testTransaction.Id, testTransaction.UserId, true);
 
             // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.Transactions.AsQueryable(), Times.Once());
             Assert.AreEqual(testTransaction.Id, result.Id);
             Assert.AreEqual(testTransaction.UserId, result.UserId);
             Assert.AreEqual(testTransaction.Amount, result.Amount);
             Assert.IsNotNull(result.Account);
             Assert.IsNotNull(result.Category);
-            Assert.IsNotNull(result.Vendor);            
+            Assert.IsNotNull(result.Vendor);
         }
 
         [TestMethod]
         public void TestGetReturnsNullIfNothingFound()
-        {   
+        {
             // Fabricate test
             _tdc.WMMContext.Setup(m => m.Transactions.AsQueryable()).Returns(_testData.Transactions);
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             var result = service.Get(Guid.NewGuid(), Guid.NewGuid(), false);
 
             // Confirm mock and assert
             Assert.IsNull(result);
         }
+        #endregion
 
+        #region GetList
         [TestMethod]
         public void TestGetListSucceeds()
         {
@@ -91,13 +94,14 @@ namespace WMMAPITests.UnitTests
             _tdc.WMMContext.Setup(m => m.Transactions.AsQueryable()).Returns(_testData.Transactions);
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
-            var result = service.GetList(testTransaction.UserId, true);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            var result = service.GetList(testTransaction.UserId, false);
 
             // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.Transactions.AsQueryable(), Times.Once());
             foreach (var transaction in result)
             {
-                Assert.AreEqual(testTransaction.UserId, transaction.UserId);             
+                Assert.AreEqual(testTransaction.UserId, transaction.UserId);
             }
         }
 
@@ -105,8 +109,6 @@ namespace WMMAPITests.UnitTests
         public void TestGetListSucceedsWithRelatedEntities()
         {
             // Fabricate test
-            // TODO Come back to this queryable issue
-            // Arrange relationships (moq context can't handle queryable includes)
             foreach (var transaction in _testData.Transactions)
             {
                 transaction.User = _testData.Users.First(u => u.Id == transaction.UserId);
@@ -118,10 +120,11 @@ namespace WMMAPITests.UnitTests
             _tdc.WMMContext.Setup(m => m.Transactions.AsQueryable()).Returns(_testData.Transactions);
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             var result = service.GetList(testTransaction.UserId, true);
 
             // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.Transactions.AsQueryable(), Times.Once());
             foreach (var transaction in result)
             {
                 Assert.AreEqual(testTransaction.UserId, transaction.UserId);
@@ -138,13 +141,16 @@ namespace WMMAPITests.UnitTests
             _tdc.WMMContext.Setup(m => m.Transactions.AsQueryable()).Returns(_testData.Transactions);
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             var result = service.GetList(Guid.NewGuid(), false);
 
             // Confirm mock and assert
+            _tdc.WMMContext.Verify(m => m.Transactions.AsQueryable(), Times.Once());
             Assert.IsTrue(result.Count == 0);
         }
+        #endregion
 
+        #region Add
         [TestMethod]
         public void TestAddTransactionSucceeds()
         {
@@ -156,12 +162,13 @@ namespace WMMAPITests.UnitTests
                 "This is a test transaction");
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             service.AddTransaction(testTransaction);
 
             // Confirm mock and assert (no asserts, just verify Mock)
             _tdc.TransactionSet.Verify(m => m.Add(It.IsAny<Transaction>()), Times.Once());
             _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
+            Assert.IsTrue(_tdc.WMMContext.Object.Transactions.Any(t => t.Id == transaction.Id));
         }
 
         [Ignore] // TODO Return to this and implement further tests once validation exists
@@ -170,7 +177,9 @@ namespace WMMAPITests.UnitTests
         {
             throw new NotImplementedException();
         }
-        
+        #endregion
+
+        #region Modify
         [TestMethod]
         public void TestModifyTransactionSucceeds()
         {
@@ -181,12 +190,14 @@ namespace WMMAPITests.UnitTests
             testTransaction.Amount = 111.22M;
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             service.ModifyTransaction(testTransaction);
 
             // Confirm mock and assert (no asserts, just verify mock)
             _tdc.WMMContext.Verify(m => m.Transactions, Times.Once());
             _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
+            Assert.AreEqual(testTransaction.Description, _tdc.WMMContext.Object.Transactions
+                .First(t => t.Id == testTransaction.Id).Description);
         }
 
         [TestMethod]
@@ -198,12 +209,14 @@ namespace WMMAPITests.UnitTests
                 .CreateTestTransaction(_testData.Accounts.First(), true, 100.00M, Guid.NewGuid(), Guid.NewGuid());
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             service.ModifyTransaction(testTransaction);
 
             // Confirm mock and assert (not needed, exception expected)
         }
+        #endregion
 
+        #region Delete
         [TestMethod]
         public void TestDeleteTransactionSucceeds()
         {
@@ -212,7 +225,7 @@ namespace WMMAPITests.UnitTests
             _tdc.TransactionSet.Setup(m => m.Find(It.IsAny<Guid>())).Returns(testTransaction);
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             service.DeleteTransaction(testTransaction.UserId, testTransaction.Id);
 
             // Confirm mock and assert
@@ -228,10 +241,11 @@ namespace WMMAPITests.UnitTests
             var testTransaction = _testData.Transactions.First();
 
             // Initialize service and call method
-            TransactionService service = new TransactionService(_tdc.WMMContext.Object);
+            ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             service.DeleteTransaction(testTransaction.UserId, Guid.NewGuid());
 
             // Confirm mock and assert (not needed, exception expected)
         }
+        #endregion        
     }
 }
