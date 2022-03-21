@@ -25,7 +25,7 @@ namespace WMMAPI.Models.AccountModels
                 UserId = userId,
                 Id = AccountId,
                 Name = Name,
-                IsAsset = false, //Using a placeholder for now //TODO: Should this be changeable?
+                //IsAsset = false, //TODO: Should this be changeable?
                 IsActive = IsActive
             };
         }
