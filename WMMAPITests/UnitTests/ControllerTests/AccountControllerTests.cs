@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using WMMAPI.Controllers;
+using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.AccountModels;
 using WMMAPITests.DataHelpers;
+using static WMMAPI.Helpers.Globals.ErrorMessages;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {
@@ -27,9 +29,11 @@ namespace WMMAPITests.UnitTests.ControllerTests
             _mockAccountService = new Mock<IAccountService>();
         }
 
+        #region Get
         [TestMethod]
         public void GetShouldReturnViewModel()
         {            
+            // Arrange test
             var userId = Guid.NewGuid();
             var testAccounts = GenerateTestAccountModels(userId);
             _mockAccountService.Setup(m => m.GetList(userId)).Returns(testAccounts);
@@ -37,15 +41,73 @@ namespace WMMAPITests.UnitTests.ControllerTests
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = userId;
 
-
+            // Call action
             OkObjectResult result = (OkObjectResult)controller.GetAccounts();
             
-
-            Assert.IsNotNull((int)result.StatusCode == (int)HttpStatusCode.OK);
+            // Assert
+            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.OK);
             Assert.IsInstanceOfType(result.Value, typeof(IList<AccountModel>));
             IList<AccountModel> accounts = (IList<AccountModel>)result.Value;
             Assert.AreEqual(5, accounts.Count);
         }
+
+        [TestMethod]
+        public void GetAppExceptionHandled()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();
+            _mockAccountService.Setup(m => m.GetList(userId)).Throws(new AppException());
+
+            AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
+            controller.UserId = userId;
+
+            // Call action
+            BadRequestObjectResult result = (BadRequestObjectResult)controller.GetAccounts();
+
+            // Assert
+            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);            
+            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
+            ExceptionResponse response = (ExceptionResponse)result.Value;
+            Assert.AreEqual(response.Message, "Exception of type 'WMMAPI.Helpers.AppException' was thrown.");
+        }
+
+        [TestMethod]
+        public void GetExceptionHandled()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();
+            _mockAccountService.Setup(m => m.GetList(userId)).Throws(new Exception());
+
+            AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
+            controller.UserId = userId;
+
+            // Call action
+            BadRequestObjectResult result = (BadRequestObjectResult)controller.GetAccounts();
+
+            // Assert
+            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
+            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
+            ExceptionResponse response = (ExceptionResponse)result.Value;
+            Assert.AreEqual(response.Message, GenericErrorMessage);
+        }
+
+        [TestMethod]
+        public void GetEmptyGuidHandled()
+        {
+            // Arrange test
+            AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
+            controller.UserId = Guid.Empty;
+
+            // Call action
+            BadRequestObjectResult result = (BadRequestObjectResult)controller.GetAccounts();
+
+            // Assert
+            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
+            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
+            ExceptionResponse response = (ExceptionResponse)result.Value;
+            Assert.AreEqual(response.Message, AuthenticationError);
+        }
+        #endregion
 
         #region TestHelpers
         private IList<AccountModel> GenerateTestAccountModels(Guid userId)

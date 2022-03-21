@@ -5,6 +5,7 @@ using System;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.AccountModels;
+using static WMMAPI.Helpers.Globals.ErrorMessages;
 
 namespace WMMAPI.Controllers
 {
@@ -23,16 +24,16 @@ namespace WMMAPI.Controllers
             _logger = logger;
             _accountService = accountService;
 
-            // TODO This shouldn't be possible, but it's needed for testing. Re-think testing?
+            // TODO With authorization in place, this shouldn't be possible, but it's needed for testing. Re-think testing?
             UserId = User != null ? Guid.Parse(User.Identity.Name) : Guid.Empty;
         }
 
         [HttpGet]
         public IActionResult GetAccounts()
         {
-            // TODO This shouldn't be a possibility, but it's needed for testing. Re-think testing?
+            // TODO With authorization in place, this shouldn't be a possibility, but it's needed for testing. Re-think testing?
             if (UserId == Guid.Empty)
-                return BadRequest(new { message = "Authentication failure" });
+                return BadRequest(new ExceptionResponse(AuthenticationError));
 
             try
             {
@@ -44,7 +45,11 @@ namespace WMMAPI.Controllers
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
 
@@ -52,7 +57,7 @@ namespace WMMAPI.Controllers
         public IActionResult AddAccount([FromBody] AddAccountModel model)
         {
             if (UserId == Guid.Empty)
-                return BadRequest(new { message = "Authentication failure" });
+                return BadRequest(new ExceptionResponse(AuthenticationError));
 
             try
             {
@@ -64,7 +69,11 @@ namespace WMMAPI.Controllers
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
 
@@ -72,7 +81,7 @@ namespace WMMAPI.Controllers
         public IActionResult ModifyAccount([FromBody] UpdateAccountModel model)
         {
             if (UserId == Guid.Empty)
-                return BadRequest(new { message = "Authentication failure" });
+                return BadRequest(new ExceptionResponse(AuthenticationError));
 
             try
             {
@@ -84,7 +93,11 @@ namespace WMMAPI.Controllers
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
     }

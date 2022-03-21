@@ -4,6 +4,12 @@ namespace WMMAPI.Helpers
 {
     public class Globals
     {
+        public readonly struct ErrorMessages
+        {
+            public const string GenericErrorMessage = "There was an error processing your request.";
+            public const string AuthenticationError = "An authentication error has occurred.";
+        }
+
         public readonly struct DefaultCategories
         {
             public const string AccountTransfer = "Account Transfer";
