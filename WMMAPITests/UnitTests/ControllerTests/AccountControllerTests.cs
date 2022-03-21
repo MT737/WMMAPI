@@ -38,7 +38,6 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var userId = Guid.NewGuid();
             var testAccounts = GenerateTestAccountModels(userId);
             _mockAccountService.Setup(m => m.GetList(userId)).Returns(testAccounts);
-
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = userId;
 
@@ -58,7 +57,6 @@ namespace WMMAPITests.UnitTests.ControllerTests
             // Arrange test
             Guid userId = Guid.NewGuid();
             _mockAccountService.Setup(m => m.GetList(userId)).Throws(new AppException());
-
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = userId;
 
@@ -78,7 +76,6 @@ namespace WMMAPITests.UnitTests.ControllerTests
             // Arrange test
             Guid userId = Guid.NewGuid();
             _mockAccountService.Setup(m => m.GetList(userId)).Throws(new Exception());
-
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = userId;
 
@@ -110,22 +107,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
         }
         #endregion
 
-        #region AddAccount
+        #region Add
         [TestMethod]
         public void AddShouldReturnViewModel()
         {
             // Arrange test
-            var userId = Guid.NewGuid();
-            AddAccountModel model = new AddAccountModel
-            {
-                Name = "TestAccount",
-                IsAsset = true,
-                IsActive = true,
-                Balance = 250
-            };
-
+            AddAccountModel model = GenerateAddAccountModel();
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
-            controller.UserId = userId;
+            controller.UserId = Guid.NewGuid();
 
             // Call action
             OkObjectResult result = (OkObjectResult)controller.AddAccount(model);
@@ -141,18 +130,10 @@ namespace WMMAPITests.UnitTests.ControllerTests
         public void AddAppExceptionHandled()
         {
             // Arrange test
-            var userId = Guid.NewGuid();
-            AddAccountModel model = new AddAccountModel
-            {
-                Name = "TestAccount",
-                IsAsset = true,
-                IsActive = true,
-                Balance = 250
-            };
-            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>())).Throws(new AppException());
-            
+            AddAccountModel model = GenerateAddAccountModel();
+            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>())).Throws(new AppException());            
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
-            controller.UserId = userId;
+            controller.UserId = Guid.NewGuid();
 
             // Call action
             BadRequestObjectResult result = (BadRequestObjectResult)controller.AddAccount(model);
@@ -168,18 +149,10 @@ namespace WMMAPITests.UnitTests.ControllerTests
         public void AddExceptionHandled()
         {
             // Arrange test
-            var userId = Guid.NewGuid();
-            AddAccountModel model = new AddAccountModel
-            {
-                Name = "TestAccount",
-                IsAsset = true,
-                IsActive = true,
-                Balance = 250
-            };
+            AddAccountModel model = GenerateAddAccountModel();
             _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>())).Throws(new Exception());
-
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
-            controller.UserId = userId;
+            controller.UserId = Guid.NewGuid();
 
             // Call action
             BadRequestObjectResult result = (BadRequestObjectResult)controller.AddAccount(model);
@@ -194,15 +167,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         public void AddEmptyGuidExceptionHandled()
         {
             // Arrange test
-            var userId = Guid.NewGuid();
-            AddAccountModel model = new AddAccountModel
-            {
-                Name = "TestAccount",
-                IsAsset = true,
-                IsActive = true,
-                Balance = 250
-            };
-
+            AddAccountModel model = GenerateAddAccountModel();
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = Guid.Empty;
 
@@ -217,6 +182,80 @@ namespace WMMAPITests.UnitTests.ControllerTests
         }
         #endregion
 
+        #region Modify
+        [TestMethod]
+        public void ModifyShouldReturnEmptyOk()
+        {
+            // Arrange test
+            UpdateAccountModel model = GenerateUpdateAccountModel();
+            AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
+            controller.UserId = Guid.NewGuid();
+
+            // Call action
+            OkResult result = (OkResult)controller.ModifyAccount(model);
+
+            // Assert
+            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.OK);            
+        }
+
+        [TestMethod]
+        public void ModifyAppExceptionHandled()
+        {
+            // Arrange test
+            UpdateAccountModel model = GenerateUpdateAccountModel();
+            _mockAccountService.Setup(m => m.ModifyAccount(It.IsAny<Account>())).Throws(new AppException());
+            AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
+            controller.UserId = Guid.NewGuid();
+
+            // Call action
+            BadRequestObjectResult result = (BadRequestObjectResult)controller.ModifyAccount(model);
+
+            // Assert
+            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
+            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
+            ExceptionResponse response = (ExceptionResponse)result.Value;
+            Assert.AreEqual(response.Message, "Exception of type 'WMMAPI.Helpers.AppException' was thrown.");
+        }
+
+        [TestMethod]
+        public void ModifyExceptionHandled()
+        {
+            // Arrange test
+            UpdateAccountModel model = GenerateUpdateAccountModel();
+            _mockAccountService.Setup(m => m.ModifyAccount(It.IsAny<Account>())).Throws(new Exception());
+            AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
+            controller.UserId = Guid.NewGuid();
+
+            // Call action
+            BadRequestObjectResult result = (BadRequestObjectResult)controller.ModifyAccount(model);
+
+            // Assert
+            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
+            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
+            ExceptionResponse response = (ExceptionResponse)result.Value;
+            Assert.AreEqual(response.Message, GenericErrorMessage);
+        }
+
+        [TestMethod]
+        public void ModifyEmptyGuidHandled()
+        {
+            // Arrange test
+            UpdateAccountModel model = GenerateUpdateAccountModel();
+            AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
+            controller.UserId = Guid.Empty;
+
+            // Call action
+            BadRequestObjectResult result = (BadRequestObjectResult)controller.ModifyAccount(model);
+
+            // Assert
+            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
+            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
+            ExceptionResponse response = (ExceptionResponse)result.Value;
+            Assert.AreEqual(response.Message, AuthenticationError);
+        }
+
+        #endregion
+
         #region TestHelpers
         private IList<AccountModel> GenerateTestAccountModels(Guid userId)
         {            
@@ -226,6 +265,27 @@ namespace WMMAPITests.UnitTests.ControllerTests
                 models.Add(new AccountModel(_td.CreateTestAccount(userId)));
             }
             return models;
+        }
+
+        private AddAccountModel GenerateAddAccountModel()
+        {
+            return new AddAccountModel
+            {
+                Name = "TestAccount",
+                IsAsset = true,
+                IsActive = true,
+                Balance = 250
+            };
+        }
+
+        private UpdateAccountModel GenerateUpdateAccountModel()
+        {
+            return new UpdateAccountModel
+            {
+                AccountId = Guid.NewGuid(),
+                Name = "TestAccount",
+                IsActive = true
+            };
         }
         #endregion
     }
