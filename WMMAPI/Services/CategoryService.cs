@@ -195,11 +195,11 @@ namespace WMMAPI.Services
         /// <exception cref="AppException">Throws AppException if validation fails</exception>
         private void ValidateCategory(Category category)
         {
-            if (NameExists(category))
-                throw new AppException($"{category.Name} already exists.");
-
             if (String.IsNullOrWhiteSpace(category.Name))
                 throw new AppException("Category name cannot be empty or whitespace only string.");
+
+            if (NameExists(category))
+                throw new AppException($"{category.Name} already exists.");
         }
         #endregion
     }
