@@ -171,11 +171,11 @@ namespace WMMAPI.Services
         // Private helper methods
         private void ValidateVendor(Vendor vendor)
         {
-            if (NameExists(vendor))
-                throw new AppException($"Vendor {vendor.Name} already exists.");
-
             if (String.IsNullOrWhiteSpace(vendor.Name))
                 throw new AppException("Vendor name cannot be empty or whitespace only string.");
+         
+            if (NameExists(vendor))
+                throw new AppException($"Vendor {vendor.Name} already exists.");
         }
         #endregion
     }
