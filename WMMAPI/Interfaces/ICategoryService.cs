@@ -11,7 +11,7 @@ namespace WMMAPI.Interfaces
         void CreateDefaults(Guid userId);
         void DeleteCategory(Guid absorbedId, Guid absorbingGuid, Guid userId);
         CategoryModel Get(Guid id, Guid userId);
-        List<CategoryModel> GetList(Guid userId);
+        IList<CategoryModel> GetList(Guid userId);
         void ModifyCategory(Category category);
     }
 }
