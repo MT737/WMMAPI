@@ -1,0 +1,13 @@
+﻿global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.VisualStudio.TestTools.UnitTesting;
+global using Moq;
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using WMMAPI.Controllers;
+global using WMMAPI.Database.Entities;
+global using WMMAPI.Helpers;
+global using WMMAPI.Interfaces;
+global using WMMAPITests.DataHelpers;
+global using static WMMAPI.Helpers.Globals.ErrorMessages;
