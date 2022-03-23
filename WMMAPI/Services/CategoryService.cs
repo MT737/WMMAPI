@@ -39,7 +39,7 @@ namespace WMMAPI.Services
         /// </summary>
         /// <param name="userId">Guid: Id of the user that owns the categories</param>
         /// <returns>An IList of category models</returns>
-        public List<CategoryModel> GetList(Guid userId)
+        public IList<CategoryModel> GetList(Guid userId)
         {
             var categories = Context.Categories
                 .Where(c => c.UserId == userId)
