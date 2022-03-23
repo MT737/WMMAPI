@@ -46,6 +46,9 @@ namespace WMMAPI.Services
                 .OrderBy(c => c.Name)
                 .Select(c => new CategoryModel(c));
 
+            if (!categories.Any())
+                throw new AppException("No categories not found.");
+
             return categories.ToList();
         }
 
