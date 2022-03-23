@@ -7,6 +7,7 @@ using System.Linq;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.TransactionModels;
+using static WMMAPI.Helpers.Globals.ErrorMessages;
 
 namespace WMMAPI.Controllers
 {
@@ -18,78 +19,111 @@ namespace WMMAPI.Controllers
         private readonly ILogger<TransactionController> _logger;
         private readonly ITransactionService _transactionService;
 
+        public Guid UserId { get; set; }
+
         public TransactionController(ILogger<TransactionController> logger, ITransactionService transactionService)
         {
             _logger = logger;
             _transactionService = transactionService;
+            
+            UserId = User != null ? Guid.Parse(User.Identity.Name) : Guid.Empty;
         }
 
         [HttpGet]
         public IActionResult GetTransactions()
         {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
-                Guid userId = Guid.Parse(User.Identity.Name);
-                List<TransactionModel> transactions = _transactionService
-                    .GetList(userId, true)
+                IList<TransactionModel> transactions = _transactionService
+                    .GetList(UserId, true)
                     .Select(t => new TransactionModel(t))
                     .ToList();
                 return Ok(transactions);
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
-                return BadRequest(new { message = "There was an error processing your request.", ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                // TODO Add logging here to get the actual error.
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
 
         [HttpPost]
         public IActionResult AddTransaction([FromBody] AddTransactionModel model)
         {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
-                Guid userId = Guid.Parse(User.Identity.Name);
-                var dbModel = model.ToDB(userId);
+                var dbModel = model.ToDB(UserId);
                 _transactionService.AddTransaction(dbModel);
 
                 // Pull saved transaction from db in order to pull names (Convenience feature for API consumer)
                 TransactionModel returnModel = new TransactionModel(_transactionService
-                    .Get(userId, dbModel.Id, true));
+                    .Get(dbModel.Id, UserId, true));
 
                 return Ok(returnModel);
             }
-            catch (Exception ex)
-            { 
-                return BadRequest(new { message = "There was an error processing your request.", ex.Message });
+            catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                // TODO Add logging here to get the actual error.
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
 
         [HttpPut]
         public IActionResult ModifyTransaction([FromBody] TransactionModel model)
         {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
-                Guid userId = Guid.Parse(User.Identity.Name);
-                var dbModel = model.ToDB(userId);
+                var dbModel = model.ToDB(UserId);
                 _transactionService.ModifyTransaction(dbModel);
                 return Ok();
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                // TODO Add logging here to get the actual error.
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
 
         [HttpDelete, Route("{id}")]
         public IActionResult DeleteTransaction(Guid transactionId)
         {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
-                _transactionService.DeleteTransaction(Guid.Parse(User.Identity.Name), transactionId);
+                _transactionService.DeleteTransaction(UserId, transactionId);
                 return Ok();
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                // TODO Add logging here to get the actual error.
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
     }
