@@ -224,9 +224,165 @@ namespace WMMAPITests.UnitTests.ControllerTests
         #endregion
 
         #region Modify
+        [TestMethod]
+        public void ModifyShouldReturnEmpty()
+        {
+            // Arrange test
+            var userId = Guid.NewGuid();
+            var testTransaction = GenerateTestTransactions(userId).First();
+            TransactionModel model = new TransactionModel(testTransaction);
+            TransactionController controller = new(_mockLogger.Object, _mockTransactionService.Object);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.ModifyTransaction(model);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(OkResult));            
+        }
+
+        [TestMethod]
+        public void ModifyAppExceptionHandled()
+        {
+            // Arrange test
+            var userId = Guid.NewGuid();
+            var testTransaction = GenerateTestTransactions(userId).First();
+            TransactionModel model = new TransactionModel(testTransaction);            
+            _mockTransactionService.Setup(m => m.ModifyTransaction(It.IsAny<Transaction>())).Throws(new AppException());
+            TransactionController controller = new(_mockLogger.Object, _mockTransactionService.Object);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.ModifyTransaction(model);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual("Exception of type 'WMMAPI.Helpers.AppException' was thrown.", resp.Message);
+        }
+
+        [TestMethod]
+        public void ModifyExceptionHandled()
+        {
+            // Arrange test
+            var userId = Guid.NewGuid();
+            var testTransaction = GenerateTestTransactions(userId).First();
+            TransactionModel model = new TransactionModel(testTransaction);
+            _mockTransactionService.Setup(m => m.ModifyTransaction(It.IsAny<Transaction>())).Throws(new Exception());
+            TransactionController controller = new(_mockLogger.Object, _mockTransactionService.Object);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.ModifyTransaction(model);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(GenericErrorMessage, resp.Message);
+        }
+
+        [TestMethod]
+        public void ModifyEmptyUserGuidHandled()
+        {
+            // Arrange test
+            var userId = Guid.NewGuid();
+            var testTransaction = GenerateTestTransactions(userId).First();
+            TransactionModel model = new TransactionModel(testTransaction);
+            TransactionController controller = new(_mockLogger.Object, _mockTransactionService.Object);
+            controller.UserId = Guid.Empty;
+
+            // Call action
+            var result = controller.ModifyTransaction(model);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(AuthenticationError, resp.Message);
+        }
         #endregion
 
         #region Delete
+        [TestMethod]
+        public void DeleteShouldReturnEmpty()
+        {
+            // Arrange test
+            var userId = Guid.NewGuid();
+            var testTransactionId = Guid.NewGuid();
+            TransactionController controller = new(_mockLogger.Object, _mockTransactionService.Object);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.DeleteTransaction(testTransactionId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(OkResult));
+        }
+
+        [TestMethod]
+        public void DeleteAppExceptionHandled()
+        {
+            // Arrange test
+            var userId = Guid.NewGuid();
+            var testTransactionId = Guid.NewGuid();
+            _mockTransactionService.Setup(m => m.DeleteTransaction(userId, testTransactionId)).Throws(new AppException());
+            TransactionController controller = new(_mockLogger.Object, _mockTransactionService.Object);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.DeleteTransaction(testTransactionId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual("Exception of type 'WMMAPI.Helpers.AppException' was thrown.", resp.Message);
+        }
+
+        [TestMethod]
+        public void DeleteExceptionHandled()
+        {
+            // Arrange test
+            var userId = Guid.NewGuid();
+            var testTransactionId = Guid.NewGuid();
+            _mockTransactionService.Setup(m => m.DeleteTransaction(userId, testTransactionId)).Throws(new Exception());
+            TransactionController controller = new(_mockLogger.Object, _mockTransactionService.Object);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.DeleteTransaction(testTransactionId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(GenericErrorMessage, resp.Message);
+        }
+
+        [TestMethod]
+        public void DeleteEmptyUserGuidHandled()
+        {
+            // Arrange test
+            TransactionController controller = new(_mockLogger.Object, _mockTransactionService.Object);
+            controller.UserId = Guid.Empty;
+
+            // Call action
+            var result = controller.DeleteTransaction(Guid.NewGuid());
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(AuthenticationError, resp.Message);
+        }
         #endregion
 
         #region TestHelpers
