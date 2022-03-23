@@ -34,9 +34,14 @@ namespace WMMAPI.Services
                 .Include(t => t.Vendor);
             }
 
-            return transaction
+            var result = transaction
                 .Where(t => t.Id == id && t.UserId == userId)
                 .SingleOrDefault();
+
+            if (result == null)
+                throw new AppException("Transaction not found.");
+
+            return result;
         }
 
         /// <summary>
@@ -57,10 +62,15 @@ namespace WMMAPI.Services
                     .Include(t => t.Vendor);
             }
 
-            return transactions
+            var results = transactions
                 .Where(t => t.UserId == userId)
                 .OrderByDescending(t => t.TransactionDate)
                 .ToList();
+
+            if (results == null || !results.Any())
+                throw new AppException("No transactions found.");
+
+            return results;
         }
 
         /// <summary>

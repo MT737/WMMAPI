@@ -71,7 +71,8 @@ namespace WMMAPITests.UnitTests
         }
 
         [TestMethod]
-        public void TestGetReturnsNullIfNothingFound()
+        [ExpectedException(typeof(AppException))]
+        public void TestGetNothingFoundThrowsException()
         {
             // Fabricate test
             _tdc.WMMContext.Setup(m => m.Transactions.AsQueryable()).Returns(_testData.Transactions);
@@ -79,9 +80,6 @@ namespace WMMAPITests.UnitTests
             // Initialize service and call method
             ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             var result = service.Get(Guid.NewGuid(), Guid.NewGuid(), false);
-
-            // Confirm mock and assert
-            Assert.IsNull(result);
         }
         #endregion
 
@@ -135,7 +133,8 @@ namespace WMMAPITests.UnitTests
         }
 
         [TestMethod]
-        public void TestGetListReturnsEmptyListIfNothingFound()
+        [ExpectedException(typeof(AppException))]
+        public void TestGetListNothingFoundReturnsAppException()
         {
             // Fabricate test
             _tdc.WMMContext.Setup(m => m.Transactions.AsQueryable()).Returns(_testData.Transactions);
@@ -143,10 +142,6 @@ namespace WMMAPITests.UnitTests
             // Initialize service and call method
             ITransactionService service = new TransactionService(_tdc.WMMContext.Object);
             var result = service.GetList(Guid.NewGuid(), false);
-
-            // Confirm mock and assert
-            _tdc.WMMContext.Verify(m => m.Transactions.AsQueryable(), Times.Once());
-            Assert.IsTrue(result.Count == 0);
         }
         #endregion
 

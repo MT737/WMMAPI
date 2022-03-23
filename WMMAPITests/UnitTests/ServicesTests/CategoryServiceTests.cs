@@ -42,7 +42,7 @@ namespace WMMAPITests.UnitTests
 
         [TestMethod]
         [ExpectedException(typeof(AppException))]
-        public void TestGetFailsNotFound()
+        public void TestGetNothingFoundThrowsAppException()
         {
             // Initialize and call method
             ICategoryService service = new CategoryService(_tdc.WMMContext.Object);
@@ -74,18 +74,15 @@ namespace WMMAPITests.UnitTests
         }
 
         [TestMethod]
-        public void TestGetListShouldBeEmpty()
+        [ExpectedException(typeof(AppException))]
+        public void TestGetListNothingFoundThrowsAppException()
         {
             // Fabricate test data
             Guid userId = Guid.NewGuid();
 
             // Initialize and call method
             ICategoryService service = new CategoryService(_tdc.WMMContext.Object);
-            var result = service.GetList(userId);
-
-            // Confirm mock and assert
-            _tdc.WMMContext.Verify(m => m.Categories, Times.Once());
-            Assert.IsTrue(result.Count == 0);
+            var result = service.GetList(userId);;
         }
         #endregion
 

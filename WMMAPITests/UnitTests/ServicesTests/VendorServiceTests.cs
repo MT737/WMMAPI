@@ -62,15 +62,12 @@ namespace WMMAPITests.UnitTests
         }
 
         [TestMethod]
-        public void TestGetDoesntExistReturnsNull()
+        [ExpectedException(typeof(AppException))]
+        public void TestGetDoesntExistThrowsAppException()
         {
             // Initialize service and call method
             IVendorService service = new VendorService(_tdc.WMMContext.Object);
             Vendor result = service.Get(Guid.NewGuid(), Guid.NewGuid());
-
-            // Confirm mock and assert
-            _tdc.WMMContext.Verify(m => m.Vendors, Times.Once());
-            Assert.IsNull(result);
         }
         #endregion
 
@@ -92,7 +89,8 @@ namespace WMMAPITests.UnitTests
         }
 
         [TestMethod]
-        public void TestGetListDoesntExistReturnsEmpty()
+        [ExpectedException(typeof (AppException))]
+        public void TestGetListDoesntExistThrowsAppException()
         {
             // Fabricate test
             Guid userId = Guid.NewGuid();
@@ -100,10 +98,6 @@ namespace WMMAPITests.UnitTests
             // Initialize service and call method
             IVendorService service = new VendorService(_tdc.WMMContext.Object);
             IList<Vendor> vendors = service.GetList(userId);
-
-            // Confirm mock and assert
-            _tdc.WMMContext.Verify(m => m.Vendors, Times.Once());
-            Assert.IsTrue(vendors.Count == 0);
         }
         #endregion
 

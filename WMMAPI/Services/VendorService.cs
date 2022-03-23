@@ -26,9 +26,14 @@ namespace WMMAPI.Services
         /// <returns>Vendor entity with the passed VendorId.</returns>
         public Vendor Get(Guid id, Guid userId)
         {
-            return Context.Vendors
+            var vendor = Context.Vendors
                 .Where(v => v.Id == id && v.UserId == userId)
                 .SingleOrDefault();
+
+            if (vendor == null)
+                throw new AppException("Vendor not found.");
+
+            return vendor;
         }
 
         /// <summary>
@@ -38,10 +43,15 @@ namespace WMMAPI.Services
         /// <returns>IList of vendor entities.</returns>
         public IList<Vendor> GetList(Guid userId)
         {
-            return Context.Vendors
+            var vendors = Context.Vendors
                 .Where(v => v.UserId == userId)
                 .OrderBy(v => v.Name)
                 .ToList();
+
+            if (!vendors.Any())
+                throw new AppException("No vendors found.");
+
+            return vendors;
         }
 
         public void AddVendor(Vendor vendor)
