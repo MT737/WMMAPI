@@ -38,8 +38,7 @@ namespace WMMAPI.Controllers
             try
             {
                 // Get list of accounts
-                var accountsWithBalance = _accountService
-                    .GetList(UserId);
+                var accountsWithBalance = _accountService.GetList(UserId);
 
                 return Ok(accountsWithBalance);
             }

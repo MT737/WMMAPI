@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using WMMAPI.Controllers;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
@@ -42,13 +41,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = userId;
 
             // Call action
-            OkObjectResult result = (OkObjectResult)controller.GetAccounts();
-            
+            var result = controller.GetAccounts();
+
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.OK);
-            Assert.IsInstanceOfType(result.Value, typeof(IList<AccountModel>));
-            IList<AccountModel> accounts = (IList<AccountModel>)result.Value;
-            Assert.AreEqual(5, accounts.Count);
+            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+            var obj = (OkObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(IList<AccountModel>));
+            IList<AccountModel> accounts = (IList<AccountModel>)obj.Value;
+            Assert.AreEqual(accounts.Count, 5);
         }
 
         [TestMethod]
@@ -61,13 +61,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = userId;
 
             // Call action
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.GetAccounts();
+            var result = controller.GetAccounts();
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);            
-            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
-            ExceptionResponse response = (ExceptionResponse)result.Value;
-            Assert.AreEqual(response.Message, "Exception of type 'WMMAPI.Helpers.AppException' was thrown.");
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual("Exception of type 'WMMAPI.Helpers.AppException' was thrown.", resp.Message);
         }
 
         [TestMethod]
@@ -80,13 +81,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = userId;
 
             // Call action
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.GetAccounts();
+            var result = controller.GetAccounts();
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
-            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
-            ExceptionResponse response = (ExceptionResponse)result.Value;
-            Assert.AreEqual(response.Message, GenericErrorMessage);
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(GenericErrorMessage, resp.Message);
         }
 
         [TestMethod]
@@ -97,13 +99,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = Guid.Empty;
 
             // Call action
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.GetAccounts();
+            var result = controller.GetAccounts();
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
-            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
-            ExceptionResponse response = (ExceptionResponse)result.Value;
-            Assert.AreEqual(response.Message, AuthenticationError);
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(AuthenticationError, resp.Message);
         }
         #endregion
 
@@ -117,12 +120,13 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = Guid.NewGuid();
 
             // Call action
-            OkObjectResult result = (OkObjectResult)controller.AddAccount(model);
+            var result = controller.AddAccount(model);
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.OK);
-            Assert.IsInstanceOfType(result.Value, typeof(AccountModel));
-            AccountModel account = (AccountModel)result.Value;
+            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+            var obj = (OkObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(AccountModel));
+            var account = (AccountModel)obj.Value;
             Assert.AreEqual(model.Name, account.Name);
         }
 
@@ -136,13 +140,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = Guid.NewGuid();
 
             // Call action
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.AddAccount(model);
+            var result = controller.AddAccount(model);
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
-            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
-            ExceptionResponse response = (ExceptionResponse)result.Value;
-            Assert.AreEqual(response.Message, "Exception of type 'WMMAPI.Helpers.AppException' was thrown.");
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual("Exception of type 'WMMAPI.Helpers.AppException' was thrown.", resp.Message);
         }
 
         [TestMethod]
@@ -155,13 +160,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = Guid.NewGuid();
 
             // Call action
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.AddAccount(model);
+            var result = controller.AddAccount(model);
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
-            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
-            ExceptionResponse response = (ExceptionResponse)result.Value;
-            Assert.AreEqual(response.Message, GenericErrorMessage);
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(GenericErrorMessage, resp.Message);
         }
         [TestMethod]
         public void AddEmptyGuidExceptionHandled()
@@ -172,13 +178,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = Guid.Empty;
 
             // Call action
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.AddAccount(model);
+            var result = controller.AddAccount(model);
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
-            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
-            ExceptionResponse response = (ExceptionResponse)result.Value;
-            Assert.AreEqual(response.Message, AuthenticationError);
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(AuthenticationError, resp.Message);
         }
         #endregion
 
@@ -192,10 +199,10 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = Guid.NewGuid();
 
             // Call action
-            OkResult result = (OkResult)controller.ModifyAccount(model);
+            var result = controller.ModifyAccount(model);
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.OK);            
+            Assert.IsInstanceOfType(result, typeof(OkResult));
         }
 
         [TestMethod]
@@ -208,13 +215,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = Guid.NewGuid();
 
             // Call action
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.ModifyAccount(model);
+            var result = controller.ModifyAccount(model);
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
-            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
-            ExceptionResponse response = (ExceptionResponse)result.Value;
-            Assert.AreEqual(response.Message, "Exception of type 'WMMAPI.Helpers.AppException' was thrown.");
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual("Exception of type 'WMMAPI.Helpers.AppException' was thrown.", resp.Message);
         }
 
         [TestMethod]
@@ -227,13 +235,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = Guid.NewGuid();
 
             // Call action
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.ModifyAccount(model);
+            var result = controller.ModifyAccount(model);
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
-            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
-            ExceptionResponse response = (ExceptionResponse)result.Value;
-            Assert.AreEqual(response.Message, GenericErrorMessage);
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(GenericErrorMessage, resp.Message);
         }
 
         [TestMethod]
@@ -245,13 +254,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             controller.UserId = Guid.Empty;
 
             // Call action
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.ModifyAccount(model);
+            var result = controller.ModifyAccount(model);
 
             // Assert
-            Assert.AreEqual((int)result.StatusCode, (int)HttpStatusCode.BadRequest);
-            Assert.IsInstanceOfType(result.Value, typeof(ExceptionResponse));
-            ExceptionResponse response = (ExceptionResponse)result.Value;
-            Assert.AreEqual(response.Message, AuthenticationError);
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(AuthenticationError, resp.Message);
         }
 
         #endregion
