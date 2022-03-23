@@ -92,7 +92,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         }
 
         [TestMethod]
-        public void GetEmptyGuidHandled()
+        public void GetEmptyUserGuidHandled()
         {
             // Arrange test
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
