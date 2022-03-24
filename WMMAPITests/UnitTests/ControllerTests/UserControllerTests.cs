@@ -8,14 +8,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
     {
         private Mock<ILogger<UserController>> _mockLogger;
         private Mock<IUserService> _mockUserService;
-        private Mock<IOptions<AppSettings>> _mockAppSettings;
+        private IOptions<AppSettings> _appSettings;
 
         [TestInitialize]
         public void InitializeTest()
         {
             _mockLogger = new Mock<ILogger<UserController>>();
             _mockUserService = new Mock<IUserService>();
-            _mockAppSettings = new Mock<IOptions<AppSettings>>();
+            _appSettings = Options.Create(new AppSettings { Secret = "KeepItSecretKeepItSafe" });
         }
 
         #region Authenticate
@@ -43,9 +43,8 @@ namespace WMMAPITests.UnitTests.ControllerTests
             };
             _mockUserService.Setup(m => m.Authenticate(model.EmailAddress, model.Password)).Returns(user);
             
-            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _mockAppSettings.Object);
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
             controller.UserId = userId;
-            controller.Secret = "Keepitsecretkeepitsafe";
 
             // Call action
             var result = controller.AuthenticateUser(model);

@@ -23,17 +23,17 @@ namespace WMMAPI.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly AppSettings _appSettings;
         
         public Guid UserId { get; set; }
-        public string Secret { get; set; } // TODO hack to allow unit testing. Find a better way
 
         public UserController(ILogger<UserController> logger, IUserService userService, IOptions<AppSettings> appSettings)
         {
             _logger = logger;
             _userService = userService;
+            _appSettings = appSettings.Value;
 
             UserId = User != null ? Guid.Parse(User.Identity.Name) : Guid.Empty;
-            Secret = appSettings.Value != null ? appSettings.Value.Secret : null; // TODO hack to allow unit testing. Find a better way
         }
 
         [AllowAnonymous]
@@ -52,7 +52,7 @@ namespace WMMAPI.Controllers
                 {
                     // Create an authentication token
                     var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = Encoding.ASCII.GetBytes(Secret);
+                    var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
                         Subject = new ClaimsIdentity(new Claim[]
