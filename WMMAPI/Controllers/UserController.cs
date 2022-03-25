@@ -46,7 +46,7 @@ namespace WMMAPI.Controllers
                 var user = _userService.Authenticate(model.EmailAddress, model.Password);
 
                 if (user == null)
-                    return BadRequest(new ExceptionResponse("Email address and password combination is incorrect."));
+                    return BadRequest(new ExceptionResponse(InvalidEmailAndPassword));
 
                 try
                 {
@@ -68,14 +68,15 @@ namespace WMMAPI.Controllers
                     // return basic user info and authentication token
                     return Ok(new AuthenticatedUserModel(user, tokenString));
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
+                    // TODO Log these for sure as they will be due to JWT work.
                     return BadRequest(new ExceptionResponse(GenericErrorMessage));
                 }
             }
             catch (Exception ex)
             {
-                // TODO  Errors at this level are likely internal issues with settings. Should log these instead of returning them?
+                // TODO  Log these? They are likely due to password authentication issues.
                 return BadRequest(new ExceptionResponse(ex.Message));
             }            
         }

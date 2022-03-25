@@ -8,6 +8,7 @@ namespace WMMAPI.Helpers
         {
             public const string GenericErrorMessage = "There was an error processing your request.";
             public const string AuthenticationError = "An authentication error has occurred.";
+            public const string InvalidEmailAndPassword = "Email address and password combination is incorrect.";
         }
 
         public readonly struct DefaultCategories
