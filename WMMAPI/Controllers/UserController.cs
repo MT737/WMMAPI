@@ -105,6 +105,9 @@ namespace WMMAPI.Controllers
         [ProducesResponseType(typeof(UserModel), StatusCodes.Status200OK)]
         public IActionResult Get()
         {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
                 var result = _userService.GetById(UserId);
@@ -126,7 +129,10 @@ namespace WMMAPI.Controllers
 
         [HttpPut]
         public IActionResult ModifyUser([FromBody] UpdateUserModel model)
-        {            
+        {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
                 var dbUser = model.ToDB(UserId);    
@@ -145,7 +151,10 @@ namespace WMMAPI.Controllers
 
         [HttpDelete]
         public IActionResult DeleteUser()
-        {            
+        {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
                 _userService.RemoveUser(UserId);

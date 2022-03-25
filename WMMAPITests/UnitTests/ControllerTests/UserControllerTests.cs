@@ -212,13 +212,285 @@ namespace WMMAPITests.UnitTests.ControllerTests
         #endregion
 
         #region Get
+        [TestMethod]
+        public void GetUserSucceedsReturnsUserModel()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();
+            User user = new User
+            {
+                Id = userId,
+                FirstName = "TestName",
+                LastName = "TestLastName",
+                DOB = DateTime.Now.AddYears(-22),
+                EmailAddress = "test@email.com",
+                PasswordHash = null,
+                PasswordSalt = null,
+                IsDeleted = false
+            };
+
+            _mockUserService.Setup(m => m.GetById(userId)).Returns(user);
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.Get();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+            var obj = (OkObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(UserModel));
+            var resp = (UserModel)obj.Value;
+            Assert.AreEqual(user.FirstName, resp.FirstName);
+            Assert.AreEqual(user.Id, resp.Id);
+        }
+
+        [TestMethod]
+        public void GetUserAppExceptionHandled()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();
+
+            _mockUserService.Setup(m => m.GetById(userId)).Throws(new AppException());
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.Get();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual("Exception of type 'WMMAPI.Helpers.AppException' was thrown.", resp.Message);            
+        }
+
+        [TestMethod]
+        public void GetUserExceptionHandled()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();
+
+            _mockUserService.Setup(m => m.GetById(userId)).Throws(new Exception());
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.Get();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(GenericErrorMessage, resp.Message);
+        }
+
+        [TestMethod]
+        public void GetUserEmptyUserIdGuidHandled()
+        {
+            // Arrange test
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = Guid.Empty;
+
+            // Call action
+            var result = controller.Get();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(AuthenticationError, resp.Message);
+        }
         #endregion
 
         #region Modify
+        [TestMethod]
+        public void ModifyUserSucceedsReturnsEmptyOk()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();
+            UpdateUserModel model = new UpdateUserModel
+            {
+                FirstName = "FN",
+                LastName = "LN",
+                DOB = "11/11/1911",
+                EmailAddress = "mrTest@test.com",
+                Password = "NewPassword"
+            };
+
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.ModifyUser(model);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(OkResult));            
+        }
+
+        [TestMethod]
+        public void ModifyAppExceptionHandled()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();
+            UpdateUserModel model = new UpdateUserModel
+            {
+                FirstName = "FN",
+                LastName = "LN",
+                DOB = "11/11/1911",
+                EmailAddress = "mrTest@test.com",
+                Password = "NewPassword"
+            };
+
+            _mockUserService.Setup(m => m.Modify(It.IsAny<User>(), It.IsAny<string>())).Throws(new AppException());
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.ModifyUser(model);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual("Exception of type 'WMMAPI.Helpers.AppException' was thrown.", resp.Message);
+        }
+
+        [TestMethod]
+        public void ModifyExceptionHandled()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();
+            UpdateUserModel model = new UpdateUserModel
+            {
+                FirstName = "FN",
+                LastName = "LN",
+                DOB = "11/11/1911",
+                EmailAddress = "mrTest@test.com",
+                Password = "NewPassword"
+            };
+
+            _mockUserService.Setup(m => m.Modify(It.IsAny<User>(), It.IsAny<string>())).Throws(new Exception());
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.ModifyUser(model);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(GenericErrorMessage, resp.Message);
+        }
+
+        [TestMethod]
+        public void ModifyEmptyUserIdGuidHandled()
+        {
+            // Arrange test
+            UpdateUserModel model = new UpdateUserModel
+            {
+                FirstName = "FN",
+                LastName = "LN",
+                DOB = "11/11/1911",
+                EmailAddress = "mrTest@test.com",
+                Password = "NewPassword"
+            };
+
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = Guid.Empty;
+
+            // Call action
+            var result = controller.ModifyUser(model);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(AuthenticationError, resp.Message);
+        }
         #endregion
 
         #region Delete
-        #endregion
+        [TestMethod]
+        public void DeleteUserSucceedsReturnsEmptyOk()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid(); 
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = userId;
 
+            // Call action
+            var result = controller.DeleteUser();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(OkResult));
+        }
+
+        [TestMethod]
+        public void DeleteAppExceptionHandled()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();            
+            _mockUserService.Setup(m => m.RemoveUser(userId)).Throws(new AppException());
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.DeleteUser();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual("Exception of type 'WMMAPI.Helpers.AppException' was thrown.", resp.Message);
+        }
+
+        [TestMethod]
+        public void DeleteExceptionHandled()
+        {
+            // Arrange test
+            Guid userId = Guid.NewGuid();
+            _mockUserService.Setup(m => m.RemoveUser(userId)).Throws(new Exception());
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = userId;
+
+            // Call action
+            var result = controller.DeleteUser();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(GenericErrorMessage, resp.Message);
+        }
+
+        [TestMethod]
+        public void DeleteEmptyUserGuidHandled()
+        {
+            // Arrange test
+            _mockUserService.Setup(m => m.RemoveUser(It.IsAny<Guid>())).Throws(new Exception());
+            UserController controller = new UserController(_mockLogger.Object, _mockUserService.Object, _appSettings);
+            controller.UserId = Guid.Empty;
+
+            // Call action
+            var result = controller.DeleteUser();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            var obj = (BadRequestObjectResult)result;
+            Assert.IsInstanceOfType(obj.Value, typeof(ExceptionResponse));
+            var resp = (ExceptionResponse)obj.Value;
+            Assert.AreEqual(AuthenticationError, resp.Message);
+        }
+        #endregion
     }
 }
