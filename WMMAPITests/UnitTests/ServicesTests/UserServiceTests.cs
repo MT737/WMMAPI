@@ -148,6 +148,8 @@ namespace WMMAPITests.UnitTests
             _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
             Assert.AreEqual(user.Id, result.Id);
             Assert.AreEqual(user.EmailAddress, result.EmailAddress);
+            Assert.IsTrue(result.Categories.Any());
+            Assert.IsTrue(result.Vendors.Any());
         }
 
         [DataTestMethod]

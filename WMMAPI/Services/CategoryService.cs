@@ -6,7 +6,6 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.CategoryModels;
-using static WMMAPI.Helpers.Globals;
 
 namespace WMMAPI.Services
 {
@@ -16,6 +15,7 @@ namespace WMMAPI.Services
         {
         }
 
+        #region ServiceMethods
         /// <summary>
         /// Returns the category for the specified Id.
         /// </summary>
@@ -115,36 +115,7 @@ namespace WMMAPI.Services
             Absorption(absorbedId, absorbingId, userId);
             Delete(absorbedId);
         }
-
-        /// <summary>
-        /// Generates default categories for the user if they do not exist in the user's DB profile.
-        /// </summary>
-        /// <param name="userId">Guid: Id of the user for which to generate default categories.</param>
-        public void CreateDefaults(Guid userId)
-        {
-            if (!DefaultsExist(userId)) //Preventing duplication of defaults.
-            {
-                string[] categories = DefaultCategories.GetAllDefaultCategories();
-                string[] notDisplayed = DefaultCategories.GetAllNotDisplayedDefaultCategories();
-
-                foreach (string category in categories)
-                {
-                    Category cat = new Category
-                    {
-                        UserId = userId,
-                        Name = category,
-                        IsDefault = true,
-                        IsDisplayed = !notDisplayed.Contains(category) // TODO refactor to remove double neg?
-                    };
-
-                    Add(cat, false);
-                }
-
-                // Save categories to the db
-                SaveChanges();
-            }
-        }
-
+        #endregion
 
         #region Private Helpers
         /// <summary>
@@ -179,16 +150,6 @@ namespace WMMAPI.Services
                 transaction.CategoryId = absorbingId;
             }
             Context.SaveChanges();
-        }
-
-        /// <summary>
-        /// Indicates the existing of default categories in the user's DB profile.
-        /// </summary>
-        /// <param name="userId">Guid: Id of the user for which to look for default categories.</param>
-        /// <returns>Bool: Indication of the existence of default categories in the user's DB profile.</returns>
-        private bool DefaultsExist(Guid userId)
-        {
-            return Context.Categories.Where(c => c.UserId == userId && c.IsDefault == true).Any();
         }
 
         /// <summary>

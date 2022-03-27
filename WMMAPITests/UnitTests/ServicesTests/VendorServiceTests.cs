@@ -1,4 +1,4 @@
-﻿using WMMAPI.Services;
+using WMMAPI.Services;
 
 namespace WMMAPITests.UnitTests
 {
@@ -15,24 +15,6 @@ namespace WMMAPITests.UnitTests
             _tdc = new TestDataContext(_testData);
             _tdc.WMMContext.Setup(m => m.Set<Vendor>()).Returns(_tdc.VendorSet.Object);
         }
-
-        #region CreateDefaults
-        [TestMethod]
-        public void TestCreateDefaultsSucceeds()
-        {
-            // Fabricate test data
-            Guid userId = Guid.NewGuid(); // New user so no defaults
-
-            // Initialize service and call method
-            VendorService service = new VendorService(_tdc.WMMContext.Object);
-            service.CreateDefaults(userId);
-
-            // Verify mock and assert (just verify, nothing to assert)
-            int defaultVendCount = Globals.DefaultVendors.GetAllDevaultVendors().Count();
-            _tdc.VendorSet.Verify(m => m.Add(It.IsAny<Vendor>()), Times.Exactly(defaultVendCount));
-            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
-        }
-        #endregion
 
         #region Get
         [TestMethod]

@@ -1,9 +1,11 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
+using static WMMAPI.Helpers.Globals;
 
 namespace WMMAPI.Services
 {
@@ -66,6 +68,11 @@ namespace WMMAPI.Services
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
+            user.Categories = CreateDefaults<Category>(
+                user.Id, DefaultCategories.GetAllDefaultCategories(), DefaultCategories.GetAllNotDisplayedDefaultCategories());
+            user.Vendors = CreateDefaults<Vendor>(
+                user.Id, DefaultVendors.GetAllDevaultVendors(), DefaultVendors.GetAllNotDisplayedDefaultVendors());
+
             Add(user);
 
             return user;
@@ -90,7 +97,7 @@ namespace WMMAPI.Services
             {
                 if (Context.Users.Any(u => u.EmailAddress == user.EmailAddress && u.Id != user.Id))
                     throw new AppException("Email is alread registered to an account");
-                
+
                 currentUser.EmailAddress = user.EmailAddress;
             }
 
@@ -115,7 +122,7 @@ namespace WMMAPI.Services
 
             currentUser.IsDeleted = false;
 
-            Update(currentUser);            
+            Update(currentUser);
         }
 
         /// <summary>
@@ -181,7 +188,7 @@ namespace WMMAPI.Services
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
-        
+
         /// <summary>
         /// Verifies that the password passed in, once hashed, matches the stored hash.
         /// </summary>
@@ -208,6 +215,31 @@ namespace WMMAPI.Services
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Creates property defaults based on the passed type
+        /// </summary>
+        /// <typeparam name="T">Type must inherit from BaseVendCat</typeparam>
+        /// <param name="userId">User's Id</param>
+        /// <param name="defaults">String array containing the entry names for which to create defaults.</param>
+        /// <param name="notDisplayed">String array containing the entry names for which to not display.</param>
+        /// <returns></returns>
+        private ICollection<T> CreateDefaults<T>(Guid userId, string[] defaults, string[] notDisplayed) where T : BaseVendCat
+        {
+            ICollection<T> defaultsList = new List<T>();
+            foreach (var item in defaults)
+            {
+                var entry = (T)Activator.CreateInstance(typeof(T));
+                entry.Id = Guid.NewGuid();
+                entry.UserId = userId;
+                entry.Name = item;
+                entry.IsDefault = !notDisplayed.Contains(item);
+                entry.IsDisplayed = true;
+                
+                defaultsList.Add(entry);
+            }
+            return defaultsList;
         }
         #endregion
     }
