@@ -1,12 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using System.Linq;
-using WMMAPI.Database.Entities;
-using WMMAPI.Helpers;
-using WMMAPI.Interfaces;
-using WMMAPI.Services;
-using WMMAPITests.DataHelpers;
+﻿using WMMAPI.Services;
 
 namespace WMMAPITests.UnitTests
 {

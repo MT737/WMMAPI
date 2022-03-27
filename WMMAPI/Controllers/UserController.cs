@@ -12,6 +12,7 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.UserModels;
+using static WMMAPI.Helpers.Globals.ErrorMessages;
 
 namespace WMMAPI.Controllers
 {
@@ -23,12 +24,16 @@ namespace WMMAPI.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
         private readonly AppSettings _appSettings;
+        
+        public Guid UserId { get; set; }
 
         public UserController(ILogger<UserController> logger, IUserService userService, IOptions<AppSettings> appSettings)
         {
             _logger = logger;
             _userService = userService;
             _appSettings = appSettings.Value;
+
+            UserId = User != null ? Guid.Parse(User.Identity.Name) : Guid.Empty;
         }
 
         [AllowAnonymous]
@@ -36,28 +41,44 @@ namespace WMMAPI.Controllers
         [ProducesResponseType(typeof(AuthenticatedUserModel), StatusCodes.Status200OK)]
         public IActionResult AuthenticateUser([FromBody] AuthenticateUserModel model)
         {
-            var user = _userService.Authenticate(model.EmailAddress, model.Password);
-
-            if (user == null)
-                return BadRequest(new { message = "Email address and password combination is incorrect." });
-
-            // Create an authentication token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+                var user = _userService.Authenticate(model.EmailAddress, model.Password);
 
-            // return basic user info and authentication token
-            return Ok(new AuthenticatedUserModel(user, tokenString));
+                if (user == null)
+                    return BadRequest(new ExceptionResponse(InvalidEmailAndPassword));
+
+                try
+                {
+                    // Create an authentication token
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = new ClaimsIdentity(new Claim[]
+                        {
+                            new Claim(ClaimTypes.Name, user.Id.ToString())
+                        }),
+                        Expires = DateTime.UtcNow.AddDays(7),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    };
+                    var token = tokenHandler.CreateToken(tokenDescriptor);
+                    var tokenString = tokenHandler.WriteToken(token);
+
+                    // return basic user info and authentication token
+                    return Ok(new AuthenticatedUserModel(user, tokenString));
+                }
+                catch (Exception)
+                {
+                    // TODO Log these for sure as they will be due to JWT work.
+                    return BadRequest(new ExceptionResponse(GenericErrorMessage));
+                }
+            }
+            catch (Exception ex)
+            {
+                // TODO  Log these? They are likely due to password authentication issues.
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }            
         }
 
         [AllowAnonymous]
@@ -72,7 +93,11 @@ namespace WMMAPI.Controllers
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
 
@@ -80,47 +105,68 @@ namespace WMMAPI.Controllers
         [ProducesResponseType(typeof(UserModel), StatusCodes.Status200OK)]
         public IActionResult Get()
         {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
-                var result = _userService.GetById(Guid.Parse(User.Identity.Name));
+                var result = _userService.GetById(UserId);
                 if (result != null)
                 {
                     return Ok(new UserModel(result));
                 }
-                return BadRequest(new { message = "User not found" });
+                return BadRequest(new ExceptionResponse("User not found"));
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
 
         [HttpPut]
         public IActionResult ModifyUser([FromBody] UpdateUserModel model)
-        {            
+        {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
-                var dbUser = model.ToDB(Guid.Parse(User.Identity.Name));    
+                var dbUser = model.ToDB(UserId);    
                 _userService.Modify(dbUser, model.Password);
                 return Ok();
             }
             catch (AppException ex)
             {
-                return BadRequest( new { message = ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
 
         [HttpDelete]
         public IActionResult DeleteUser()
-        {            
+        {
+            if (UserId == Guid.Empty)
+                return BadRequest(new ExceptionResponse(AuthenticationError));
+
             try
             {
-                _userService.RemoveUser(Guid.Parse(User.Identity.Name));
+                _userService.RemoveUser(UserId);
                 return Ok();
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ExceptionResponse(GenericErrorMessage));
             }
         }
     }
