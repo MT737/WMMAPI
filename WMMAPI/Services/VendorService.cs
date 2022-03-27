@@ -5,7 +5,6 @@ using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using static WMMAPI.Helpers.Globals;
 
 namespace WMMAPI.Services
 {
@@ -103,35 +102,6 @@ namespace WMMAPI.Services
             Absorption(absorbedId, absorbingId, userId);
             Delete(absorbedId);
         }
-
-        /// <summary>
-        /// Creates default vendor data for the user.
-        /// </summary>
-        /// <param name="userId">Guid: Id of the user for which to create defaults.</param>
-        public void CreateDefaults(Guid userId)
-        {
-            if (!DefaultsExist(userId)) //Preventing duplication of defaults.
-            {
-                string[] vendors = DefaultVendors.GetAllDevaultVendors();
-                string[] notDisplayed = DefaultVendors.GetAllNotDisplayedDefaultVendors();
-
-                foreach (string vendor in vendors)
-                {
-                    Vendor vend = new Vendor
-                    {
-                        UserId = userId,
-                        Name = vendor,
-                        IsDefault = true,
-                        IsDisplayed = !notDisplayed.Contains(vendor) // TODO refactor to remove double neg?
-                    };
-
-                    Add(vend, false);
-                }
-
-                // Save vendors to the db
-                SaveChanges();
-            }
-        }
         #endregion
 
         #region HelperMethods
@@ -166,16 +136,6 @@ namespace WMMAPI.Services
                 transaction.VendorId = absorbingId;
             }
             Context.SaveChanges();
-        }
-
-        /// <summary>
-        /// Indicates the existence of default vendors in the user's DB profile.
-        /// </summary>
-        /// <param name="userId">Guid: Id of the user for whom to check for default vendors.</param>
-        /// <returns>Bool: True if the user's DB profile contains default vendors. Otherwise false.</returns>
-        private bool DefaultsExist(Guid userId)
-        {
-            return Context.Vendors.Where(v => v.UserId == userId && v.IsDefault == true).Any();
         }
 
         // Private helper methods

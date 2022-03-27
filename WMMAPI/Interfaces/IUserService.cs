@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using WMMAPI.Database.Entities;
 
 namespace WMMAPI.Interfaces

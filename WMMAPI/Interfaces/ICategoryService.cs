@@ -8,7 +8,6 @@ namespace WMMAPI.Interfaces
     public interface ICategoryService
     {
         void AddCategory(Category category);
-        void CreateDefaults(Guid userId);
         void DeleteCategory(Guid absorbedId, Guid absorbingGuid, Guid userId);
         CategoryModel Get(Guid id, Guid userId);
         IList<CategoryModel> GetList(Guid userId);

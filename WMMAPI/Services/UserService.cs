@@ -4,6 +4,7 @@ using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
+using static WMMAPI.Helpers.Globals;
 
 namespace WMMAPI.Services
 {
@@ -66,6 +67,8 @@ namespace WMMAPI.Services
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
+            CreateDefaults(user);
+
             Add(user);
 
             return user;
@@ -90,7 +93,7 @@ namespace WMMAPI.Services
             {
                 if (Context.Users.Any(u => u.EmailAddress == user.EmailAddress && u.Id != user.Id))
                     throw new AppException("Email is alread registered to an account");
-                
+
                 currentUser.EmailAddress = user.EmailAddress;
             }
 
@@ -115,7 +118,7 @@ namespace WMMAPI.Services
 
             currentUser.IsDeleted = false;
 
-            Update(currentUser);            
+            Update(currentUser);
         }
 
         /// <summary>
@@ -181,7 +184,7 @@ namespace WMMAPI.Services
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
-        
+
         /// <summary>
         /// Verifies that the password passed in, once hashed, matches the stored hash.
         /// </summary>
@@ -208,6 +211,30 @@ namespace WMMAPI.Services
             }
 
             return true;
+        }
+
+        // TODO Try to abstract the logic using generics
+        private void CreateDefaults(User user)
+        {
+            string[] notDisplayed = DefaultCategories.GetAllNotDisplayedDefaultCategories();
+            user.Categories = DefaultCategories.GetAllDefaultCategories()
+                .Select(c => new Category
+                {
+                    UserId = user.Id,
+                    Name = c,
+                    IsDefault = true,
+                    IsDisplayed = !notDisplayed.Contains(c)
+                }).ToList();
+
+            notDisplayed = DefaultVendors.GetAllNotDisplayedDefaultVendors();
+            user.Vendors = DefaultVendors.GetAllDevaultVendors()
+                .Select(v => new Vendor
+                {
+                    UserId = user.Id,
+                    Name = v,
+                    IsDefault= true,
+                    IsDisplayed = !notDisplayed.Contains(v)
+                }).ToList();
         }
         #endregion
     }
