@@ -1,4 +1,4 @@
-﻿using WMMAPI.Services;
+using WMMAPI.Services;
 
 namespace WMMAPITests.UnitTests
 {
@@ -74,24 +74,6 @@ namespace WMMAPITests.UnitTests
             // Initialize and call method
             ICategoryService service = new CategoryService(_tdc.WMMContext.Object);
             var result = service.GetList(userId);;
-        }
-        #endregion
-
-        #region CreateDefaults
-        [TestMethod]
-        public void TestCreateDefaultsSucceeds()
-        {
-            // Fabricate test data
-            Guid userId = Guid.NewGuid(); // New user so no defaults
-
-            // Initialize service and call method
-            ICategoryService service = new CategoryService(_tdc.WMMContext.Object);
-            service.CreateDefaults(userId);
-
-            // Verify mock and assert (just verify, nothing to assert)
-            int defaultCatCount = Globals.DefaultCategories.GetAllDefaultCategories().Count();
-            _tdc.CategorySet.Verify(m => m.Add(It.IsAny<Category>()), Times.Exactly(defaultCatCount));
-            _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
         }
         #endregion
 

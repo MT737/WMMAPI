@@ -131,6 +131,27 @@ namespace WMMAPITests.UnitTests
         #endregion
 
         #region Create
+
+
+        //#region CreateDefaults
+        //[TestMethod]
+        //public void TestCreateDefaultsSucceeds()
+        //{
+        //    // Fabricate test data
+        //    Guid userId = Guid.NewGuid(); // New user so no defaults
+
+        //    // Initialize service and call method
+        //    VendorService service = new VendorService(_tdc.WMMContext.Object);
+        //    service.CreateDefaults(userId);
+
+        //    // Verify mock and assert (just verify, nothing to assert)
+        //    int defaultVendCount = Globals.DefaultVendors.GetAllDevaultVendors().Count();
+        //    _tdc.VendorSet.Verify(m => m.Add(It.IsAny<Vendor>()), Times.Exactly(defaultVendCount));
+        //    _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
+        //}
+        //#endregion
+
+
         [TestMethod]
         public void TestCreateSucceeds()
         {
@@ -148,6 +169,8 @@ namespace WMMAPITests.UnitTests
             _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
             Assert.AreEqual(user.Id, result.Id);
             Assert.AreEqual(user.EmailAddress, result.EmailAddress);
+            Assert.IsTrue(result.Categories.Any());
+            Assert.IsTrue(result.Vendors.Any());
         }
 
         [DataTestMethod]

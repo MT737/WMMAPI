@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Database;
 using WMMAPI.Database.Entities;
@@ -67,7 +68,10 @@ namespace WMMAPI.Services
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            CreateDefaults(user);
+            user.Categories = CreateDefaults<Category>(
+                user.Id, DefaultCategories.GetAllDefaultCategories(), DefaultCategories.GetAllNotDisplayedDefaultCategories());
+            user.Vendors = CreateDefaults<Vendor>(
+                user.Id, DefaultVendors.GetAllDevaultVendors(), DefaultVendors.GetAllNotDisplayedDefaultVendors());
 
             Add(user);
 
@@ -213,28 +217,29 @@ namespace WMMAPI.Services
             return true;
         }
 
-        // TODO Try to abstract the logic using generics
-        private void CreateDefaults(User user)
+        /// <summary>
+        /// Creates property defaults based on the passed type
+        /// </summary>
+        /// <typeparam name="T">Type must inherit from BaseVendCat</typeparam>
+        /// <param name="userId">User's Id</param>
+        /// <param name="defaults">String array containing the entry names for which to create defaults.</param>
+        /// <param name="notDisplayed">String array containing the entry names for which to not display.</param>
+        /// <returns></returns>
+        private ICollection<T> CreateDefaults<T>(Guid userId, string[] defaults, string[] notDisplayed) where T : BaseVendCat
         {
-            string[] notDisplayed = DefaultCategories.GetAllNotDisplayedDefaultCategories();
-            user.Categories = DefaultCategories.GetAllDefaultCategories()
-                .Select(c => new Category
-                {
-                    UserId = user.Id,
-                    Name = c,
-                    IsDefault = true,
-                    IsDisplayed = !notDisplayed.Contains(c)
-                }).ToList();
-
-            notDisplayed = DefaultVendors.GetAllNotDisplayedDefaultVendors();
-            user.Vendors = DefaultVendors.GetAllDevaultVendors()
-                .Select(v => new Vendor
-                {
-                    UserId = user.Id,
-                    Name = v,
-                    IsDefault= true,
-                    IsDisplayed = !notDisplayed.Contains(v)
-                }).ToList();
+            ICollection<T> defaultsList = new List<T>();
+            foreach (var item in defaults)
+            {
+                var entry = (T)Activator.CreateInstance(typeof(T));
+                entry.Id = Guid.NewGuid();
+                entry.UserId = userId;
+                entry.Name = item;
+                entry.IsDefault = !notDisplayed.Contains(item);
+                entry.IsDisplayed = true;
+                
+                defaultsList.Add(entry);
+            }
+            return defaultsList;
         }
         #endregion
     }
