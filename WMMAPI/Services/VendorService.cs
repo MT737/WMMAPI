@@ -5,6 +5,7 @@ using WMMAPI.Database;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
+using WMMAPI.Models.VendorModels;
 
 namespace WMMAPI.Services
 {
@@ -40,17 +41,17 @@ namespace WMMAPI.Services
         /// </summary>
         /// <param name="userID">Guid: UserId for which to get a list of vendors.</param>
         /// <returns>IList of vendor entities.</returns>
-        public IList<Vendor> GetList(Guid userId)
+        public IList<VendorModel> GetList(Guid userId)
         {
             var vendors = Context.Vendors
                 .Where(v => v.UserId == userId)
                 .OrderBy(v => v.Name)
-                .ToList();
+                .Select(v => new VendorModel(v));
 
             if (!vendors.Any())
                 throw new AppException("No vendors found.");
 
-            return vendors;
+            return vendors.ToList();
         }
 
         public void AddVendor(Vendor vendor)
