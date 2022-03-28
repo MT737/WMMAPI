@@ -8,6 +8,7 @@ using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.TransactionModels;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
+using static WMMAPI.Helpers.ClaimsHelpers;
 
 namespace WMMAPI.Controllers
 {
@@ -25,18 +26,15 @@ namespace WMMAPI.Controllers
         {
             _logger = logger;
             _transactionService = transactionService;
-            
-            UserId = User != null ? Guid.Parse(User.Identity.Name) : Guid.Empty;
         }
 
         [HttpGet]
         public IActionResult GetTransactions()
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 IList<TransactionModel> transactions = _transactionService
                     .GetList(UserId, true)
                     .Select(t => new TransactionModel(t))
@@ -44,6 +42,10 @@ namespace WMMAPI.Controllers
                 return Ok(transactions);
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -57,11 +59,10 @@ namespace WMMAPI.Controllers
         [HttpPost]
         public IActionResult AddTransaction([FromBody] AddTransactionModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 var dbModel = model.ToDB(UserId);
                 _transactionService.AddTransaction(dbModel);
 
@@ -75,6 +76,10 @@ namespace WMMAPI.Controllers
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
             catch (Exception)
             {
                 // TODO Add logging here to get the actual error.
@@ -85,16 +90,19 @@ namespace WMMAPI.Controllers
         [HttpPut]
         public IActionResult ModifyTransaction([FromBody] TransactionModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 var dbModel = model.ToDB(UserId);
                 _transactionService.ModifyTransaction(dbModel);
                 return Ok();
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -107,16 +115,19 @@ namespace WMMAPI.Controllers
 
         [HttpDelete, Route("{id}")]
         public IActionResult DeleteTransaction(Guid transactionId)
-        {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
+        {            
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 _transactionService.DeleteTransaction(UserId, transactionId);
                 return Ok();
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }

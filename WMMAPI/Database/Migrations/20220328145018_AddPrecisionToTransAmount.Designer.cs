@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WMMAPI.Database;
 
@@ -11,9 +12,10 @@ using WMMAPI.Database;
 namespace WMMAPI.Database.Migrations
 {
     [DbContext(typeof(WMMContext))]
-    partial class WMMContextModelSnapshot : ModelSnapshot
+    [Migration("20220328145018_AddPrecisionToTransAmount")]
+    partial class AddPrecisionToTransAmount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

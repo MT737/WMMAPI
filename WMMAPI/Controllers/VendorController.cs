@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.VendorModels;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
+using static WMMAPI.Helpers.ClaimsHelpers;
 
 namespace WMMAPI.Controllers
 {
@@ -25,22 +25,23 @@ namespace WMMAPI.Controllers
         {
             _logger = logger;
             _vendorService = vendorRepo;
-
-            UserId = UserId = User != null ? Guid.Parse(User.Identity.Name) : Guid.Empty;
         }
 
         [HttpGet]
         public IActionResult GetVendors()
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 IList<VendorModel> vendors = _vendorService.GetList(UserId);
                 return Ok(vendors);
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -53,16 +54,19 @@ namespace WMMAPI.Controllers
         [HttpPost]
         public IActionResult AddVendor([FromBody] AddVendorModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 var dbModel = model.ToDB(UserId);
                 _vendorService.AddVendor(dbModel);
                 return Ok(new VendorModel(dbModel));
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -75,15 +79,18 @@ namespace WMMAPI.Controllers
         [HttpPut]
         public IActionResult ModifyVendor([FromBody] VendorModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 _vendorService.ModifyVendor(model.ToDB(UserId));
                 return Ok();
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -96,11 +103,10 @@ namespace WMMAPI.Controllers
         [HttpDelete]
         public IActionResult DeleteVendor([FromBody] DeleteVendorModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 _vendorService.DeleteVendor(
                     model.AbsorbedVendor, 
                     model.AbsorbingVendor, 
@@ -108,6 +114,10 @@ namespace WMMAPI.Controllers
                 return Ok();
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }

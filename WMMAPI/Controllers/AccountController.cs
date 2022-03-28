@@ -6,6 +6,7 @@ using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.AccountModels;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
+using static WMMAPI.Helpers.ClaimsHelpers;
 
 namespace WMMAPI.Controllers
 {
@@ -23,26 +24,25 @@ namespace WMMAPI.Controllers
         {
             _logger = logger;
             _accountService = accountService;
-
-            // TODO With authorization in place, this shouldn't be possible, but it's needed for testing. Re-think testing?
-            UserId = User != null ? Guid.Parse(User.Identity.Name) : Guid.Empty;
         }
 
         [HttpGet]
         public IActionResult GetAccounts()
         {
-            // TODO With authorization in place, this shouldn't be a possibility, but it's needed for testing. Re-think testing?
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+                
                 // Get list of accounts
                 var accountsWithBalance = _accountService.GetList(UserId);
 
                 return Ok(accountsWithBalance);
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -55,11 +55,10 @@ namespace WMMAPI.Controllers
         [HttpPost]
         public IActionResult AddAccount([FromBody] AddAccountModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 var account = model.ToDB(UserId);
                 _accountService.AddAccount(account);
 
@@ -67,6 +66,10 @@ namespace WMMAPI.Controllers
                 return Ok(new AccountModel(account));
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -79,11 +82,10 @@ namespace WMMAPI.Controllers
         [HttpPut]
         public IActionResult ModifyAccount([FromBody] UpdateAccountModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 var account = model.ToDB(UserId);
                 _accountService.ModifyAccount(account);
 
@@ -91,6 +93,10 @@ namespace WMMAPI.Controllers
                 return Ok();
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }

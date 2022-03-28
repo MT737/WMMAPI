@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace WMMAPI.Database.Entities
@@ -27,7 +28,7 @@ namespace WMMAPI.Database.Entities
         [Required]
         public bool IsDebit { get; set; }
 
-        [Required, Range(0, 9999999999999999.99)]
+        [Required, Range(0, 9999999999999999.99), Precision(18, 2)]
         public decimal Amount { get; set; }
 
         [StringLength(200)]
