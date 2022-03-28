@@ -86,8 +86,8 @@ namespace WMMAPI.Database.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
-                        .HasPrecision(16, 2)
-                        .HasColumnType("decimal(16,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");

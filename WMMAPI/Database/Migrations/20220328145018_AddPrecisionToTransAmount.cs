@@ -11,12 +11,14 @@ namespace WMMAPI.Database.Migrations
             migrationBuilder.AlterColumn<decimal>(
                 name: "Amount",
                 table: "Transactions",
-                type: "decimal(16,2)",
-                precision: 16,
+                type: "decimal(18,2)",
+                precision: 18,
                 scale: 2,
                 nullable: false,
                 oldClrType: typeof(decimal),
-                oldType: "decimal(18,2)");
+                oldType: "decimal(16,2)",
+                oldPrecision: 16,
+                oldScale: 2);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -24,11 +26,13 @@ namespace WMMAPI.Database.Migrations
             migrationBuilder.AlterColumn<decimal>(
                 name: "Amount",
                 table: "Transactions",
-                type: "decimal(18,2)",
+                type: "decimal(16,2)",
+                precision: 16,
+                scale: 2,
                 nullable: false,
                 oldClrType: typeof(decimal),
-                oldType: "decimal(16,2)",
-                oldPrecision: 16,
+                oldType: "decimal(18,2)",
+                oldPrecision: 18,
                 oldScale: 2);
         }
     }
