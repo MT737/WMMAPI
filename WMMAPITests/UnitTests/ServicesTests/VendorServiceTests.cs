@@ -1,3 +1,4 @@
+using WMMAPI.Models.VendorModels;
 using WMMAPI.Services;
 
 namespace WMMAPITests.UnitTests
@@ -53,12 +54,11 @@ namespace WMMAPITests.UnitTests
 
             // Initialize service and call method
             IVendorService service = new VendorService(_tdc.WMMContext.Object);
-            IList<Vendor> vendors = service.GetList(user.Id);
+            IList<VendorModel> vendors = service.GetList(user.Id);
 
             // Confirm mock and assert
             _tdc.WMMContext.Verify(m => m.Vendors, Times.Once());
             Assert.IsTrue(vendors.Count > 0);
-            Assert.IsFalse(vendors.Any(v => v.UserId != user.Id));
         }
 
         [TestMethod]
@@ -70,7 +70,7 @@ namespace WMMAPITests.UnitTests
 
             // Initialize service and call method
             IVendorService service = new VendorService(_tdc.WMMContext.Object);
-            IList<Vendor> vendors = service.GetList(userId);
+            IList<VendorModel> vendors = service.GetList(userId);
         }
         #endregion
 
