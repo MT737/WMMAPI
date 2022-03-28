@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore .\WMMAPI\WMMAPI.sln
     - name: Build
-      run: dotnet build WMMAPI/WMMAPI.csproj --no-restore
+      run: dotnet build .\WMMAPI\WMMAPI.sln --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test .\WMMAPI\WMMAPI.sln --no-build --verbosity normal
