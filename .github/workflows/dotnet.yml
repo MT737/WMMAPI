@@ -21,8 +21,8 @@ jobs:
       run: dotnet restore
       working-directory: ./WMMAPI
     - name: Build
-      run: dotnet build .\WMMAPI\WMMAPI.sln --no-restore
+      run: dotnet build --no-restore
       working-directory: ./WMMAPI
     - name: Test
-      run: dotnet test .\WMMAPI\WMMAPI.sln --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal
       working-directory: ./WMMAPI
