@@ -13,6 +13,7 @@ using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.UserModels;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
+using static WMMAPI.Helpers.ClaimsHelpers;
 
 namespace WMMAPI.Controllers
 {
@@ -32,8 +33,6 @@ namespace WMMAPI.Controllers
             _logger = logger;
             _userService = userService;
             _appSettings = appSettings.Value;
-
-            UserId = User != null ? Guid.Parse(User.Identity.Name) : Guid.Empty;
         }
 
         [AllowAnonymous]
@@ -105,11 +104,9 @@ namespace WMMAPI.Controllers
         [ProducesResponseType(typeof(UserModel), StatusCodes.Status200OK)]
         public IActionResult Get()
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
                 var result = _userService.GetById(UserId);
                 if (result != null)
                 {
@@ -121,6 +118,10 @@ namespace WMMAPI.Controllers
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }            
             catch (Exception)
             {
                 return BadRequest(new ExceptionResponse(GenericErrorMessage));
@@ -130,16 +131,18 @@ namespace WMMAPI.Controllers
         [HttpPut]
         public IActionResult ModifyUser([FromBody] UpdateUserModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
                 var dbUser = model.ToDB(UserId);    
                 _userService.Modify(dbUser, model.Password);
                 return Ok();
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -152,15 +155,17 @@ namespace WMMAPI.Controllers
         [HttpDelete]
         public IActionResult DeleteUser()
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
                 _userService.RemoveUser(UserId);
                 return Ok();
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }

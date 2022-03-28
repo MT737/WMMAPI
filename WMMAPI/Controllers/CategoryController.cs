@@ -7,6 +7,7 @@ using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.CategoryModels;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
+using static WMMAPI.Helpers.ClaimsHelpers;
 
 namespace WMMAPI.Controllers
 {
@@ -24,22 +25,23 @@ namespace WMMAPI.Controllers
         {
             _logger = logger;
             _categoryService = categoryService;
-
-            UserId = User != null ? Guid.Parse(User.Identity.Name) : Guid.Empty;
         }
 
         [HttpGet]
         public IActionResult GetCategories()
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 IList<CategoryModel> categories = _categoryService.GetList(UserId);
                 return Ok(categories);
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -52,16 +54,19 @@ namespace WMMAPI.Controllers
         [HttpPost]
         public IActionResult AddCategory([FromBody] AddCategoryModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 var category = model.ToDB(UserId);
                 _categoryService.AddCategory(category);
                 return Ok(new CategoryModel(category));
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -74,15 +79,18 @@ namespace WMMAPI.Controllers
         [HttpPut]
         public IActionResult ModifyCategory([FromBody] CategoryModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 _categoryService.ModifyCategory(model.ToDB(UserId));
                 return Ok();
             }
             catch (AppException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
+            }
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));
             }
@@ -95,11 +103,10 @@ namespace WMMAPI.Controllers
         [HttpDelete]
         public IActionResult DeleteCatgory([FromBody] DeleteCategoryModel model)
         {
-            if (UserId == Guid.Empty)
-                return BadRequest(new ExceptionResponse(AuthenticationError));
-
             try
             {
+                UserId = GetUserId(UserId, User);
+
                 _categoryService.DeleteCategory(
                     model.AbsorbedId,
                     model.AbsorbingId,
@@ -109,6 +116,10 @@ namespace WMMAPI.Controllers
             catch (AppException ex)
             {
                 return BadRequest(new ExceptionResponse(ex.Message));                
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return BadRequest(new ExceptionResponse(ex.Message));
             }
             catch (Exception)
             {
