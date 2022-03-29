@@ -109,6 +109,7 @@ namespace WMMAPI
                 };
                 c.AddSecurityRequirement(securityRequirements);
 
+                c.EnableAnnotations();
             });
         }
 
