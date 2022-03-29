@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Swashbuckle.AspNetCore.Annotations;
+using System;
 using System.ComponentModel.DataAnnotations;
 using WMMAPI.Database.Entities;
 
@@ -14,6 +15,7 @@ namespace WMMAPI.Models.UserModels
         public string LastName { get; set; }
 
         [Required]
+        [SwaggerSchema(Format = "date")]
         public string DOB { get; set; }
 
         [Required, EmailAddress, StringLength(200)]
