@@ -120,7 +120,11 @@ namespace WMMAPI
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WMMAPI v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "WMMAPI v1");
+                    c.DefaultModelsExpandDepth(-1);
+                });
             }
 
             app.UseHttpsRedirection();
