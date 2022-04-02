@@ -5,38 +5,20 @@ using WMMAPI.Database.Entities;
 namespace WMMAPI.Models.CategoryModels
 {
     //TODO: Lots of similarities with VendorModel. Consider a base class?
-    public class CategoryModel
+    public class CategoryModel : BaseCategoryModel
     {
         [Required]
-        public Guid CategoryId { get; set; }
-
-        [Required, StringLength(100)]
-        public string Name { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public bool IsDefault { get; set; }
 
-        [Required]
-        public bool IsDisplayed { get; set; }
-
         public CategoryModel(Category category)
         {
-            CategoryId = category.Id;
+            Id = category.Id;
             Name = category.Name;
             IsDisplayed = category.IsDisplayed;
             IsDefault = category.IsDefault;
-        }
-
-        public Category ToDB(Guid userId)
-        {
-            return new Category
-            {
-                UserId = userId,
-                Id = CategoryId,
-                Name = Name,
-                IsDefault = false, //Placeholder
-                IsDisplayed = IsDisplayed
-            };
         }
     }
 }

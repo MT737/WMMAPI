@@ -28,7 +28,7 @@ namespace WMMAPITests.UnitTests
 
             // Confirm mock and assert
             _tdc.WMMContext.Verify(m => m.Categories, Times.Once());
-            Assert.AreEqual(cat.Id, result.CategoryId);
+            Assert.AreEqual(cat.Id, result.Id);
         }
 
         [TestMethod]
@@ -60,7 +60,7 @@ namespace WMMAPITests.UnitTests
             var userCats = _testData.Categories.Where(c => c.UserId == userId).Select(c => c.Id);
             foreach (var record in result)
             {
-                Assert.IsTrue(userCats.Contains(record.CategoryId));
+                Assert.IsTrue(userCats.Contains(record.Id));
             }
         }
 

@@ -186,8 +186,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         {
             // Arrange test
             var userId = Guid.NewGuid();
-            Vendor vendor = _td.CreateTestVendor(true);
-            VendorModel model = new VendorModel(vendor);
+            UpdateVendorModel model = GenerateTestModifyVendorModel(_td.CreateTestVendor(true));
             VendorController controller = new(_mockLogger.Object, _mockVendorService.Object);
             controller.UserId = userId;
             
@@ -203,8 +202,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         {
             // Arrange test
             var userId = Guid.NewGuid();
-            Vendor vendor = _td.CreateTestVendor(true);
-            VendorModel model = new VendorModel(vendor);
+            UpdateVendorModel model = GenerateTestModifyVendorModel(_td.CreateTestVendor(true));
             _mockVendorService.Setup(m => m.ModifyVendor(It.IsAny<Vendor>())).Throws(new AppException());
             VendorController controller = new(_mockLogger.Object, _mockVendorService.Object);
             controller.UserId = userId;
@@ -225,8 +223,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         {
             // Arrange test
             var userId = Guid.NewGuid();
-            Vendor vendor = _td.CreateTestVendor(true);
-            VendorModel model = new VendorModel(vendor);
+            UpdateVendorModel model = GenerateTestModifyVendorModel(_td.CreateTestVendor(true));
             _mockVendorService.Setup(m => m.ModifyVendor(It.IsAny<Vendor>())).Throws(new Exception());
             VendorController controller = new(_mockLogger.Object, _mockVendorService.Object);
             controller.UserId = userId;
@@ -246,8 +243,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         public void ModifyEmptyUserGuidHandled()
         {
             // Arrange test
-            Vendor vendor = _td.CreateTestVendor(true);
-            VendorModel model = new VendorModel(vendor);
+            UpdateVendorModel model = GenerateTestModifyVendorModel(_td.CreateTestVendor(true));
             VendorController controller = new(_mockLogger.Object, _mockVendorService.Object);
             controller.UserId = Guid.Empty;
 
@@ -359,6 +355,16 @@ namespace WMMAPITests.UnitTests.ControllerTests
             {
                 Name = "TestVendorName",
                 IsDisplayed = true
+            };
+        }
+
+        private UpdateVendorModel GenerateTestModifyVendorModel(Vendor vendor)
+        {     
+            return new UpdateVendorModel
+            {
+                Id = vendor.Id,
+                Name = vendor.Name,
+                IsDisplayed = vendor.IsDisplayed
             };
         }
 

@@ -77,7 +77,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPut]
-        public IActionResult ModifyVendor([FromBody] VendorModel model)
+        public IActionResult ModifyVendor([FromBody] UpdateVendorModel model)
         {
             try
             {

@@ -4,16 +4,19 @@ using WMMAPI.Database.Entities;
 
 namespace WMMAPI.Models.CategoryModels
 {
-    public class AddCategoryModel : BaseCategoryModel
-    {        
+    public class UpdateCategoryModel : BaseCategoryModel
+    {
+        [Required]
+        public Guid Id { get; set; }
+
         public Category ToDB(Guid userId)
         {
             return new Category
             {
-                Id = Guid.NewGuid(),
                 UserId = userId,
+                Id = Id,
                 Name = Name,
-                IsDefault = false,
+                IsDefault = false, //Placeholder
                 IsDisplayed = IsDisplayed
             };
         }

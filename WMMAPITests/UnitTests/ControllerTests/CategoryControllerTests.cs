@@ -184,8 +184,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         public void ModifyShouldReturnEmptyOk()
         {
             // Arrange test
-            Category category = _td.CreateTestCategory(true);
-            CategoryModel model = new CategoryModel(category);
+            UpdateCategoryModel model = GenerateTestUpdateCategoryModel(_td.CreateTestCategory(true));
             CategoryController controller = new(_mockLogger.Object, _mockCategoryService.Object);
             controller.UserId = Guid.NewGuid();
 
@@ -200,8 +199,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         public void ModifyAppExceptionHandled()
         {
             // Arrange test
-            Category category = _td.CreateTestCategory(true);
-            CategoryModel model = new CategoryModel(category);
+            UpdateCategoryModel model = GenerateTestUpdateCategoryModel(_td.CreateTestCategory(true));
             _mockCategoryService.Setup(m => m.ModifyCategory(It.IsAny<Category>())).Throws(new AppException());
             CategoryController controller = new(_mockLogger.Object, _mockCategoryService.Object);
             controller.UserId = Guid.NewGuid();
@@ -221,8 +219,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         public void ModifyExceptionHandled()
         {
             // Arrange test
-            Category category = _td.CreateTestCategory(true);
-            CategoryModel model = new CategoryModel(category);
+            UpdateCategoryModel model = GenerateTestUpdateCategoryModel(_td.CreateTestCategory(true));
             _mockCategoryService.Setup(m => m.ModifyCategory(It.IsAny<Category>())).Throws(new Exception());
             CategoryController controller = new(_mockLogger.Object, _mockCategoryService.Object);
             controller.UserId = Guid.NewGuid();
@@ -242,8 +239,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         public void ModifyEmptyUserGuidHandled()
         {
             // Arrange test
-            Category category = _td.CreateTestCategory(true);
-            CategoryModel model = new CategoryModel(category);
+            UpdateCategoryModel model = GenerateTestUpdateCategoryModel(_td.CreateTestCategory(true));
             CategoryController controller = new(_mockLogger.Object, _mockCategoryService.Object);
             controller.UserId = Guid.Empty;
 
@@ -353,6 +349,14 @@ namespace WMMAPITests.UnitTests.ControllerTests
             return new AddCategoryModel
             {
                 Name = "TestCategoryName"
+            };
+        }
+
+        private UpdateCategoryModel GenerateTestUpdateCategoryModel(Category category)
+        {
+            return new UpdateCategoryModel
+            {
+
             };
         }
 
