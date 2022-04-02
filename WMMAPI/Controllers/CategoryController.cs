@@ -77,7 +77,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPut]
-        public IActionResult ModifyCategory([FromBody] CategoryModel model)
+        public IActionResult ModifyCategory([FromBody] UpdateCategoryModel model)
         {
             try
             {
