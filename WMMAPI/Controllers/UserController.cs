@@ -12,8 +12,8 @@ using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.UserModels;
-using static WMMAPI.Helpers.Globals.ErrorMessages;
 using static WMMAPI.Helpers.ClaimsHelpers;
+using static WMMAPI.Helpers.Globals.ErrorMessages;
 
 namespace WMMAPI.Controllers
 {
@@ -82,13 +82,14 @@ namespace WMMAPI.Controllers
 
         [AllowAnonymous]
         [HttpPut("register")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult RegisterUser([FromBody] RegisterUserModel user)
         {
             try
             {
                 User dbUser = user.ToDB();
                 _userService.Create(dbUser, user.Password);
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {
@@ -129,6 +130,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult ModifyUser([FromBody] UpdateUserModel model)
         {
             try
@@ -136,7 +138,7 @@ namespace WMMAPI.Controllers
                 UserId = GetUserId(UserId, User);
                 var dbUser = model.ToDB(UserId);    
                 _userService.Modify(dbUser, model.Password);
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {
@@ -153,13 +155,14 @@ namespace WMMAPI.Controllers
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult DeleteUser()
         {
             try
             {
                 UserId = GetUserId(UserId, User);
                 _userService.RemoveUser(UserId);
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {

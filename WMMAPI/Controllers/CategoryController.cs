@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -6,8 +7,8 @@ using System.Collections.Generic;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
 using WMMAPI.Models.CategoryModels;
-using static WMMAPI.Helpers.Globals.ErrorMessages;
 using static WMMAPI.Helpers.ClaimsHelpers;
+using static WMMAPI.Helpers.Globals.ErrorMessages;
 
 namespace WMMAPI.Controllers
 {
@@ -52,6 +53,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(CategoryModel), StatusCodes.Status201Created)]
         public IActionResult AddCategory([FromBody] AddCategoryModel model)
         {
             try
@@ -60,7 +62,7 @@ namespace WMMAPI.Controllers
 
                 var category = model.ToDB(UserId);
                 _categoryService.AddCategory(category);
-                return Ok(new CategoryModel(category));
+                return StatusCode(StatusCodes.Status201Created, new CategoryModel(category));
             }
             catch (AppException ex)
             {
@@ -77,6 +79,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult ModifyCategory([FromBody] UpdateCategoryModel model)
         {
             try
@@ -84,7 +87,7 @@ namespace WMMAPI.Controllers
                 UserId = GetUserId(UserId, User);
 
                 _categoryService.ModifyCategory(model.ToDB(UserId));
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {
@@ -101,6 +104,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult DeleteCatgory([FromBody] DeleteCategoryModel model)
         {
             try
@@ -111,7 +115,7 @@ namespace WMMAPI.Controllers
                     model.AbsorbedId,
                     model.AbsorbingId,
                     UserId);
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {

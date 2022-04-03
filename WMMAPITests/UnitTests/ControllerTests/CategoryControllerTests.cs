@@ -1,4 +1,5 @@
-﻿using WMMAPI.Models.CategoryModels;
+﻿using Microsoft.AspNetCore.Http;
+using WMMAPI.Models.CategoryModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {
@@ -112,8 +113,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.AddCategory(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
-            var obj = (OkObjectResult)result;
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            var obj = (ObjectResult)result;
+            Assert.AreEqual(StatusCodes.Status201Created, obj.StatusCode);
             Assert.IsInstanceOfType(obj.Value, typeof(CategoryModel));
             var categoryModel = (CategoryModel)obj.Value;
             Assert.AreEqual(model.Name, categoryModel.Name);
@@ -192,7 +194,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.ModifyCategory(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);
         }
 
         [TestMethod]
@@ -268,7 +272,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.DeleteCatgory(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);            
         }
 
         [TestMethod]
