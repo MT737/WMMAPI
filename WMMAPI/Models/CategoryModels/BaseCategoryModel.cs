@@ -7,7 +7,7 @@ namespace WMMAPI.Models.CategoryModels
         [Required, StringLength(100)]
         public string Name { get; set; }
 
-        [Required, StringLength(100)]
+        [Required]
         public bool IsDisplayed { get; set; }
     }
 }

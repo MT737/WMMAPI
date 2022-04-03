@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using WMMAPI.Models.UserModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
@@ -147,7 +148,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.RegisterUser(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);
         }
 
         [TestMethod]
@@ -328,7 +331,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.ModifyUser(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));            
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));   
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);
         }
 
         [TestMethod]
@@ -430,7 +435,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.DeleteUser();
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);
         }
 
         [TestMethod]

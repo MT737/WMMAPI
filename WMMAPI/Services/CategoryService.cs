@@ -86,7 +86,7 @@ namespace WMMAPI.Services
 
             // If still here, validation passed. Update properties and call update.
             currentCategory.Name = category.Name;
-            currentCategory.IsDefault = category.IsDisplayed;
+            currentCategory.IsDisplayed = category.IsDisplayed;
             Update(currentCategory);
         }
 
