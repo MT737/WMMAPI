@@ -1,4 +1,5 @@
-﻿using WMMAPI.Models.TransactionModels;
+﻿using Microsoft.AspNetCore.Http;
+using WMMAPI.Models.TransactionModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {
@@ -124,8 +125,8 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.AddTransaction(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
-            var obj = (OkObjectResult)result;
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            var obj = (ObjectResult)result;
             Assert.IsInstanceOfType(obj.Value, typeof(TransactionModel));
             var resp = (TransactionModel)obj.Value;
             Assert.AreEqual(testTransaction.Id, resp.Id);
@@ -225,7 +226,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.ModifyTransaction(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));            
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);
         }
 
         [TestMethod]
@@ -308,7 +311,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.DeleteTransaction(testTransactionId);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);
         }
 
         [TestMethod]

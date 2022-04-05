@@ -9,6 +9,7 @@ using WMMAPI.Interfaces;
 using WMMAPI.Models.TransactionModels;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
 using static WMMAPI.Helpers.ClaimsHelpers;
+using Microsoft.AspNetCore.Http;
 
 namespace WMMAPI.Controllers
 {
@@ -57,6 +58,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(TransactionModel), StatusCodes.Status201Created)]
         public IActionResult AddTransaction([FromBody] AddTransactionModel model)
         {
             try
@@ -70,7 +72,7 @@ namespace WMMAPI.Controllers
                 TransactionModel returnModel = new TransactionModel(_transactionService
                     .Get(dbModel.Id, UserId, true));
 
-                return Ok(returnModel);
+                return StatusCode(StatusCodes.Status201Created, returnModel);
             }
             catch (AppException ex)
             {
@@ -88,6 +90,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult ModifyTransaction([FromBody] TransactionModel model)
         {
             try
@@ -96,7 +99,7 @@ namespace WMMAPI.Controllers
 
                 var dbModel = model.ToDB(UserId);
                 _transactionService.ModifyTransaction(dbModel);
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {
@@ -114,6 +117,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpDelete, Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult DeleteTransaction(Guid transactionId)
         {            
             try
@@ -121,7 +125,7 @@ namespace WMMAPI.Controllers
                 UserId = GetUserId(UserId, User);
 
                 _transactionService.DeleteTransaction(UserId, transactionId);
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {
