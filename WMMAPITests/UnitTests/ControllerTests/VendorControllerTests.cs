@@ -1,4 +1,5 @@
-﻿using WMMAPI.Models.VendorModels;
+﻿using Microsoft.AspNetCore.Http;
+using WMMAPI.Models.VendorModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {
@@ -112,8 +113,8 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.AddVendor(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
-            var obj = (OkObjectResult)result;
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            var obj = (ObjectResult)result;
             Assert.IsInstanceOfType(obj.Value, typeof(VendorModel));
             var vendor = (VendorModel)obj.Value;
             Assert.AreEqual(model.Name, vendor.Name);
@@ -194,7 +195,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.ModifyVendor(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);
         }
 
         [TestMethod]
@@ -273,7 +276,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.DeleteVendor(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);
         }
 
         [TestMethod]

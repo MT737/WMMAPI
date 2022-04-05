@@ -8,6 +8,7 @@ using WMMAPI.Interfaces;
 using WMMAPI.Models.VendorModels;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
 using static WMMAPI.Helpers.ClaimsHelpers;
+using Microsoft.AspNetCore.Http;
 
 namespace WMMAPI.Controllers
 {
@@ -52,6 +53,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(VendorModel), StatusCodes.Status201Created)]
         public IActionResult AddVendor([FromBody] AddVendorModel model)
         {
             try
@@ -60,7 +62,7 @@ namespace WMMAPI.Controllers
 
                 var dbModel = model.ToDB(UserId);
                 _vendorService.AddVendor(dbModel);
-                return Ok(new VendorModel(dbModel));
+                return StatusCode(StatusCodes.Status201Created, new VendorModel(dbModel));
             }
             catch (AppException ex)
             {
@@ -77,6 +79,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult ModifyVendor([FromBody] UpdateVendorModel model)
         {
             try
@@ -84,7 +87,7 @@ namespace WMMAPI.Controllers
                 UserId = GetUserId(UserId, User);
 
                 _vendorService.ModifyVendor(model.ToDB(UserId));
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {
@@ -101,6 +104,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult DeleteVendor([FromBody] DeleteVendorModel model)
         {
             try
@@ -111,7 +115,7 @@ namespace WMMAPI.Controllers
                     model.AbsorbedVendor, 
                     model.AbsorbingVendor, 
                     UserId);
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {
