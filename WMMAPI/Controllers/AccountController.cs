@@ -7,6 +7,7 @@ using WMMAPI.Interfaces;
 using WMMAPI.Models.AccountModels;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
 using static WMMAPI.Helpers.ClaimsHelpers;
+using Microsoft.AspNetCore.Http;
 
 namespace WMMAPI.Controllers
 {
@@ -53,6 +54,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(AccountModel), StatusCodes.Status201Created)]
         public IActionResult AddAccount([FromBody] AddAccountModel model)
         {
             try
@@ -63,7 +65,7 @@ namespace WMMAPI.Controllers
                 _accountService.AddAccount(account);
 
                 //TODO: Need to add functionality for setting initial balance                
-                return Ok(new AccountModel(account));
+                return StatusCode(StatusCodes.Status201Created, new AccountModel(account));
             }
             catch (AppException ex)
             {
@@ -80,6 +82,7 @@ namespace WMMAPI.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult ModifyAccount([FromBody] UpdateAccountModel model)
         {
             try
@@ -90,7 +93,7 @@ namespace WMMAPI.Controllers
                 _accountService.ModifyAccount(account);
 
                 //TODO: Add functionality for adjusting balance
-                return Ok();
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (AppException ex)
             {

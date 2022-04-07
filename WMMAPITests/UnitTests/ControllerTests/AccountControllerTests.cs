@@ -1,4 +1,5 @@
-﻿using WMMAPI.Models.AccountModels;
+﻿using Microsoft.AspNetCore.Http;
+using WMMAPI.Models.AccountModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {
@@ -111,8 +112,8 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.AddAccount(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
-            var obj = (OkObjectResult)result;
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            var obj = (ObjectResult)result;
             Assert.IsInstanceOfType(obj.Value, typeof(AccountModel));
             var account = (AccountModel)obj.Value;
             Assert.AreEqual(model.Name, account.Name);
@@ -190,7 +191,9 @@ namespace WMMAPITests.UnitTests.ControllerTests
             var result = controller.ModifyAccount(model);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            var obj = (StatusCodeResult)result;
+            Assert.AreEqual(StatusCodes.Status204NoContent, obj.StatusCode);
         }
 
         [TestMethod]
