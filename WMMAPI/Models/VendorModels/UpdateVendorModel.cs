@@ -15,8 +15,9 @@ namespace WMMAPI.Models.VendorModels
             {
                 Id = Id,
                 UserId = userId,
-                IsDefault = false, //placeholder
-                IsDisplayed = IsDisplayed
+                Name = Name,
+                IsDisplayed = IsDisplayed,
+                IsDefault = false //placeholder
             };
         }
     }
