@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using WMMAPI.Database.Entities;
 
 namespace WMMAPI.Models.CategoryModels

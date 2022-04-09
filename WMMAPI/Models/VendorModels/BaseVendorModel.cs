@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using WMMAPI.Database.Entities;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace WMMAPI.Models.VendorModels
 {
@@ -9,7 +7,7 @@ namespace WMMAPI.Models.VendorModels
         [Required, StringLength(100)]
         public string Name { get; set; }
 
-        [Required, StringLength(100)]
+        [Required]
         public bool IsDisplayed { get; set; }
     }
 }
