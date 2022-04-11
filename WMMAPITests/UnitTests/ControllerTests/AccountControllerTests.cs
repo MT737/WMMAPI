@@ -124,7 +124,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         {
             // Arrange test
             AddAccountModel model = GenerateAddAccountModel();
-            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>())).Throws(new AppException());            
+            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>(), It.IsAny<Decimal>())).Throws(new AppException());            
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = Guid.NewGuid();
 
@@ -144,7 +144,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         {
             // Arrange test
             AddAccountModel model = GenerateAddAccountModel();
-            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>())).Throws(new Exception());
+            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>(), It.IsAny<Decimal>())).Throws(new Exception());
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = Guid.NewGuid();
 

@@ -64,15 +64,35 @@ namespace WMMAPI.Services
         /// Validates and adds account to the database.
         /// </summary>
         /// <param name="newAccount">Account to add to the database. Throws AppException if validation fails.</param>
-        public void AddAccount(Account newAccount)
+        public void AddAccount(Account newAccount, decimal balance)
         {
             // Validate account. Validation errors result in thrown exceptions.
             ValidateAccount(newAccount);
-                        
-            //If still here, validation passed. Add account.
-            Add(newAccount);
 
-            //TODO: If no error, add transaction to set balance
+            var thingy = Context.Vendors
+                    .Single(v => v.UserId == newAccount.UserId && v.Name == Globals.DefaultVendors.NA).Id;
+
+            // If still here, validation passed. Add a new account transaction.
+            newAccount.Transactions = new List<Transaction>
+            {
+                new Transaction
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = newAccount.UserId,
+                    TransactionDate = DateTime.UtcNow,
+                    AccountId = newAccount.Id,
+                    CategoryId = Context.Categories
+                        .Single(c => c.UserId == newAccount.UserId && c.Name == Globals.DefaultCategories.NewAccount).Id,
+                    VendorId = Context.Vendors
+                        .Single(v => v.UserId == newAccount.UserId && v.Name == Globals.DefaultVendors.NA).Id,
+                    IsDebit = false,
+                    Amount = balance,
+                    Description = Globals.DefaultMessages.InitialAccountTransaction
+                }
+            };
+            
+            // Now add entities to the DB
+            Add(newAccount);
         }
 
         /// <summary>

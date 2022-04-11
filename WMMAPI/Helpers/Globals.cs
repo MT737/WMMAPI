@@ -11,6 +11,11 @@ namespace WMMAPI.Helpers
             public const string InvalidEmailAndPassword = "Email address and password combination is incorrect.";
         }
 
+        public readonly struct DefaultMessages
+        {
+            public const string InitialAccountTransaction = "Initial account transaction";
+        }
+
         public readonly struct DefaultCategories
         {
             public const string AccountTransfer = "Account Transfer";

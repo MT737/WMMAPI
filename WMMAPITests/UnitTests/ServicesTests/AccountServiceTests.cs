@@ -125,8 +125,9 @@ namespace WMMAPITests.UnitTests
         public void TestAddAccountSucceeds()
         {
             IAccountService service = new AccountService(_tdc.WMMContext.Object);
+            Guid userId = _testData.Users.First().Id;
 
-            service.AddAccount(_testData.CreateTestAccount());
+            service.AddAccount(_testData.CreateTestAccount(userId), 500M);
 
             _tdc.AccountSet.Verify(m => m.Add(It.IsAny<Account>()), Times.Once());
             _tdc.WMMContext.Verify(m => m.SaveChanges(), Times.Once());
@@ -143,7 +144,7 @@ namespace WMMAPITests.UnitTests
 
             // Initialize service and call method
             IAccountService service = new AccountService(_tdc.WMMContext.Object);
-            service.AddAccount(account);
+            service.AddAccount(account, 500M);
         }
 
         [DataTestMethod]
@@ -160,7 +161,7 @@ namespace WMMAPITests.UnitTests
 
             // Initialize service and call method
             IAccountService service = new AccountService(_tdc.WMMContext.Object);
-            service.AddAccount(account);
+            service.AddAccount(account, 500M);
         }
         #endregion
 
