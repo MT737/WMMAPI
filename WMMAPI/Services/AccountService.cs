@@ -31,9 +31,7 @@ namespace WMMAPI.Services
             if (account == null)
                 throw new AppException("Account not found.");
 
-            var model = new AccountModel(account);
-            model.Balance = GetBalance(model.Id, model.IsAsset);
-            return model;
+            return new AccountModel(account, GetBalance(account.Id, account.IsAsset));
         }
 
         /// <summary>
@@ -46,25 +44,21 @@ namespace WMMAPI.Services
             var accounts = Context.Accounts
                 .Where(a => a.UserId == userId)
                 .OrderBy(a => a.Name)
-                .Select(x => new AccountModel(x)).ToList();
+                .ToList();
 
             if (accounts.Count == 0)
                 throw new AppException("No accounts found.");
             
-            // Get balance
-            foreach(var account in accounts)
-            {
-                account.Balance = GetBalance(account.Id, account.IsAsset);
-            }
-
-            return accounts;
+            return accounts
+                .Select(a => new AccountModel(a, GetBalance(a.Id, a.IsAsset)))
+                .ToList();
         }
 
         /// <summary>
         /// Validates and adds account to the database.
         /// </summary>
         /// <param name="newAccount">Account to add to the database. Throws AppException if validation fails.</param>
-        public void AddAccount(Account newAccount, decimal balance)
+        public AccountModel AddAccount(Account newAccount, decimal balance)
         {
             // Validate account. Validation errors result in thrown exceptions.
             ValidateAccount(newAccount);
@@ -93,6 +87,8 @@ namespace WMMAPI.Services
             
             // Now add entities to the DB
             Add(newAccount);
+
+            return (new AccountModel(newAccount, balance));
         }
 
         /// <summary>

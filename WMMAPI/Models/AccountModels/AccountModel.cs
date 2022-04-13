@@ -16,12 +16,13 @@ namespace WMMAPI.Models.AccountModels
         public decimal Balance { get; set; }
 
 
-        public AccountModel(Account account)
+        public AccountModel(Account account, decimal balance )
         {
             Id = account.Id;
             Name = account.Name;
             IsAsset = account.IsAsset;
             IsActive = account.IsActive;
+            Balance = balance;
         }
     }
 }
