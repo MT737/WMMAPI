@@ -107,6 +107,16 @@ namespace WMMAPITests.UnitTests.ControllerTests
             AddAccountModel model = GenerateAddAccountModel();
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = Guid.NewGuid();
+            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>(), It.IsAny<Decimal>()))
+                .Returns(new AccountModel(
+                    new Account {
+                        Id = Guid.NewGuid(),
+                        Name = model.Name,
+                        IsAsset = model.IsAsset,
+                        IsActive = model.IsActive
+                    }, 
+                    model.Balance)
+                );
 
             // Call action
             var result = controller.AddAccount(model);
@@ -124,7 +134,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         {
             // Arrange test
             AddAccountModel model = GenerateAddAccountModel();
-            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>())).Throws(new AppException());            
+            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>(), It.IsAny<Decimal>())).Throws(new AppException());            
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = Guid.NewGuid();
 
@@ -144,7 +154,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
         {
             // Arrange test
             AddAccountModel model = GenerateAddAccountModel();
-            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>())).Throws(new Exception());
+            _mockAccountService.Setup(m => m.AddAccount(It.IsAny<Account>(), It.IsAny<Decimal>())).Throws(new Exception());
             AccountController controller = new(_mockLogger.Object, _mockAccountService.Object);
             controller.UserId = Guid.NewGuid();
 
@@ -263,7 +273,7 @@ namespace WMMAPITests.UnitTests.ControllerTests
             IList<AccountModel> models = new List<AccountModel>();
             for (int i = 0; i < 5; i++)
             {
-                models.Add(new AccountModel(_td.CreateTestAccount(userId)));
+                models.Add(new AccountModel(_td.CreateTestAccount(userId), 500.00M));
             }
             return models;
         }

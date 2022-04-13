@@ -62,10 +62,10 @@ namespace WMMAPI.Controllers
                 UserId = GetUserId(UserId, User);
 
                 var account = model.ToDB(UserId);
-                _accountService.AddAccount(account);
+                var addedModel = _accountService.AddAccount(account, model.Balance);
 
                 //TODO: Need to add functionality for setting initial balance                
-                return StatusCode(StatusCodes.Status201Created, new AccountModel(account));
+                return StatusCode(StatusCodes.Status201Created, addedModel);
             }
             catch (AppException ex)
             {
