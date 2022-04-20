@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using WMMAPI.Models.AccountModels;
+using WMMAPI.Services.AccountServices.AccountModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -6,10 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using WMMAPI.Models.TransactionModels;
-using static WMMAPI.Helpers.Globals.ErrorMessages;
+using WMMAPI.Services.TransactionServices.TransactionModels;
 using static WMMAPI.Helpers.ClaimsHelpers;
-using Microsoft.AspNetCore.Http;
+using static WMMAPI.Helpers.Globals.ErrorMessages;
 
 namespace WMMAPI.Controllers
 {

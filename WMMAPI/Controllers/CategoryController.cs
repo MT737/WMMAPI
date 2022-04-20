@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using WMMAPI.Models.CategoryModels;
+using WMMAPI.Services.CategoryServices.CategoryModels;
 using static WMMAPI.Helpers.ClaimsHelpers;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
 

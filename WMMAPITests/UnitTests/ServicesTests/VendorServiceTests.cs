@@ -1,5 +1,5 @@
-using WMMAPI.Models.VendorModels;
-using WMMAPI.Services;
+using WMMAPI.Services.VendorService;
+using WMMAPI.Services.VendorService.VendorModels;
 
 namespace WMMAPITests.UnitTests
 {

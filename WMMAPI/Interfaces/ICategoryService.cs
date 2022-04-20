@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using WMMAPI.Database.Entities;
-using WMMAPI.Models.CategoryModels;
+using WMMAPI.Services.CategoryServices.CategoryModels;
 
 namespace WMMAPI.Interfaces
 {

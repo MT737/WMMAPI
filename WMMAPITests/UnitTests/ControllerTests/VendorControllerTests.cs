@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using WMMAPI.Models.VendorModels;
+using WMMAPI.Services.VendorService.VendorModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {

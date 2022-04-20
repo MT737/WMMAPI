@@ -1,5 +1,5 @@
-﻿using WMMAPI.Models.AccountModels;
-using WMMAPI.Services;
+﻿using WMMAPI.Services.AccountServices;
+using WMMAPI.Services.AccountServices.AccountModels;
 
 namespace WMMAPITests.UnitTests
 {

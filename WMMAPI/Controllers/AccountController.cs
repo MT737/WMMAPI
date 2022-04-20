@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using WMMAPI.Models.AccountModels;
-using static WMMAPI.Helpers.Globals.ErrorMessages;
+using WMMAPI.Services.AccountServices.AccountModels;
 using static WMMAPI.Helpers.ClaimsHelpers;
-using Microsoft.AspNetCore.Http;
+using static WMMAPI.Helpers.Globals.ErrorMessages;
 
 namespace WMMAPI.Controllers
 {
