@@ -1,4 +1,4 @@
-﻿using WMMAPI.Services;
+﻿using WMMAPI.Services.UserService;
 
 namespace WMMAPITests.UnitTests
 {

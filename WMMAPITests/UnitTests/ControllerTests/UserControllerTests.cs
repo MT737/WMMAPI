@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using WMMAPI.Models.UserModels;
+using WMMAPI.Services.UserService.UserModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {
