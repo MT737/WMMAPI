@@ -12,7 +12,11 @@ using System.Threading.Tasks;
 using WMMAPI.Database;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using WMMAPI.Services;
+using WMMAPI.Services.AccountServices;
+using WMMAPI.Services.CategoryServices;
+using WMMAPI.Services.TransactionServices;
+using WMMAPI.Services.UserService;
+using WMMAPI.Services.VendorService;
 
 namespace WMMAPI
 {

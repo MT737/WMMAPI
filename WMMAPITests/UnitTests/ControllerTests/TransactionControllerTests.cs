@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using WMMAPI.Models.TransactionModels;
+using WMMAPI.Services.TransactionServices.TransactionModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {

@@ -11,7 +11,7 @@ using System.Text;
 using WMMAPI.Database.Entities;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using WMMAPI.Models.UserModels;
+using WMMAPI.Services.UserService.UserModels;
 using static WMMAPI.Helpers.ClaimsHelpers;
 using static WMMAPI.Helpers.Globals.ErrorMessages;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using WMMAPI.Database.Entities;
-using WMMAPI.Models.AccountModels;
+using WMMAPI.Services.AccountServices.AccountModels;
 
 namespace WMMAPI.Interfaces
 {

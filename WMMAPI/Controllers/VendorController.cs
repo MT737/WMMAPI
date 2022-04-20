@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using WMMAPI.Helpers;
 using WMMAPI.Interfaces;
-using WMMAPI.Models.VendorModels;
-using static WMMAPI.Helpers.Globals.ErrorMessages;
+using WMMAPI.Services.VendorService.VendorModels;
 using static WMMAPI.Helpers.ClaimsHelpers;
-using Microsoft.AspNetCore.Http;
+using static WMMAPI.Helpers.Globals.ErrorMessages;
 
 namespace WMMAPI.Controllers
 {

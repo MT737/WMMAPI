@@ -1,4 +1,5 @@
 using WMMAPI.Services;
+using WMMAPI.Services.CategoryServices;
 
 namespace WMMAPITests.UnitTests
 {

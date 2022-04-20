@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using WMMAPI.Database;
-using WMMAPI.Interfaces;
 
 namespace WMMAPI.Services
 {

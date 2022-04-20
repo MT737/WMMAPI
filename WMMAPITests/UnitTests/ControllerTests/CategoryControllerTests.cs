@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using WMMAPI.Models.CategoryModels;
+using WMMAPI.Services.CategoryServices.CategoryModels;
 
 namespace WMMAPITests.UnitTests.ControllerTests
 {
