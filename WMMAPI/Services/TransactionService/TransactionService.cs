@@ -29,7 +29,7 @@ namespace WMMAPI.Services.TransactionServices
 
             if (includeRelatedEntities)
             {
-                transaction
+                transaction = transaction
                 .Include(t => t.Account)
                 .Include(t => t.Category)
                 .Include(t => t.Vendor);
@@ -57,7 +57,7 @@ namespace WMMAPI.Services.TransactionServices
 
             if (includeRelatedEntities)
             {
-                transactions
+                transactions = transactions
                     .Include(t => t.Account)
                     .Include(t => t.Category)
                     .Include(t => t.Vendor);

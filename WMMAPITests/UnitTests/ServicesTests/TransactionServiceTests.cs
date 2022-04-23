@@ -33,6 +33,9 @@ namespace WMMAPITests.UnitTests
             Assert.AreEqual(testTransaction.Id, result.Id);
             Assert.AreEqual(testTransaction.UserId, result.UserId);
             Assert.AreEqual(testTransaction.Amount, result.Amount);
+            Assert.IsNull(testTransaction.Account);
+            Assert.IsNull(testTransaction.Category);
+            Assert.IsNull(testTransaction.Vendor);
         }
 
         [TestMethod]
@@ -93,6 +96,7 @@ namespace WMMAPITests.UnitTests
             foreach (var transaction in result)
             {
                 Assert.AreEqual(testTransaction.UserId, transaction.UserId);
+                Assert.IsNull(testTransaction.Account);
             }
         }
 
